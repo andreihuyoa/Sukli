@@ -1,0 +1,17 @@
+{
+  "name": "tindawise-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile:start": "npm run -w @tindawise/mobile start",
+    "mobile:android": "npm run -w @tindawise/mobile android",
+    "mobile:lint": "npm run -w @tindawise/mobile lint",
+    "backend:dev": "npm run -w @tindawise/backend dev",
+    "backend:build": "npm run -w @tindawise/backend build",
+    "backend:start": "npm run -w @tindawise/backend start"
+  }
+}
