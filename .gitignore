@@ -8,6 +8,12 @@ node_modules/
 
 # Expo
 .expo/
+# Track typed routes so `tsc` works without a local Metro run (regenerate: apps/mobile npm run router:types)
+!apps/mobile/.expo/
+apps/mobile/.expo/*
+!apps/mobile/.expo/types/
+apps/mobile/.expo/types/*
+!apps/mobile/.expo/types/router.d.ts
 dist/
 web-build/
 expo-env.d.ts
