@@ -6,6 +6,9 @@ node_modules/
 .idea/
 .cursor/
 
+apps/mobile/assets/stitch-reference/
+apps/mobile/docs/
+
 # Expo
 .expo/
 # Track typed routes so `tsc` works without a local Metro run (regenerate: apps/mobile npm run router:types)
