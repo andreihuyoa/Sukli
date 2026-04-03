@@ -9,10 +9,11 @@ const TINT = "rgba(56, 102, 65, 0.82)";
 type Props = {
   onBackPress?: () => void;
   right?: ReactNode;
+  onRefresh?: () => void;
   syncPill?: boolean;
 };
 
-export function AppHeader({ onBackPress, right, syncPill }: Props) {
+export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -42,15 +43,17 @@ export function AppHeader({ onBackPress, right, syncPill }: Props) {
               <AppIcon name="arrow_back" size={24} color="#ffffff" strokeWidth={2.25} />
             </Pressable>
           ) : null}
-          <AppIcon name="storefront" size={24} color="#ffffff" strokeWidth={2.25} />
+          <View className="h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "#2d6a4f" }}>
+            <AppIcon name="storefront" size={18} color="#ffffff" strokeWidth={2.25} />
+          </View>
           <Text
             className="font-headline text-xl font-bold tracking-tight text-white"
-            style={{ fontFamily: "Vollkorn_700Bold" }}
+            style={{ fontFamily: "Vollkorn_700Bold", letterSpacing: -0.2 }}
           >
             Tindahan
           </Text>
         </View>
-        {syncPill ? (
+        {right ? right : syncPill ? (
           <View className="flex-row items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 backdrop-blur-md">
             <View className="relative h-2 w-2">
               <View className="absolute inline-flex h-full w-full rounded-full bg-on-tertiary-container opacity-75" />
@@ -62,15 +65,21 @@ export function AppHeader({ onBackPress, right, syncPill }: Props) {
             <AppIcon name="cloud_sync" size={16} color="#bfe36d" strokeWidth={2} />
           </View>
         ) : (
-          right ?? (
+          <View className="flex-row items-center gap-3">
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Sync status"
+              accessibilityLabel="Refresh"
+              hitSlop={12}
+              onPress={onRefresh}
               className="min-h-[48px] min-w-[48px] items-center justify-center rounded-full active:opacity-80"
+              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
             >
-              <AppIcon name="cloud_sync" size={24} color="#ffffff" strokeWidth={2.25} />
+              <AppIcon name="sync" size={18} color="#ffffff" strokeWidth={2.25} />
             </Pressable>
-          )
+            <View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/25" style={{ backgroundColor: "rgba(27,67,50,0.35)" }}>
+              <Text className="font-body text-xs font-bold text-white">JD</Text>
+            </View>
+          </View>
         )}
       </View>
     </View>
