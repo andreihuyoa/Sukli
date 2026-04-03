@@ -47,7 +47,7 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
             <AppIcon name="storefront" size={18} color="#ffffff" strokeWidth={2.25} />
           </View>
           <Text
-            className="font-headline text-xl font-bold tracking-tight text-white"
+            className="font-headline text-2xl font-bold tracking-tight text-white"
             style={{ fontFamily: "Vollkorn_700Bold", letterSpacing: -0.2 }}
           >
             Tindahan
