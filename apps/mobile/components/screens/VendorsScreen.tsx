@@ -7,72 +7,8 @@ import { Entrance } from "@/components/animation/Entrance";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
-
-type Supplier = {
-  id: number;
-  name: string;
-  role: string;
-  roleColor: string;
-  image: string;
-  tags: { label: string; color: string; bg: string }[];
-  catalog: { product: string; price: string }[];
-  accent?: boolean;
-};
-
-const suppliers: Supplier[] = [
-  {
-    id: 1,
-    name: "Green Harvest Co.",
-    role: "Primary Vendor",
-    roleColor: "#1b4332",
-    image: "https://images.unsplash.com/photo-1769181463790-0c5a2a8fea69?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-    tags: [
-      { label: "Organic Produce", color: "#1b4332", bg: "rgba(27,67,50,0.1)" },
-      { label: "Farm Direct", color: "#1b4332", bg: "rgba(27,67,50,0.1)" },
-    ],
-    catalog: [
-      { product: "Premium Arabica (1kg)", price: "₱420.00" },
-      { product: "Organic Kale (bundle)", price: "₱85.00" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Metro Logistics",
-    role: "Dry Goods",
-    roleColor: "#3d6924",
-    image: "https://images.unsplash.com/photo-1644079446600-219068676743?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-    tags: [
-      { label: "Pantry Staples", color: "#3d6924", bg: "rgba(61,105,36,0.1)" },
-      { label: "Bulk Spirits", color: "#3d6924", bg: "rgba(61,105,36,0.1)" },
-    ],
-    catalog: [
-      { product: "Jasmine Rice (25kg)", price: "₱1,250.00" },
-      { product: "Soy Sauce (12×1L)", price: "₱640.00" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Heritage Grains",
-    role: "Contract Pending",
-    roleColor: "#6a3342",
-    image: "https://images.unsplash.com/photo-1634151942706-adf1d42dc7e7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-    tags: [
-      { label: "Artisan Flour", color: "#6a3342", bg: "rgba(106,51,66,0.1)" },
-      { label: "Pastry Supplies", color: "#6a3342", bg: "rgba(106,51,66,0.1)" },
-    ],
-    catalog: [
-      { product: "Cake Flour (10kg)", price: "₱890.00" },
-      { product: "Unsalted Butter (5kg)", price: "₱2,100.00" },
-    ],
-    accent: true,
-  },
-];
-
-const priceList = [
-  { product: "Whole Milk (Case of 12)", vendor: "Metro Logistics", price: "₱1,140.00", minOrder: "5 Cases" },
-  { product: "White Sugar (50kg)", vendor: "Green Harvest Co.", price: "₱2,850.00", minOrder: "1 Bag" },
-  { product: "Baking Powder (2.5kg)", vendor: "Heritage Grains", price: "₱420.00", minOrder: "10 Units" },
-];
+import { useVendors } from "@/hooks/useVendors";
+import type { Supplier, VendorCatalogLine, VendorPriceListRow } from "@/types";
 
 const GLASS_BG = "rgba(255,255,255,0.82)";
 const HEADER_BODY = 56;
@@ -80,14 +16,17 @@ const TAB_BAR = 88;
 
 export function VendorsScreen() {
   const insets = useSafeAreaInsets();
+  const { suppliers, priceList } = useVendors();
   const [catalogQuery, setCatalogQuery] = useState("");
-  const [expandedSupplierId, setExpandedSupplierId] = useState<number | null>(null);
+  const [expandedSupplierId, setExpandedSupplierId] = useState<string | null>(null);
 
   const filteredList = useMemo(() => {
     const q = catalogQuery.trim().toLowerCase();
     if (!q) return priceList;
-    return priceList.filter((item) => item.product.toLowerCase().includes(q) || item.vendor.toLowerCase().includes(q));
-  }, [catalogQuery]);
+    return priceList.filter(
+      (item) => item.productName.toLowerCase().includes(q) || item.vendorName.toLowerCase().includes(q)
+    );
+  }, [catalogQuery, priceList]);
 
   return (
     <View className="flex-1" style={{ backgroundColor: "#f2f2f7" }}>
@@ -101,7 +40,7 @@ export function VendorsScreen() {
           paddingBottom: TAB_BAR + insets.bottom + 80,
           paddingHorizontal: 16,
         }}
-        keyExtractor={(s) => String(s.id)}
+        keyExtractor={(s) => s.id}
         ListHeaderComponent={
           <View>
             <Entrance delayMs={40}>
@@ -164,24 +103,30 @@ export function VendorsScreen() {
             />
           </Entrance>
         )}
+        ListEmptyComponent={
+          <View className="px-2 py-10 items-center">
+            <Text className="text-sm text-center" style={{ color: "#8e8e93" }}>
+              No vendors yet. Sync suppliers from your back office when available.
+            </Text>
+          </View>
+        }
       />
-
-      {/* The reference also implies a catalog query, but to keep this port focused on UI,
-          we show the filtered result count only inside each supplier’s “View Catalog” section. */}
     </View>
   );
 }
 
 export default VendorsScreen;
 
+type CatalogRow = VendorPriceListRow | VendorCatalogLine;
+
 function SupplierCard(props: {
   supplier: Supplier;
   expanded: boolean;
   onToggle: () => void;
-  filteredList: { product: string; vendor: string; price: string; minOrder: string }[];
+  filteredList: VendorPriceListRow[];
 }) {
   const { supplier, expanded, onToggle, filteredList } = props;
-  const catalogMatches = filteredList.filter((p) => p.vendor === supplier.name);
+  const catalogMatches = filteredList.filter((p) => p.vendorName === supplier.name);
 
   return (
     <View
@@ -197,7 +142,7 @@ function SupplierCard(props: {
         <View className="flex-row items-start justify-between mb-4">
           <View className="flex-row items-center gap-3">
             <View className="h-12 w-12 rounded-xl overflow-hidden" style={{ backgroundColor: "rgba(0,0,0,0.03)" }}>
-              <ImageWithFallback src={supplier.image} alt={supplier.name} style={{ width: "100%", height: "100%" }} />
+              <ImageWithFallback src={supplier.imageUrl} alt={supplier.name} style={{ width: "100%", height: "100%" }} />
             </View>
             <View>
               <Text numberOfLines={1} style={{ color: "#1c1c1e", fontWeight: "900", fontSize: 16, letterSpacing: -0.1 }}>
@@ -240,11 +185,7 @@ function SupplierCard(props: {
 
         <View className="flex-row flex-wrap gap-2" style={{ marginBottom: 12 }}>
           {supplier.tags.map((tag) => (
-            <View
-              key={tag.label}
-              className="rounded-full px-2.5 py-1"
-              style={{ backgroundColor: tag.bg, alignItems: "center" }}
-            >
+            <View key={tag.label} className="rounded-full px-2.5 py-1" style={{ backgroundColor: tag.backgroundColor, alignItems: "center" }}>
               <Text style={{ color: tag.color, fontWeight: "900", fontSize: 12 }}>{tag.label}</Text>
             </View>
           ))}
@@ -257,12 +198,7 @@ function SupplierCard(props: {
           {expanded ? (
             <View style={{ gap: 10 }}>
               {(catalogMatches.length ? catalogMatches : supplier.catalog).slice(0, 3).map((entry, idx) => (
-                <View key={idx} className="flex-row items-center justify-between">
-                  <Text style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 13 }} numberOfLines={1}>
-                    {entry.product}
-                  </Text>
-                  <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 13 }}>{entry.price}</Text>
-                </View>
+                <CatalogRowView key={rowKey(entry, idx)} row={entry} />
               ))}
               <Text style={{ color: "#8e8e93", fontWeight: "600", fontSize: 12 }}>
                 {catalogMatches.length ? `${catalogMatches.length} match(es) in your search` : "Showing featured items"}
@@ -271,11 +207,11 @@ function SupplierCard(props: {
           ) : (
             <View style={{ gap: 8 }}>
               {supplier.catalog.slice(0, 2).map((c) => (
-                <View key={c.product} className="flex-row items-center justify-between">
+                <View key={c.productName} className="flex-row items-center justify-between">
                   <Text numberOfLines={1} style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 13 }}>
-                    {c.product}
+                    {c.productName}
                   </Text>
-                  <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 13 }}>{c.price}</Text>
+                  <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 13 }}>{c.priceDisplay}</Text>
                 </View>
               ))}
             </View>
@@ -296,3 +232,20 @@ function SupplierCard(props: {
   );
 }
 
+function rowKey(entry: CatalogRow, idx: number): string {
+  return `${entry.productName}-${idx}`;
+}
+
+function CatalogRowView(props: { row: CatalogRow }) {
+  const { row } = props;
+  const product = row.productName;
+  const price = row.priceDisplay;
+  return (
+    <View className="flex-row items-center justify-between">
+      <Text style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 13 }} numberOfLines={1}>
+        {product}
+      </Text>
+      <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 13 }}>{price}</Text>
+    </View>
+  );
+}

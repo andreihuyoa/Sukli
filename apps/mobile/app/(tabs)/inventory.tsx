@@ -7,79 +7,27 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { Entrance } from "@/components/animation/Entrance";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
-
-type InventoryStatus = "optimal" | "low";
-
-type InventoryItem = {
-  id: number;
-  name: string;
-  category: string;
-  price: string;
-  available: number;
-  unit: string;
-  status: InventoryStatus;
-  image: string;
-};
-
-const inventoryItems: InventoryItem[] = [
-  {
-    id: 1,
-    name: "Artisan Lavender Soap",
-    category: "Personal Care",
-    price: "₱148.00",
-    available: 42,
-    unit: "Units",
-    status: "optimal",
-    image: "https://images.unsplash.com/photo-1606447965993-60155023d1ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 2,
-    name: "Wildflower Honey (500g)",
-    category: "Grocery",
-    price: "₱215.00",
-    available: 4,
-    unit: "Units",
-    status: "low",
-    image: "https://images.unsplash.com/photo-1759442727303-4c08421317d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 3,
-    name: "Forest Green Ceramic Plate",
-    category: "Homeware",
-    price: "₱299.00",
-    available: 118,
-    unit: "Units",
-    status: "optimal",
-    image: "https://images.unsplash.com/photo-1701673468521-c09b84867edd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 4,
-    name: "Cold Brew Reserve",
-    category: "Beverages",
-    price: "₱180.00",
-    available: 6,
-    unit: "Bottles",
-    status: "low",
-    image: "https://images.unsplash.com/photo-1702647104850-64f1c3ccf549?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-];
+import { useInventory } from "@/hooks/useInventory";
+import type { InventoryItem } from "@/types";
 
 const HEADER_BODY = 56;
 const TAB_BAR = 88;
 
 export default function InventoryScreen() {
+  const { items } = useInventory();
   const [query, setQuery] = useState("");
   const insets = useSafeAreaInsets();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return inventoryItems;
-    return inventoryItems.filter(
+    if (!q) return items;
+    return items.filter(
       (item) => item.name.toLowerCase().includes(q) || item.category.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [items, query]);
 
-  const lowStockCount = useMemo(() => inventoryItems.filter((i) => i.status === "low").length, []);
+  const lowStockCount = useMemo(() => items.filter((i) => i.status === "low").length, [items]);
+  const totalSkus = items.length;
 
   return (
     <View className="flex-1 bg-background">
@@ -119,7 +67,7 @@ export default function InventoryScreen() {
                       Total SKUs
                     </Text>
                     <Text className="font-headline text-[30px] font-extrabold" style={{ color: "#1b4332", lineHeight: 1.1 }}>
-                      1,284
+                      {totalSkus.toLocaleString("en-PH")}
                     </Text>
                   </View>
                 </View>
@@ -199,72 +147,14 @@ export default function InventoryScreen() {
             </Entrance>
           </View>
         }
-        renderItem={({ item, index }) => {
-          const isLow = item.status === "low";
-          return (
-            <Entrance delayMs={100 + index * 60}>
-              <View
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.82)",
-                  borderBottomWidth: isLow ? 3 : 0,
-                  borderBottomColor: isLow ? "rgba(106,51,66,0.3)" : "transparent",
-                }}
-              >
-                <View className="flex-row items-center gap-3 p-4">
-                  <View className="h-16 w-16 rounded-xl overflow-hidden shrink-0" style={{ backgroundColor: "rgba(0,0,0,0.03)" }}>
-                    <Image source={{ uri: item.image }} style={{ width: 64, height: 64 }} contentFit="cover" />
-                  </View>
-
-                  <View className="flex-1 min-w-0">
-                    <Text
-                      className="font-body-medium mb-1"
-                      numberOfLines={1}
-                      style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 14 }}
-                    >
-                      {item.name}
-                    </Text>
-                    <Text className="text-xs mb-2" numberOfLines={1} style={{ color: "#8e8e93", fontWeight: "500" }}>
-                      {item.category}
-                    </Text>
-
-                    <View className="flex-row items-center gap-2">
-                      <Text className="font-headline font-bold" style={{ color: "#1b4332", fontSize: 15 }}>
-                        {item.price}
-                      </Text>
-                      <Text className="text-xs font-semibold" style={{ color: isLow ? "#6a3342" : "#8e8e93", fontWeight: "600" }}>
-                        · {item.available} {item.unit}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View className="flex-col items-end gap-2 shrink-0">
-                    <View
-                      className="px-2.5 py-1 rounded-full"
-                      style={{ backgroundColor: isLow ? "rgba(106,51,66,0.1)" : "rgba(27,67,50,0.1)" }}
-                    >
-                      <Text
-                        className="text-[10px] font-label font-bold uppercase"
-                        style={{ color: isLow ? "#6a3342" : "#1b4332", fontWeight: "800" }}
-                      >
-                        {isLow ? "Low Stock" : "Optimal"}
-                      </Text>
-                    </View>
-
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel="More options"
-                      className="h-7 w-7 rounded-full items-center justify-center"
-                      style={{ backgroundColor: "rgba(0,0,0,0.02)" }}
-                    >
-                      <AppIcon name="more_vert" size={14} color="#8e8e93" strokeWidth={2.5} />
-                    </Pressable>
-                  </View>
-                </View>
-              </View>
-            </Entrance>
-          );
-        }}
+        renderItem={({ item, index }) => <InventoryRow item={item} index={index} />}
+        ListEmptyComponent={
+          <View className="px-6 py-10 items-center">
+            <Text className="text-sm font-body text-center" style={{ color: "#8e8e93" }}>
+              No inventory yet. Connect your store data to see SKUs here.
+            </Text>
+          </View>
+        }
         ListFooterComponent={
           <Entrance delayMs={500}>
             <Pressable
@@ -278,7 +168,7 @@ export default function InventoryScreen() {
                 borderColor: "rgba(27,67,50,0.25)",
               }}
               onPress={() => {
-                // TODO: wire to "Add New Product" flow.
+                // Wire to catalog / API create flow.
               }}
             >
               <AppIcon name="add_box" size={16} color="#1b4332" strokeWidth={2.5} />
@@ -290,5 +180,73 @@ export default function InventoryScreen() {
         }
       />
     </View>
+  );
+}
+
+function InventoryRow(props: { item: InventoryItem; index: number }) {
+  const { item, index } = props;
+  const isLow = item.status === "low";
+  return (
+    <Entrance delayMs={100 + index * 60}>
+      <View
+        className="rounded-2xl overflow-hidden"
+        style={{
+          backgroundColor: "rgba(255,255,255,0.82)",
+          borderBottomWidth: isLow ? 3 : 0,
+          borderBottomColor: isLow ? "rgba(106,51,66,0.3)" : "transparent",
+        }}
+      >
+        <View className="flex-row items-center gap-3 p-4">
+          <View className="h-16 w-16 rounded-xl overflow-hidden shrink-0" style={{ backgroundColor: "rgba(0,0,0,0.03)" }}>
+            <Image source={{ uri: item.imageUrl }} style={{ width: 64, height: 64 }} contentFit="cover" />
+          </View>
+
+          <View className="flex-1 min-w-0">
+            <Text
+              className="font-body-medium mb-1"
+              numberOfLines={1}
+              style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 14 }}
+            >
+              {item.name}
+            </Text>
+            <Text className="text-xs mb-2" numberOfLines={1} style={{ color: "#8e8e93", fontWeight: "500" }}>
+              {item.category}
+            </Text>
+
+            <View className="flex-row items-center gap-2">
+              <Text className="font-headline font-bold" style={{ color: "#1b4332", fontSize: 15 }}>
+                {item.priceDisplay}
+              </Text>
+              <Text className="text-xs font-semibold" style={{ color: isLow ? "#6a3342" : "#8e8e93", fontWeight: "600" }}>
+                · {item.available} {item.unit}
+              </Text>
+            </View>
+          </View>
+
+          <View className="flex-col items-end gap-2 shrink-0">
+            <View
+              className="px-2.5 py-1 rounded-full"
+              style={{ backgroundColor: isLow ? "rgba(106,51,66,0.1)" : "rgba(27,67,50,0.1)" }}
+            >
+              <Text
+                className="text-[10px] font-label font-bold uppercase"
+                style={{ color: isLow ? "#6a3342" : "#1b4332", fontWeight: "800" }}
+              >
+                {isLow ? "Low Stock" : "Optimal"}
+              </Text>
+            </View>
+
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="More options"
+              className="h-7 w-7 rounded-full items-center justify-center"
+              style={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+            >
+              <AppIcon name="more_vert" size={14} color="#8e8e93" strokeWidth={2.5} />
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Entrance>
   );
 }

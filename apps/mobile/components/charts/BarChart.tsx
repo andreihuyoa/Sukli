@@ -1,13 +1,10 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-type Bar = {
-  label: string;
-  value: number;
-};
+import type { ChartBarPoint } from "@/types";
 
 type Props = {
-  data: Bar[];
+  data: ChartBarPoint[];
   /**
    * If true, colors the last bar as primary green and the second-to-last as secondary.
    * Matches the React reference where "Today" is highlighted.

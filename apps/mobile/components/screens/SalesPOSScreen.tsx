@@ -7,85 +7,15 @@ import { AppIcon } from "@/components/ui/AppIcon";
 import { Entrance } from "@/components/animation/Entrance";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
+import { usePosCatalog } from "@/hooks/usePosCatalog";
+import { POS_ALL_CATEGORY, type PosCartLine, type PosProduct } from "@/types";
 
-type Product = {
-  id: number;
-  name: string;
-  variant: string;
-  price: number;
-  status: "in-stock" | "low";
-  category: string;
-  image: string;
-};
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: "Wild Highland Honey",
-    variant: "500ml Artisanal Jar",
-    price: 850,
-    status: "in-stock",
-    category: "Fresh Harvest",
-    image: "https://images.unsplash.com/photo-1584389344735-f73aa9678f6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 2,
-    name: "Heritage Sourdough",
-    variant: "Whole Grain Loaf",
-    price: 320,
-    status: "low",
-    category: "Artisanal Grains",
-    image: "https://images.unsplash.com/photo-1767065888075-59d3bf3f02d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 3,
-    name: "Cold-Pressed Olive Oil",
-    variant: "250ml Extra Virgin",
-    price: 1200,
-    status: "in-stock",
-    category: "Bottled Oils",
-    image: "https://images.unsplash.com/photo-1707827914998-0d56ee13c161?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 4,
-    name: "Smoked Sea Salt",
-    variant: "100g Bamboo Tin",
-    price: 450,
-    status: "in-stock",
-    category: "Ferments",
-    image: "https://images.unsplash.com/photo-1591272216626-b09e38519371?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 5,
-    name: "Cold Brew Reserve",
-    variant: "Craft Brewed 500ml",
-    price: 180,
-    status: "low",
-    category: "Fresh Harvest",
-    image: "https://images.unsplash.com/photo-1702647104850-64f1c3ccf549?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-  {
-    id: 6,
-    name: "Dark Cacao Bars",
-    variant: "70% Premium Single Origin",
-    price: 285,
-    status: "in-stock",
-    category: "Artisanal Grains",
-    image: "https://images.unsplash.com/photo-1735504645719-92a09b6ea365?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=400",
-  },
-];
-
-const categories = ["All Items", "Artisanal Grains", "Fresh Harvest", "Ferments", "Bottled Oils"] as const;
-
-type CartItem = {
-  product: Product;
-  qty: number;
-};
+const POS_VAT_RATE = 0.12;
 
 function useCart() {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<PosCartLine[]>([]);
 
-  const add = (product: Product) => {
+  const add = (product: PosProduct) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
@@ -95,7 +25,7 @@ function useCart() {
     });
   };
 
-  const remove = (id: number) => {
+  const remove = (id: string) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === id);
       if (!existing) return prev;
@@ -108,11 +38,11 @@ function useCart() {
 
   const clear = () => setItems([]);
 
-  const qty = (id: number) => items.find((i) => i.product.id === id)?.qty ?? 0;
+  const qty = (id: string) => items.find((i) => i.product.id === id)?.qty ?? 0;
 
-  const total = items.reduce((sum, i) => sum + i.product.price * i.qty, 0);
+  const total = items.reduce((sum, i) => sum + i.product.unitPricePhp * i.qty, 0);
   const count = items.reduce((sum, i) => sum + i.qty, 0);
-  const tax = total * 0.12;
+  const tax = total * POS_VAT_RATE;
 
   return { items, add, remove, clear, qty, total, tax, count };
 }
@@ -125,8 +55,14 @@ const HEADER_BODY = 56;
 const TAB_BAR = 88;
 
 export function SalesPOSScreen() {
+  const { products } = usePosCatalog();
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All Items");
+  const categories = useMemo(() => {
+    const unique = [...new Set(products.map((p) => p.category).filter(Boolean))];
+    return [POS_ALL_CATEGORY, ...unique] as const;
+  }, [products]);
+
+  const [activeCategory, setActiveCategory] = useState<string>(POS_ALL_CATEGORY);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutDone, setCheckoutDone] = useState(false);
 
@@ -136,11 +72,11 @@ export function SalesPOSScreen() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return products.filter((p) => {
-      const matchCat = activeCategory === "All Items" || p.category === activeCategory;
+      const matchCat = activeCategory === POS_ALL_CATEGORY || p.category === activeCategory;
       const matchQ = !q || p.name.toLowerCase().includes(q) || p.variant.toLowerCase().includes(q);
       return matchCat && matchQ;
     });
-  }, [activeCategory, query]);
+  }, [activeCategory, products, query]);
 
   const handleCheckout = () => {
     if (cart.count <= 0) return;
@@ -165,7 +101,7 @@ export function SalesPOSScreen() {
           paddingBottom: TAB_BAR + insets.bottom + 140,
           paddingHorizontal: 16,
         }}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View>
             <View className="px-1 pt-1 pb-3">
@@ -198,15 +134,18 @@ export function SalesPOSScreen() {
             </Entrance>
 
             <View className="mt-4 mb-3" style={{ paddingHorizontal: 2 }}>
-              <ScrollCategories
-                categories={categories as readonly string[]}
-                active={activeCategory}
-                onChange={(c) => setActiveCategory(c as (typeof categories)[number])}
-              />
+              <ScrollCategories categories={categories} active={activeCategory} onChange={setActiveCategory} />
             </View>
           </View>
         }
         renderItem={({ item, index }) => <ProductCard product={item} index={index} cart={cart} />}
+        ListEmptyComponent={
+          <View className="px-2 py-8 items-center">
+            <Text className="text-sm text-center" style={{ color: "#8e8e93" }}>
+              No products loaded. Connect your catalog to sell from the register.
+            </Text>
+          </View>
+        }
       />
 
       {cart.count > 0 && !cartOpen ? (
@@ -296,7 +235,7 @@ export function SalesPOSScreen() {
                 {cart.items.map((ci) => (
                   <View key={ci.product.id} className="flex-row items-center gap-3">
                     <View className="h-12 w-12 rounded-xl overflow-hidden items-center justify-center" style={{ backgroundColor: "rgba(0,0,0,0.03)" }}>
-                      <ImageWithFallback src={ci.product.image} alt={ci.product.name} style={{ width: "100%", height: "100%" }} />
+                      <ImageWithFallback src={ci.product.imageUrl} alt={ci.product.name} style={{ width: "100%", height: "100%" }} />
                     </View>
 
                     <View className="flex-1 min-w-0">
@@ -304,7 +243,7 @@ export function SalesPOSScreen() {
                         {ci.product.name}
                       </Text>
                       <Text style={{ color: "#8e8e93", fontWeight: "500", fontSize: 12 }}>
-                        ₱{ci.product.price.toLocaleString("en-PH")} / unit
+                        ₱{ci.product.unitPricePhp.toLocaleString("en-PH")} / unit
                       </Text>
                     </View>
 
@@ -347,7 +286,7 @@ export function SalesPOSScreen() {
                   <Text style={{ color: "#1c1c1e", fontWeight: "800", fontSize: 13 }}>₱{cart.total.toLocaleString("en-PH")}</Text>
                 </View>
                 <View className="flex-row items-center justify-between mb-3">
-                  <Text style={{ color: "#8e8e93", fontWeight: "500", fontSize: 13 }}>Tax (12%)</Text>
+                  <Text style={{ color: "#8e8e93", fontWeight: "500", fontSize: 13 }}>Tax ({Math.round(POS_VAT_RATE * 100)}%)</Text>
                   <Text style={{ color: "#1c1c1e", fontWeight: "800", fontSize: 13 }}>₱{cart.tax.toFixed(2)}</Text>
                 </View>
                 <View className="flex-row items-center justify-between pt-2 border-t" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
@@ -400,11 +339,7 @@ export function SalesPOSScreen() {
 
 export default SalesPOSScreen;
 
-function ScrollCategories(props: {
-  categories: readonly string[];
-  active: string;
-  onChange: (c: string) => void;
-}) {
+function ScrollCategories(props: { categories: readonly string[]; active: string; onChange: (c: string) => void }) {
   const { categories, active, onChange } = props;
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 4 }}>
@@ -431,7 +366,9 @@ function ScrollCategories(props: {
   );
 }
 
-function ProductCard(props: { product: Product; index: number; cart: ReturnType<typeof useCart> }) {
+type CartApi = ReturnType<typeof useCart>;
+
+function ProductCard(props: { product: PosProduct; index: number; cart: CartApi }) {
   const { product, index, cart } = props;
   const inCart = cart.qty(product.id);
 
@@ -441,14 +378,14 @@ function ProductCard(props: { product: Product; index: number; cart: ReturnType<
         className="rounded-2xl overflow-hidden"
         style={{
           ...GLASS,
-          borderBottomWidth: product.status === "low" ? 3 : 0,
-          borderBottomColor: product.status === "low" ? "rgba(106,51,66,0.3)" : "transparent",
+          borderBottomWidth: product.stockLevel === "low" ? 3 : 0,
+          borderBottomColor: product.stockLevel === "low" ? "rgba(106,51,66,0.3)" : "transparent",
           marginBottom: 12,
         }}
       >
         <View className="items-center" style={{ padding: 12 }}>
           <View className="h-24 w-24 rounded-xl overflow-hidden" style={{ backgroundColor: "rgba(0,0,0,0.03)" }}>
-            <ImageWithFallback src={product.image} alt={product.name} style={{ width: "100%", height: "100%" }} />
+            <ImageWithFallback src={product.imageUrl} alt={product.name} style={{ width: "100%", height: "100%" }} />
           </View>
 
           <Text className="mt-3" numberOfLines={1} style={{ color: "#1c1c1e", fontWeight: "800", fontSize: 14 }}>
@@ -459,7 +396,7 @@ function ProductCard(props: { product: Product; index: number; cart: ReturnType<
           </Text>
 
           <View className="flex-row items-center justify-between w-full mt-3">
-            <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 15 }}>₱{product.price.toLocaleString("en-PH")}</Text>
+            <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 15 }}>₱{product.unitPricePhp.toLocaleString("en-PH")}</Text>
 
             {inCart > 0 ? (
               <View className="flex-row items-center gap-2 px-2 py-1 rounded-full" style={{ backgroundColor: "rgba(27,67,50,0.08)" }}>
@@ -500,4 +437,3 @@ function ProductCard(props: { product: Product; index: number; cart: ReturnType<
     </Entrance>
   );
 }
-
