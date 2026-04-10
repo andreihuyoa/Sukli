@@ -28,17 +28,24 @@ import type { AuthUser } from "../decorators/current-user.decorator";
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
-  private readonly supabase: SupabaseClient;
+  // Lazily initialized so a missing key crashes at request time with a clear
+  // error rather than at DI wiring time with a cryptic module-load failure.
+  private _supabase: SupabaseClient | null = null;
 
   constructor(
     private readonly config: ConfigService,
     @Inject(DRIZZLE) private readonly db: DrizzleDb
-  ) {
-    this.supabase = createClient(
-      config.getOrThrow("SUPABASE_URL"),
-      config.getOrThrow("SUPABASE_SERVICE_ROLE_KEY"),
-      { auth: { persistSession: false } }
-    );
+  ) {}
+
+  private get supabase(): SupabaseClient {
+    if (!this._supabase) {
+      this._supabase = createClient(
+        this.config.getOrThrow("SUPABASE_URL"),
+        this.config.getOrThrow("SUPABASE_SERVICE_ROLE_KEY"),
+        { auth: { persistSession: false } }
+      );
+    }
+    return this._supabase;
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

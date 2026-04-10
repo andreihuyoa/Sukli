@@ -1,31 +1,35 @@
 import {
-  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { eq } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDb } from '../../database/database.module';
-import { users } from '../../database/schema';
-import { ulid } from '../../common/utils/ulid';
-import type { RegisterDto } from './dto/register.dto';
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { eq } from "drizzle-orm";
+import { ulid } from "../../common/utils/ulid";
+import { DRIZZLE, DrizzleDb } from "../../database/database.module";
+import { users } from "../../database/schema";
+import type { RegisterDto } from "./dto/register.dto";
 
 @Injectable()
 export class AuthService {
-  private readonly supabase: SupabaseClient;
+  private _supabase: SupabaseClient | null = null;
 
   constructor(
     private readonly config: ConfigService,
-    @Inject(DRIZZLE) private readonly db: DrizzleDb,
-  ) {
-    this.supabase = createClient(
-      config.getOrThrow('SUPABASE_URL'),
-      config.getOrThrow('SUPABASE_SERVICE_ROLE_KEY'),
-      { auth: { persistSession: false } },
-    );
+    @Inject(DRIZZLE) private readonly db: DrizzleDb
+  ) {}
+
+  private get supabase(): SupabaseClient {
+    if (!this._supabase) {
+      this._supabase = createClient(
+        this.config.getOrThrow("SUPABASE_URL"),
+        this.config.getOrThrow("SUPABASE_SERVICE_ROLE_KEY"),
+        { auth: { persistSession: false } }
+      );
+    }
+    return this._supabase;
   }
 
   /**
@@ -37,16 +41,16 @@ export class AuthService {
    */
   async register(
     token: string,
-    dto: RegisterDto,
+    dto: RegisterDto
   ): Promise<typeof users.$inferSelect> {
     // Verify the Supabase token to get the auth user
     const { data, error } = await this.supabase.auth.getUser(token);
     if (error || !data.user) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException("Invalid or expired token");
     }
 
     const supabaseAuthId = data.user.id;
-    const email = data.user.email ?? '';
+    const email = data.user.email ?? "";
 
     // Idempotent — return existing profile if already created
     const [existing] = await this.db
@@ -64,7 +68,7 @@ export class AuthService {
         supabaseAuthId,
         email,
         fullName: dto.fullName,
-        plan: 'free',
+        plan: "free",
       })
       .returning();
 
@@ -81,7 +85,7 @@ export class AuthService {
       .where(eq(users.id, userId))
       .limit(1);
 
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException("User not found");
     return user;
   }
 }
