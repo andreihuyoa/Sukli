@@ -1,4 +1,4 @@
-# SariSariFlow
+# Suki
 
 Offline-first store management for **sari-sari** (neighborhood convenience) stores in the Philippines: inventory, sales, suppliers, simple insights, and smart restocking hints that work on low-end Android devices with unreliable connectivity.
 
