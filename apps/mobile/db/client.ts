@@ -14,7 +14,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as schema from './schema';
 import * as relations from './relations';
 
-const DB_NAME = 'tindawise.db';
+const DB_NAME = 'suki.db';
 
 // Lazy singleton — created on first import, reused thereafter.
 let _db: ReturnType<typeof drizzle> | null = null;

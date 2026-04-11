@@ -1,13 +1,13 @@
 {
-  "name": "@tindawise/mobile",
+  "name": "@suki/mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start --tunnel",
     "start:tunnel": "expo start --tunnel",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android --lan",
-    "ios": "expo start --ios --lan",
+    "android": "expo start --android --tunnel",
+    "ios": "expo start --ios --tunnel",
     "web": "expo start --web",
     "lint": "expo lint",
     "router:types": "node ./scripts/regenerate-router-types.cjs",

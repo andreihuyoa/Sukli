@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "TindaWise",
-    "slug": "TindaWise",
+    "name": "Suki",
+    "slug": "suki",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tindawise",
+    "scheme": "suki",
     "userInterfaceStyle": "automatic",
     "jsEngine": "hermes",
     "newArchEnabled": true,

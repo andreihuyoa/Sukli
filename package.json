@@ -1,5 +1,5 @@
 {
-  "name": "tindawise-monorepo",
+  "name": "suki-monorepo",
   "private": true,
   "version": "1.0.0",
   "workspaces": [
@@ -7,12 +7,12 @@
     "packages/*"
   ],
   "scripts": {
-    "mobile:start": "npm run -w @tindawise/mobile start",
-    "mobile:android": "npm run -w @tindawise/mobile android",
-    "mobile:lint": "npm run -w @tindawise/mobile lint",
-    "backend:dev": "npm run -w @tindawise/backend dev",
-    "backend:build": "npm run -w @tindawise/backend build",
-    "backend:start": "npm run -w @tindawise/backend start"
+    "mobile:start": "npm run -w @suki/mobile start",
+    "mobile:android": "npm run -w @suki/mobile android",
+    "mobile:lint": "npm run -w @suki/mobile lint",
+    "backend:dev": "npm run -w @suki/backend dev",
+    "backend:build": "npm run -w @suki/backend build",
+    "backend:start": "npm run -w @suki/backend start"
   },
   "devDependencies": {
     "eslint-config-prettier": "^10.1.8",
