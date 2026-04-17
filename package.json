@@ -15,8 +15,12 @@
     "backend:start": "npm run -w @sukli/backend start",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md,yml,yaml}": "prettier --write"
+  },
   "devDependencies": {
     "eslint-config-prettier": "^10.1.8",
+    "lint-staged": "^16.4.0",
     "prettier": "3.8.1"
   }
 }

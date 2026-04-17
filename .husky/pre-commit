@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# Robust on Windows + GitHub Desktop: avoid shell-resolving `npx`.
+node "./node_modules/lint-staged/bin/lint-staged.js"
