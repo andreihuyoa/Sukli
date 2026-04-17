@@ -12,7 +12,7 @@ const pool = mysql.createPool({
   port: Number(process.env.DB_PORT ?? 3306),
   user: process.env.DB_USER ?? "root",
   password: process.env.DB_PASSWORD ?? "",
-  database: process.env.DB_NAME ?? "suki",
+  database: process.env.DB_NAME ?? "sukli",
   waitForConnections: true,
   connectionLimit: 10,
 });
@@ -27,5 +27,5 @@ app.get("/health", async (_req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`@suki/backend listening on :${port}`);
+  console.log(`@sukli/backend listening on :${port}`);
 });

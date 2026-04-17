@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Suki",
-    "slug": "suki",
+    "name": "Sukli",
+    "slug": "sukli",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "suki",
+    "scheme": "sukli",
     "userInterfaceStyle": "automatic",
     "jsEngine": "hermes",
     "newArchEnabled": true,
