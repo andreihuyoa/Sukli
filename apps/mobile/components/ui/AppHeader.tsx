@@ -1,10 +1,52 @@
+import { BlurView } from "expo-blur";
+import { GlassView, isGlassEffectAPIAvailable } from "expo-glass-effect";
 import type { ReactNode } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppIcon } from "./AppIcon";
 
-const TINT = "rgba(56, 102, 65, 0.82)";
+const COL = {
+  barFill: "rgba(242, 242, 247, 0.94)",
+  barFillAndroid: "#f2f2f7",
+  barBorder: "rgba(0, 0, 0, 0.08)",
+  title: "#1c1c1e",
+  accent: "#1b4332",
+  muted: "#8e8e93",
+  iconOnLight: "#1b4332",
+  subtleFill: "rgba(27, 67, 50, 0.1)",
+};
+
+const HEADER_BOTTOM_RADIUS = 20;
+const TOOLBAR_MIN_HEIGHT = 56;
+
+function HeaderFallbackFill() {
+  return (
+    <>
+      <BlurView
+        intensity={Platform.OS === "android" ? 40 : 72}
+        tint="light"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
+            borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+          },
+        ]}
+      />
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
+            borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+            backgroundColor:
+              Platform.OS === "android" ? COL.barFillAndroid : COL.barFill,
+          },
+        ]}
+      />
+    </>
+  );
+}
 
 type Props = {
   onBackPress?: () => void;
@@ -15,73 +57,221 @@ type Props = {
 
 export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
   const insets = useSafeAreaInsets();
+  const useNativeGlass = Platform.OS === "ios" && isGlassEffectAPIAvailable();
+
+  const toolbar = (
+    <View
+      style={[
+        styles.toolbar,
+        {
+          paddingTop: insets.top,
+          minHeight: TOOLBAR_MIN_HEIGHT + insets.top,
+        },
+      ]}
+    >
+      <View style={styles.left}>
+        {onBackPress ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            hitSlop={12}
+            onPress={onBackPress}
+            style={styles.iconButton}
+          >
+            <AppIcon
+              name="arrow_back"
+              size={24}
+              color={COL.iconOnLight}
+              strokeWidth={2.25}
+            />
+          </Pressable>
+        ) : null}
+        <View style={styles.brandIcon}>
+          <AppIcon
+            name="storefront"
+            size={18}
+            color={COL.accent}
+            strokeWidth={2.5}
+          />
+        </View>
+        <Text style={styles.title} numberOfLines={1}>
+          Tindahan
+        </Text>
+      </View>
+
+      {right ? (
+        right
+      ) : syncPill ? (
+        <View style={styles.syncPill}>
+          <View style={styles.syncDotOuter}>
+            <View style={styles.syncDotInner} />
+          </View>
+          <Text style={styles.syncLabel}>Cloud Synced</Text>
+          <AppIcon
+            name="cloud_sync"
+            size={16}
+            color={COL.accent}
+            strokeWidth={2}
+          />
+        </View>
+      ) : (
+        <View style={styles.rightActions}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Refresh"
+            hitSlop={12}
+            onPress={() => onRefresh?.()}
+            style={({ pressed }) => [
+              styles.refreshButton,
+              pressed && styles.refreshPressed,
+            ]}
+          >
+            <AppIcon
+              name="sync"
+              size={18}
+              color={COL.iconOnLight}
+              strokeWidth={2.25}
+            />
+          </Pressable>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>JD</Text>
+          </View>
+        </View>
+      )}
+    </View>
+  );
 
   return (
-    <View
-      className="absolute left-0 right-0 top-0 z-50 overflow-hidden rounded-b-3xl"
-      style={{ paddingTop: insets.top, minHeight: 56 + insets.top }}
-    >
-      {Platform.OS === "ios" ? (
-        <BlurView intensity={85} tint="light" style={StyleSheet.absoluteFill} />
+    <View style={styles.shell} pointerEvents="box-none">
+      {useNativeGlass ? (
+        <GlassView
+          style={styles.bar}
+          glassEffectStyle="regular"
+          colorScheme="light"
+        >
+          {toolbar}
+        </GlassView>
       ) : (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: TINT }]} />
-      )}
-      <View
-        style={[StyleSheet.absoluteFill, { backgroundColor: Platform.OS === "ios" ? "rgba(56, 102, 65, 0.35)" : undefined }]}
-        pointerEvents="none"
-      />
-      <View className="flex-1 flex-row items-center justify-between px-6 pb-2">
-        <View className="flex-row items-center gap-3">
-          {onBackPress ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Go back"
-              hitSlop={12}
-              onPress={onBackPress}
-              className="min-h-[48px] min-w-[48px] items-center justify-center"
-            >
-              <AppIcon name="arrow_back" size={24} color="#ffffff" strokeWidth={2.25} />
-            </Pressable>
-          ) : null}
-          <View className="h-9 w-9 items-center justify-center rounded-xl" style={{ backgroundColor: "#2d6a4f" }}>
-            <AppIcon name="storefront" size={18} color="#ffffff" strokeWidth={2.25} />
-          </View>
-          <Text
-            className="font-headline text-2xl font-bold tracking-tight text-white"
-            style={{ fontFamily: "Vollkorn_700Bold", letterSpacing: -0.2 }}
-          >
-            Tindahan
-          </Text>
+        <View style={styles.bar}>
+          <HeaderFallbackFill />
+          {toolbar}
         </View>
-        {right ? right : syncPill ? (
-          <View className="flex-row items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 backdrop-blur-md">
-            <View className="relative h-2 w-2">
-              <View className="absolute inline-flex h-full w-full rounded-full bg-on-tertiary-container opacity-75" />
-              <View className="relative h-2 w-2 rounded-full bg-on-tertiary-container" />
-            </View>
-            <Text className="text-[10px] font-semibold uppercase tracking-widest text-on-tertiary-container">
-              Cloud Synced
-            </Text>
-            <AppIcon name="cloud_sync" size={16} color="#bfe36d" strokeWidth={2} />
-          </View>
-        ) : (
-          <View className="flex-row items-center gap-3">
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Refresh"
-              hitSlop={12}
-              onPress={onRefresh}
-              className="min-h-[48px] min-w-[48px] items-center justify-center rounded-full active:opacity-80"
-              style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
-            >
-              <AppIcon name="sync" size={18} color="#ffffff" strokeWidth={2.25} />
-            </Pressable>
-            <View className="h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/25" style={{ backgroundColor: "rgba(27,67,50,0.35)" }}>
-              <Text className="font-body text-xs font-bold text-white">JD</Text>
-            </View>
-          </View>
-        )}
-      </View>
+      )}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  shell: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    zIndex: 50,
+  },
+  bar: {
+    overflow: "hidden",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: COL.barBorder,
+    borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
+    borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+  },
+  toolbar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingBottom: 12,
+  },
+  left: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+    minWidth: 0,
+  },
+  iconButton: {
+    minHeight: 48,
+    minWidth: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  brandIcon: {
+    height: 36,
+    width: 36,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 12,
+    backgroundColor: COL.subtleFill,
+  },
+  title: {
+    fontFamily: "Vollkorn_700Bold",
+    fontSize: 22,
+    fontWeight: "700",
+    letterSpacing: -0.2,
+    color: COL.title,
+    flexShrink: 1,
+  },
+  syncPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: COL.barBorder,
+    backgroundColor: "rgba(255, 255, 255, 0.55)",
+  },
+  syncDotOuter: {
+    position: "relative",
+    height: 8,
+    width: 8,
+  },
+  syncDotInner: {
+    position: "absolute",
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COL.accent,
+    opacity: 0.85,
+  },
+  syncLabel: {
+    fontSize: 10,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+    color: COL.accent,
+  },
+  rightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  refreshButton: {
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 22,
+    backgroundColor: "rgba(27, 67, 50, 0.08)",
+  },
+  refreshPressed: {
+    opacity: 0.75,
+  },
+  avatar: {
+    height: 40,
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: COL.barBorder,
+    backgroundColor: COL.subtleFill,
+  },
+  avatarText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COL.accent,
+  },
+});
