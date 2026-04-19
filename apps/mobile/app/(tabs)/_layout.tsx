@@ -1,10 +1,10 @@
+import { NavigationBar } from "@/components/navigation/NavigationBar";
 import { Tabs } from "expo-router";
-import { TindahanTabBar } from "@/components/navigation/TindahanTabBar";
 
 export default function TabsLayout() {
   return (
     <Tabs
-      tabBar={(props) => <TindahanTabBar {...props} />}
+      tabBar={(props) => <NavigationBar {...props} />}
       screenOptions={{
         headerShown: false,
         animation: "shift",
@@ -15,6 +15,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="inventory" options={{ title: "Stock" }} />
       <Tabs.Screen name="vendors" options={{ title: "Vendors" }} />
       <Tabs.Screen name="stats" options={{ title: "Stats" }} />
+      <Tabs.Screen name="settings" options={{ title: "Settings" }} />
     </Tabs>
   );
 }
