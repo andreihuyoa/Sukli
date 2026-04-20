@@ -1,4 +1,6 @@
 import type { LucideIcon } from "lucide-react-native";
+import { cssInterop } from "nativewind";
+import { StyleSheet, type StyleProp, type TextStyle } from "react-native";
 import {
   AlertTriangle,
   ArrowUpDown,
@@ -105,9 +107,30 @@ type Props = {
   size?: number;
   color?: string;
   strokeWidth?: number;
+  className?: string;
+  style?: StyleProp<TextStyle>;
 };
 
-export function AppIcon({ name, size = 24, color, strokeWidth = 2 }: Props) {
+function AppIconBase({
+  name,
+  size = 24,
+  color,
+  strokeWidth = 2,
+  style,
+}: Props) {
   const Icon = ICONS[name];
-  return <Icon size={size} color={color} strokeWidth={strokeWidth} />;
+  const resolvedStyle = StyleSheet.flatten(style);
+  const resolvedColor =
+    color ??
+    (typeof resolvedStyle?.color === "string"
+      ? resolvedStyle.color
+      : undefined);
+
+  return <Icon size={size} color={resolvedColor} strokeWidth={strokeWidth} />;
 }
+
+cssInterop(AppIconBase, {
+  className: "style",
+});
+
+export const AppIcon = AppIconBase;

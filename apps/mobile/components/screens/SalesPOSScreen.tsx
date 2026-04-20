@@ -10,16 +10,18 @@ import { usePosCatalog } from "@/hooks/usePosCatalog";
 import { POS_ALL_CATEGORY, type PosCartLine, type PosProduct } from "@/types";
 
 const POS_VAT_RATE = 0.12;
+const TAB_BAR = 88;
+const TOP_CONTENT_INSET = 16;
 
 function useCart() {
   const [items, setItems] = useState<PosCartLine[]>([]);
 
   const add = (product: PosProduct) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
+      const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
-        return prev.map((i) =>
-          i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i
+        return prev.map((item) =>
+          item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item
         );
       }
       return [...prev, { product, qty: 1 }];
@@ -28,66 +30,59 @@ function useCart() {
 
   const remove = (id: string) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === id);
+      const existing = prev.find((item) => item.product.id === id);
       if (!existing) return prev;
       if (existing.qty > 1) {
-        return prev.map((i) =>
-          i.product.id === id ? { ...i, qty: i.qty - 1 } : i
+        return prev.map((item) =>
+          item.product.id === id ? { ...item, qty: item.qty - 1 } : item
         );
       }
-      return prev.filter((i) => i.product.id !== id);
+      return prev.filter((item) => item.product.id !== id);
     });
   };
 
   const clear = () => setItems([]);
-
-  const qty = (id: string) => items.find((i) => i.product.id === id)?.qty ?? 0;
-
+  const qty = (id: string) =>
+    items.find((item) => item.product.id === id)?.qty ?? 0;
   const total = items.reduce(
-    (sum, i) => sum + i.product.unitPricePhp * i.qty,
+    (sum, item) => sum + item.product.unitPricePhp * item.qty,
     0
   );
-  const count = items.reduce((sum, i) => sum + i.qty, 0);
+  const count = items.reduce((sum, item) => sum + item.qty, 0);
   const tax = total * POS_VAT_RATE;
 
   return { items, add, remove, clear, qty, total, tax, count };
 }
 
-const GLASS = {
-  backgroundColor: "rgba(255,255,255,0.82)",
-};
-
-const TAB_BAR = 88;
-const TOP_CONTENT_INSET = 16;
-
 export function SalesPOSScreen() {
   const { products } = usePosCatalog();
   const [query, setQuery] = useState("");
-  const categories = useMemo(() => {
-    const unique = [
-      ...new Set(products.map((p) => p.category).filter(Boolean)),
-    ];
-    return [POS_ALL_CATEGORY, ...unique] as const;
-  }, [products]);
-
   const [activeCategory, setActiveCategory] =
     useState<string>(POS_ALL_CATEGORY);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutDone, setCheckoutDone] = useState(false);
 
-  const cart = useCart();
   const insets = useSafeAreaInsets();
+  const cart = useCart();
+
+  const categories = useMemo(() => {
+    const unique = [
+      ...new Set(products.map((product) => product.category).filter(Boolean)),
+    ];
+    return [POS_ALL_CATEGORY, ...unique] as const;
+  }, [products]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return products.filter((p) => {
-      const matchCat =
-        activeCategory === POS_ALL_CATEGORY || p.category === activeCategory;
-      const matchQ =
+    return products.filter((product) => {
+      const matchesCategory =
+        activeCategory === POS_ALL_CATEGORY ||
+        product.category === activeCategory;
+      const matchesQuery =
         !q ||
-        p.name.toLowerCase().includes(q) ||
-        p.variant.toLowerCase().includes(q);
-      return matchCat && matchQ;
+        product.name.toLowerCase().includes(q) ||
+        product.variant.toLowerCase().includes(q);
+      return matchesCategory && matchesQuery;
     });
   }, [activeCategory, products, query]);
 
@@ -102,7 +97,7 @@ export function SalesPOSScreen() {
   };
 
   return (
-    <View className="flex-1" style={{ backgroundColor: "#f2f2f7" }}>
+    <View className="flex-1 bg-screen-grouped">
       <FlashList
         data={filtered}
         numColumns={2}
@@ -116,51 +111,33 @@ export function SalesPOSScreen() {
         ListHeaderComponent={
           <View>
             <View className="px-1 pt-1 pb-3">
-              <Text
-                className="text-xs font-label font-bold uppercase tracking-widest"
-                style={{ color: "#8e8e93", fontWeight: 600 }}
-              >
+              <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
                 Point of Sale
               </Text>
-              <Text
-                style={{
-                  color: "#1b4332",
-                  fontSize: 30,
-                  fontWeight: "900",
-                  letterSpacing: -0.2,
-                  lineHeight: 34,
-                }}
-              >
+              <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
                 Register Sales
               </Text>
             </View>
 
             <Entrance delayMs={40}>
-              <View
-                className="flex-row items-center rounded-2xl px-4 py-3"
-                style={{
-                  ...GLASS,
-                  borderRadius: 16,
-                }}
-              >
+              <View className="flex-row items-center rounded-2xl bg-glass-surface px-4 py-3">
                 <AppIcon
                   name="search"
                   size={15}
-                  color="#8e8e93"
+                  className="text-label-muted"
                   strokeWidth={2}
                 />
                 <TextInput
                   value={query}
                   onChangeText={setQuery}
                   placeholder="Search inventory, categories or SKUs..."
-                  placeholderTextColor="#8e8e93"
-                  className="flex-1 bg-transparent text-sm font-body"
-                  style={{ color: "#1c1c1e", fontWeight: "500", marginLeft: 8 }}
+                  placeholderTextColor="#5f675f"
+                  className="ml-2 flex-1 bg-transparent text-sm font-body-medium text-label-primary"
                 />
               </View>
             </Entrance>
 
-            <View className="mt-4 mb-3" style={{ paddingHorizontal: 2 }}>
+            <View className="mb-3 mt-4 px-0.5">
               <ScrollCategories
                 categories={categories}
                 active={activeCategory}
@@ -173,8 +150,8 @@ export function SalesPOSScreen() {
           <ProductCard product={item} index={index} cart={cart} />
         )}
         ListEmptyComponent={
-          <View className="px-2 py-8 items-center">
-            <Text className="text-sm text-center" style={{ color: "#8e8e93" }}>
+          <View className="items-center px-2 py-8">
+            <Text className="text-center text-sm text-label-muted">
               No products loaded. Connect your catalog to sell from the
               register.
             </Text>
@@ -184,40 +161,25 @@ export function SalesPOSScreen() {
 
       {cart.count > 0 && !cartOpen ? (
         <View
+          className="flex-row items-center justify-between rounded-[14px] bg-revenue-hero px-[14px] py-3"
           style={{
             position: "absolute",
             left: 16,
             right: 16,
             bottom: TAB_BAR + insets.bottom + 4,
-            backgroundColor: "#2d6a4f",
-            borderRadius: 14,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
           }}
         >
           <View className="flex-row items-center gap-2">
-            <View
-              className="h-7 w-7 rounded-full items-center justify-center"
-              style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
-            >
-              <Text style={{ color: "#fff", fontWeight: "900", fontSize: 12 }}>
+            <View className="h-7 w-7 items-center justify-center rounded-full bg-hero-cta-ghost">
+              <Text className="text-xs font-label font-bold text-on-primary">
                 {cart.count}
               </Text>
             </View>
             <View>
-              <Text
-                style={{
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: 10,
-                  fontWeight: "600",
-                }}
-              >
+              <Text className="text-[10px] font-body-semibold text-on-hero-muted">
                 {cart.count} item{cart.count !== 1 ? "s" : ""}
               </Text>
-              <Text style={{ color: "#fff", fontSize: 14, fontWeight: "900" }}>
+              <Text className="text-sm font-label font-bold text-on-primary">
                 ₱{cart.total.toLocaleString("en-PH")}
               </Text>
             </View>
@@ -227,11 +189,15 @@ export function SalesPOSScreen() {
             accessibilityRole="button"
             accessibilityLabel="View cart"
             onPress={() => setCartOpen(true)}
-            className="flex-row items-center gap-2 px-4 py-2 rounded-xl"
-            style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
+            className="flex-row items-center gap-2 rounded-xl bg-hero-cta-ghost px-4 py-2"
           >
-            <AppIcon name="cart" size={14} color="#fff" strokeWidth={2.5} />
-            <Text style={{ color: "#fff", fontWeight: "900", fontSize: 13 }}>
+            <AppIcon
+              name="cart"
+              size={14}
+              className="text-on-primary"
+              strokeWidth={2.5}
+            />
+            <Text className="text-[13px] font-label font-bold text-on-primary">
               View Cart
             </Text>
           </Pressable>
@@ -252,45 +218,23 @@ export function SalesPOSScreen() {
             />
 
             <View
+              className="bg-surface px-5 pt-[10px]"
               style={{
-                backgroundColor: "rgba(248,250,248,0.98)",
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
-                paddingHorizontal: 20,
-                paddingTop: 10,
                 paddingBottom: 120 + insets.bottom,
               }}
             >
-              <View className="items-center pt-2 pb-4">
-                <View
-                  style={{
-                    width: 40,
-                    height: 4,
-                    borderRadius: 10,
-                    backgroundColor: "rgba(0,0,0,0.15)",
-                  }}
-                />
+              <View className="items-center pb-4 pt-2">
+                <View className="h-1 w-10 rounded-full bg-overlay-muted" />
               </View>
 
-              <View className="flex-row items-center justify-between mb-4">
+              <View className="mb-4 flex-row items-center justify-between">
                 <View>
-                  <Text
-                    style={{
-                      color: "#1b4332",
-                      fontSize: 22,
-                      fontWeight: "900",
-                      letterSpacing: -0.2,
-                    }}
-                  >
+                  <Text className="text-[22px] font-black tracking-[-0.2px] text-forest">
                     Current Order
                   </Text>
-                  <Text
-                    style={{
-                      color: "#8e8e93",
-                      fontWeight: "500",
-                      fontSize: 12,
-                    }}
-                  >
+                  <Text className="text-xs font-body-medium text-label-muted">
                     {cart.count} item{cart.count !== 1 ? "s" : ""} in cart
                   </Text>
                 </View>
@@ -298,99 +242,71 @@ export function SalesPOSScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Close"
                   onPress={() => setCartOpen(false)}
-                  className="h-10 w-10 rounded-full items-center justify-center"
-                  style={{ backgroundColor: "rgba(0,0,0,0.06)" }}
+                  className="h-10 w-10 items-center justify-center rounded-full bg-overlay-muted"
                 >
                   <AppIcon
                     name="x"
                     size={16}
-                    color="#1c1c1e"
+                    className="text-label-primary"
                     strokeWidth={2.5}
                   />
                 </Pressable>
               </View>
 
-              <View style={{ gap: 12, marginBottom: 16 }}>
-                {cart.items.map((ci) => (
+              <View className="mb-4 gap-3">
+                {cart.items.map((line) => (
                   <View
-                    key={ci.product.id}
+                    key={line.product.id}
                     className="flex-row items-center gap-3"
                   >
-                    <View
-                      className="h-12 w-12 rounded-xl overflow-hidden items-center justify-center"
-                      style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
-                    >
+                    <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-xl bg-overlay-soft">
                       <ImageWithFallback
-                        src={ci.product.imageUrl}
-                        alt={ci.product.name}
+                        src={line.product.imageUrl}
+                        alt={line.product.name}
                         style={{ width: "100%", height: "100%" }}
                       />
                     </View>
 
-                    <View className="flex-1 min-w-0">
+                    <View className="min-w-0 flex-1">
                       <Text
                         numberOfLines={1}
-                        style={{
-                          color: "#1c1c1e",
-                          fontWeight: "800",
-                          fontSize: 14,
-                          fontFamily: "System",
-                        }}
+                        className="text-sm font-body font-bold text-label-primary"
                       >
-                        {ci.product.name}
+                        {line.product.name}
                       </Text>
-                      <Text
-                        style={{
-                          color: "#8e8e93",
-                          fontWeight: "500",
-                          fontSize: 12,
-                        }}
-                      >
-                        ₱{ci.product.unitPricePhp.toLocaleString("en-PH")} /
+                      <Text className="text-xs font-body-medium text-label-muted">
+                        ₱{line.product.unitPricePhp.toLocaleString("en-PH")} /
                         unit
                       </Text>
                     </View>
 
-                    <View
-                      className="flex-row items-center gap-2 px-2 py-1 rounded-full"
-                      style={{ backgroundColor: "rgba(27,67,50,0.08)" }}
-                    >
+                    <View className="flex-row items-center gap-2 rounded-full bg-forest-alpha-10 px-2 py-1">
                       <Pressable
                         accessibilityRole="button"
                         accessibilityLabel="Decrease quantity"
-                        onPress={() => cart.remove(ci.product.id)}
-                        className="h-7 w-7 rounded-full items-center justify-center"
-                        style={{ backgroundColor: "rgba(27,67,50,0.12)" }}
+                        onPress={() => cart.remove(line.product.id)}
+                        className="h-7 w-7 items-center justify-center rounded-full bg-forest-alpha-14"
                       >
                         <AppIcon
                           name="remove"
                           size={12}
-                          color="#1b4332"
+                          className="text-forest"
                           strokeWidth={3}
                         />
                       </Pressable>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          fontWeight: "900",
-                          color: "#1b4332",
-                          minWidth: 18,
-                          textAlign: "center",
-                        }}
-                      >
-                        {ci.qty}
+                      <Text className="min-w-[18px] text-center text-sm font-label font-bold text-forest">
+                        {line.qty}
                       </Text>
                       <Pressable
                         accessibilityRole="button"
                         accessibilityLabel="Increase quantity"
-                        onPress={() => cart.add(ci.product)}
-                        className="h-7 w-7 rounded-full items-center justify-center"
-                        style={{ backgroundColor: "rgba(27,67,50,0.12)" }}
+                        onPress={() => cart.add(line.product)}
+                        className="h-7 w-7 items-center justify-center rounded-full bg-forest-alpha-14"
                       >
                         <AppIcon
                           name="add"
                           size={12}
-                          color="#1b4332"
+                          className="text-forest"
                           strokeWidth={3}
                         />
                       </Pressable>
@@ -399,74 +315,28 @@ export function SalesPOSScreen() {
                 ))}
               </View>
 
-              <View
-                className="rounded-2xl p-4 mb-4"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.7)",
-                  borderWidth: 1,
-                  borderColor: "rgba(0,0,0,0.05)",
-                }}
-              >
-                <View className="flex-row items-center justify-between mb-2">
-                  <Text
-                    style={{
-                      color: "#8e8e93",
-                      fontWeight: "500",
-                      fontSize: 13,
-                    }}
-                  >
+              <View className="mb-4 rounded-2xl border border-separator-subtle bg-glass-surface p-4">
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-[13px] font-body-medium text-label-muted">
                     Subtotal
                   </Text>
-                  <Text
-                    style={{
-                      color: "#1c1c1e",
-                      fontWeight: "800",
-                      fontSize: 13,
-                    }}
-                  >
+                  <Text className="text-[13px] font-body font-bold text-label-primary">
                     ₱{cart.total.toLocaleString("en-PH")}
                   </Text>
                 </View>
-                <View className="flex-row items-center justify-between mb-3">
-                  <Text
-                    style={{
-                      color: "#8e8e93",
-                      fontWeight: "500",
-                      fontSize: 13,
-                    }}
-                  >
+                <View className="mb-3 flex-row items-center justify-between">
+                  <Text className="text-[13px] font-body-medium text-label-muted">
                     Tax ({Math.round(POS_VAT_RATE * 100)}%)
                   </Text>
-                  <Text
-                    style={{
-                      color: "#1c1c1e",
-                      fontWeight: "800",
-                      fontSize: 13,
-                    }}
-                  >
+                  <Text className="text-[13px] font-body font-bold text-label-primary">
                     ₱{cart.tax.toFixed(2)}
                   </Text>
                 </View>
-                <View
-                  className="flex-row items-center justify-between pt-2 border-t"
-                  style={{ borderColor: "rgba(0,0,0,0.06)" }}
-                >
-                  <Text
-                    style={{
-                      color: "#1b4332",
-                      fontWeight: "900",
-                      fontSize: 16,
-                    }}
-                  >
+                <View className="flex-row items-center justify-between border-t border-separator pt-2">
+                  <Text className="text-base font-label font-bold text-forest">
                     Total Amount
                   </Text>
-                  <Text
-                    style={{
-                      color: "#1b4332",
-                      fontWeight: "900",
-                      fontSize: 22,
-                    }}
-                  >
+                  <Text className="text-[22px] font-black text-forest">
                     ₱
                     {(cart.total + cart.tax).toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
@@ -479,19 +349,23 @@ export function SalesPOSScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Complete sale"
                 onPress={handleCheckout}
-                className="w-full items-center justify-center py-4 rounded-2xl mb-3"
+                className={`mb-3 w-full items-center justify-center rounded-2xl py-4 ${
+                  checkoutDone ? "bg-forest" : "bg-revenue-hero"
+                }`}
                 style={{
-                  backgroundColor: checkoutDone ? "#1b4332" : "#2d6a4f",
                   shadowColor: "#1b4332",
                   shadowOpacity: 0.28,
                   shadowRadius: 10,
                 }}
               >
                 <View className="flex-row items-center gap-2.5">
-                  <AppIcon name="cart" size={18} color="#fff" strokeWidth={2} />
-                  <Text
-                    style={{ color: "#fff", fontWeight: "900", fontSize: 15 }}
-                  >
+                  <AppIcon
+                    name="cart"
+                    size={18}
+                    className="text-on-primary"
+                    strokeWidth={2}
+                  />
+                  <Text className="text-[15px] font-label font-bold text-on-primary">
                     {checkoutDone ? "Sale Complete!" : "Complete Sale"}
                   </Text>
                 </View>
@@ -504,12 +378,9 @@ export function SalesPOSScreen() {
                   cart.clear();
                   setCartOpen(false);
                 }}
-                className="w-full py-3 rounded-2xl items-center"
-                style={{ backgroundColor: "transparent" }}
+                className="w-full items-center rounded-2xl py-3"
               >
-                <Text
-                  style={{ color: "#6a3342", fontWeight: "700", fontSize: 14 }}
-                >
+                <Text className="text-sm font-body font-bold text-critical">
                   Cancel & Clear Cart
                 </Text>
               </Pressable>
@@ -526,39 +397,33 @@ export default SalesPOSScreen;
 function ScrollCategories(props: {
   categories: readonly string[];
   active: string;
-  onChange: (c: string) => void;
+  onChange: (category: string) => void;
 }) {
   const { categories, active, onChange } = props;
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={{ paddingRight: 4 }}
     >
-      <View style={{ flexDirection: "row" }}>
-        {categories.map((cat) => (
+      <View className="flex-row">
+        {categories.map((category) => (
           <Pressable
-            key={cat}
+            key={category}
             accessibilityRole="button"
-            accessibilityLabel={`Filter ${cat}`}
-            onPress={() => onChange(cat)}
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 6,
-              borderRadius: 999,
-              backgroundColor:
-                active === cat ? "#1b4332" : "rgba(255,255,255,0.82)",
-              marginRight: 10,
-            }}
+            accessibilityLabel={`Filter ${category}`}
+            onPress={() => onChange(category)}
+            className={`mr-[10px] rounded-full px-4 py-1.5 ${
+              active === category ? "bg-forest" : "bg-glass-surface"
+            }`}
           >
             <Text
-              style={{
-                fontSize: 13,
-                fontWeight: "900",
-                color: active === cat ? "#fff" : "#1c1c1e",
-              }}
+              className={`text-[13px] font-label font-bold ${
+                active === category ? "text-on-primary" : "text-label-primary"
+              }`}
             >
-              {cat}
+              {category}
             </Text>
           </Pressable>
         ))}
@@ -580,22 +445,15 @@ function ProductCard(props: {
   return (
     <Entrance delayMs={40 + index * 30}>
       <View
-        className="rounded-2xl overflow-hidden"
+        className="mb-3 overflow-hidden rounded-2xl bg-glass-surface"
         style={{
-          ...GLASS,
           borderBottomWidth: product.stockLevel === "low" ? 3 : 0,
           borderBottomColor:
-            product.stockLevel === "low"
-              ? "rgba(106,51,66,0.3)"
-              : "transparent",
-          marginBottom: 12,
+            product.stockLevel === "low" ? "#6a3342" : "transparent",
         }}
       >
-        <View className="items-center" style={{ padding: 12 }}>
-          <View
-            className="h-24 w-24 rounded-xl overflow-hidden"
-            style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
-          >
+        <View className="items-center p-3">
+          <View className="h-24 w-24 overflow-hidden rounded-xl bg-overlay-soft">
             <ImageWithFallback
               src={product.imageUrl}
               alt={product.name}
@@ -604,62 +462,53 @@ function ProductCard(props: {
           </View>
 
           <Text
-            className="mt-3"
+            className="mt-3 text-sm font-body font-bold text-label-primary"
             numberOfLines={1}
-            style={{ color: "#1c1c1e", fontWeight: "800", fontSize: 14 }}
           >
             {product.name}
           </Text>
           <Text
             numberOfLines={1}
-            style={{ color: "#8e8e93", fontWeight: "500", fontSize: 12 }}
+            className="text-xs font-body-medium text-label-muted"
           >
             {product.variant}
           </Text>
 
-          <View className="flex-row items-center justify-between w-full mt-3">
-            <Text style={{ color: "#1b4332", fontWeight: "900", fontSize: 15 }}>
+          <View className="mt-3 w-full flex-row items-center justify-between">
+            <Text className="text-[15px] font-label font-bold text-forest">
               ₱{product.unitPricePhp.toLocaleString("en-PH")}
             </Text>
 
             {inCart > 0 ? (
-              <View
-                className="flex-row items-center gap-2 px-2 py-1 rounded-full"
-                style={{ backgroundColor: "rgba(27,67,50,0.08)" }}
-              >
+              <View className="flex-row items-center gap-2 rounded-full bg-forest-alpha-10 px-2 py-1">
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Remove"
                   onPress={() => cart.remove(product.id)}
-                  className="h-7 w-7 rounded-full items-center justify-center"
-                  style={{ backgroundColor: "rgba(27,67,50,0.12)" }}
+                  className="h-7 w-7 items-center justify-center rounded-full bg-forest-alpha-14"
                 >
                   <AppIcon
                     name="remove"
                     size={12}
-                    color="#1b4332"
+                    className="text-forest"
                     strokeWidth={3}
                   />
                 </Pressable>
-                <Text
-                  style={{
-                    color: "#1b4332",
-                    fontWeight: "900",
-                    fontSize: 14,
-                    minWidth: 18,
-                    textAlign: "center",
-                  }}
-                >
+                <Text className="min-w-[18px] text-center text-sm font-label font-bold text-forest">
                   {inCart}
                 </Text>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel="Add"
                   onPress={() => cart.add(product)}
-                  className="h-7 w-7 rounded-full items-center justify-center"
-                  style={{ backgroundColor: "#1b4332" }}
+                  className="h-7 w-7 items-center justify-center rounded-full bg-forest"
                 >
-                  <AppIcon name="add" size={12} color="#fff" strokeWidth={3} />
+                  <AppIcon
+                    name="add"
+                    size={12}
+                    className="text-on-primary"
+                    strokeWidth={3}
+                  />
                 </Pressable>
               </View>
             ) : (
@@ -667,13 +516,12 @@ function ProductCard(props: {
                 accessibilityRole="button"
                 accessibilityLabel="Add to cart"
                 onPress={() => cart.add(product)}
-                className="h-12 w-12 rounded-full items-center justify-center"
-                style={{ backgroundColor: "rgba(27,67,50,0.12)" }}
+                className="h-12 w-12 items-center justify-center rounded-full bg-forest-alpha-14"
               >
                 <AppIcon
                   name="add"
                   size={16}
-                  color="#1b4332"
+                  className="text-forest"
                   strokeWidth={2.5}
                 />
               </Pressable>

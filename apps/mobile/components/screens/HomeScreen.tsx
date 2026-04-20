@@ -9,10 +9,6 @@ import { ScreenShell } from "@/components/ui/ScreenShell";
 import { useHomeDashboard } from "@/hooks/useHomeDashboard";
 import type { ChartBarPoint, HomeRestockAlert, HomeTransaction } from "@/types";
 
-const GLASS = {
-  backgroundColor: "rgba(255,255,255,0.82)",
-};
-
 function formatPesoDisplay(value: string): string {
   if (value === "—" || value.startsWith("₱")) return value;
   return `₱${value}`;
@@ -20,15 +16,15 @@ function formatPesoDisplay(value: string): string {
 
 const statusConfig = {
   completed: {
-    bg: "rgba(27,67,50,0.08)",
-    color: "#1b4332",
-    dot: "#34c759",
+    badgeClassName: "bg-status-completed-bg",
+    dotClassName: "bg-status-completed-dot",
+    textClassName: "text-status-completed-text",
     label: "Completed",
   },
   pending: {
-    bg: "rgba(255,159,10,0.12)",
-    color: "#c97700",
-    dot: "#ff9f0a",
+    badgeClassName: "bg-status-pending-bg",
+    dotClassName: "bg-status-pending-dot",
+    textClassName: "text-status-pending-text",
     label: "Pending",
   },
 };
@@ -39,47 +35,49 @@ function MetricCard(props: {
   value: string;
   subtitle: string;
   delayMs?: number;
-  accentColor: string;
+  accentIconClassName: string;
+  accentSurfaceClassName: string;
 }) {
-  const { iconKey, label, value, subtitle, delayMs = 0, accentColor } = props;
+  const {
+    iconKey,
+    label,
+    value,
+    subtitle,
+    delayMs = 0,
+    accentIconClassName,
+    accentSurfaceClassName,
+  } = props;
 
   return (
     <Entrance delayMs={delayMs}>
       <View
-        className="flex-1 rounded-2xl p-4"
+        className="flex-1 rounded-2xl p-4 bg-glass-surface"
         style={{
-          backgroundColor: GLASS.backgroundColor,
           borderRadius: 16,
-          shadowColor: "#000",
           shadowOpacity: 0.06,
           shadowRadius: 12,
         }}
       >
         <View className="flex-row items-start justify-between mb-3">
           <View
-            className="h-8 w-8 rounded-xl items-center justify-center"
-            style={{ backgroundColor: `${accentColor}14` }}
+            className={`h-8 w-8 rounded-xl items-center justify-center ${accentSurfaceClassName}`}
           >
             <AppIcon
               name={iconKey}
               size={18}
-              color={accentColor}
+              className={accentIconClassName}
               strokeWidth={2}
             />
           </View>
 
-          <Text
-            className="text-[10px] font-label font-bold uppercase tracking-widest"
-            style={{ color: "#8e8e93" }}
-          >
+          <Text className="text-[10px] font-label font-bold uppercase tracking-widest text-label-muted">
             {label}
           </Text>
         </View>
 
         <Text
-          className="mb-0.5"
+          className="mb-0.5 text-label-primary"
           style={{
-            color: "#1c1c1e",
             fontSize: 28,
             fontWeight: "800",
             letterSpacing: -0.2,
@@ -88,10 +86,7 @@ function MetricCard(props: {
         >
           {value}
         </Text>
-        <Text
-          className="text-[11px] font-body font-medium"
-          style={{ color: "#8e8e93" }}
-        >
+        <Text className="text-[11px] font-body font-medium text-label-muted">
           {subtitle}
         </Text>
       </View>
@@ -109,25 +104,14 @@ function RevenueHeroCard(props: {
 
   return (
     <Entrance>
-      <View
-        className="mx-4 rounded-3xl overflow-hidden"
-        style={{
-          backgroundColor: "#2d6a4f",
-          paddingHorizontal: 24,
-          paddingTop: 24,
-          paddingBottom: 20,
-        }}
-      >
-        <Text
-          className="text-[10px] font-label font-bold uppercase tracking-widest mb-3"
-          style={{ color: "rgba(255,255,255,0.7)" }}
-        >
+      <View className="mx-4 rounded-3xl overflow-hidden bg-revenue-hero px-6 pt-6 pb-5">
+        <Text className="text-[10px] font-label font-bold uppercase tracking-widest mb-3 text-on-hero-muted">
           Today&apos;s Revenue
         </Text>
 
         <Text
+          className="text-on-primary"
           style={{
-            color: "#fff",
             fontSize: 42,
             fontWeight: "900",
             letterSpacing: -0.6,
@@ -137,24 +121,14 @@ function RevenueHeroCard(props: {
           {formatPesoDisplay(amountDisplay)}
         </Text>
 
-        <View
-          className="flex-row items-center gap-1.5 px-3 py-1 rounded-full mt-3 self-start"
-          style={{
-            backgroundColor: "rgba(255,255,255,0.15)",
-            borderWidth: 1,
-            borderColor: "rgba(255,255,255,0.2)",
-          }}
-        >
+        <View className="flex-row items-center gap-1.5 px-3 py-1 rounded-full mt-3 self-start border bg-hero-pill-bg border-hero-pill-border">
           <AppIcon
             name="trending_up"
             size={14}
-            color="rgba(255,255,255,0.9)"
+            className="text-on-hero-strong"
             strokeWidth={2.5}
           />
-          <Text
-            className="text-[11px] font-body font-bold"
-            style={{ color: "rgba(255,255,255,0.9)" }}
-          >
+          <Text className="text-[11px] font-body font-bold text-on-hero-strong">
             {percentChange === 0
               ? "No comparison data"
               : `+${percentChange}% from yesterday`}
@@ -165,14 +139,15 @@ function RevenueHeroCard(props: {
           <Pressable
             accessibilityRole="button"
             onPress={onAddSale}
-            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl"
-            style={{ backgroundColor: "rgba(255,255,255,0.92)" }}
+            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl bg-hero-cta-solid"
           >
-            <AppIcon name="add" size={16} color="#1b4332" strokeWidth={2.5} />
-            <Text
-              className="text-[13px] font-body font-bold"
-              style={{ color: "#1b4332" }}
-            >
+            <AppIcon
+              name="add"
+              size={16}
+              className="text-forest"
+              strokeWidth={2.5}
+            />
+            <Text className="text-[13px] font-body font-bold text-forest">
               Add Sale
             </Text>
           </Pressable>
@@ -180,18 +155,15 @@ function RevenueHeroCard(props: {
           <Pressable
             accessibilityRole="button"
             onPress={onAddProduct}
-            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.18)",
-              borderWidth: 1,
-              borderColor: "rgba(255,255,255,0.28)",
-            }}
+            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl border bg-hero-cta-ghost border-hero-cta-ghost-border"
           >
-            <AppIcon name="add_box" size={16} color="#fff" strokeWidth={2} />
-            <Text
-              className="text-[13px] font-body font-bold"
-              style={{ color: "#fff" }}
-            >
+            <AppIcon
+              name="add_box"
+              size={16}
+              className="text-on-primary"
+              strokeWidth={2}
+            />
+            <Text className="text-[13px] font-body font-bold text-on-primary">
               Add Product
             </Text>
           </Pressable>
@@ -208,33 +180,24 @@ function GCashRevenueCard(props: {
   const { amountDisplay, changeLabel } = props;
   return (
     <Entrance delayMs={80}>
-      <View
-        className="flex-1 rounded-2xl p-4"
-        style={{
-          backgroundColor: "#0070e0",
-          paddingLeft: 16,
-          paddingRight: 16,
-          paddingTop: 16,
-        }}
-      >
+      <View className="flex-1 rounded-2xl px-4 pt-4 bg-gcash">
         <View className="flex-row items-start justify-between mb-3">
-          <View
-            className="h-8 w-8 rounded-xl items-center justify-center"
-            style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
-          >
-            <AppIcon name="smartphone" size={16} color="#fff" strokeWidth={2} />
+          <View className="h-8 w-8 rounded-xl items-center justify-center bg-gcash-icon-tile">
+            <AppIcon
+              name="smartphone"
+              size={16}
+              className="text-on-primary"
+              strokeWidth={2}
+            />
           </View>
-          <Text
-            className="text-[10px] font-label font-bold uppercase tracking-widest"
-            style={{ color: "rgba(255,255,255,0.7)" }}
-          >
+          <Text className="text-[10px] font-label font-bold uppercase tracking-widest text-on-hero-muted">
             GCash
           </Text>
         </View>
 
         <Text
+          className="text-on-primary"
           style={{
-            color: "#fff",
             fontSize: 26,
             fontWeight: "900",
             letterSpacing: -0.4,
@@ -248,13 +211,10 @@ function GCashRevenueCard(props: {
           <AppIcon
             name="trending_up"
             size={12}
-            color="rgba(255,255,255,0.8)"
+            className="text-on-hero-soft"
             strokeWidth={2.5}
           />
-          <Text
-            className="text-[11px] font-body font-bold"
-            style={{ color: "rgba(255,255,255,0.85)" }}
-          >
+          <Text className="text-[11px] font-body font-bold text-on-hero-label">
             {changeLabel}
           </Text>
         </View>
@@ -273,40 +233,25 @@ function WeeklyTrendCard(props: {
   return (
     <Entrance delayMs={120}>
       <View
-        className="mx-4 rounded-2xl p-4 pb-2"
-        style={{
-          backgroundColor: GLASS.backgroundColor,
-          borderRadius: 16,
-        }}
+        className="mx-4 rounded-2xl p-4 pb-2 bg-glass-surface"
+        style={{ borderRadius: 16 }}
       >
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center gap-2">
-            <View
-              className="h-7 w-7 rounded-lg items-center justify-center"
-              style={{ backgroundColor: "#1b433214" }}
-            >
+            <View className="h-7 w-7 rounded-lg items-center justify-center bg-forest-alpha-14">
               <AppIcon
                 name="check"
                 size={14}
-                color="#1b4332"
+                className="text-forest"
                 strokeWidth={2.5}
               />
             </View>
-            <Text
-              className="text-[10px] font-label font-bold uppercase tracking-widest"
-              style={{ color: "#8e8e93" }}
-            >
+            <Text className="text-[10px] font-label font-bold uppercase tracking-widest text-label-muted">
               Weekly Trend
             </Text>
           </View>
-          <View
-            className="px-3 py-1 rounded-lg"
-            style={{ backgroundColor: "#1b433210" }}
-          >
-            <Text
-              className="text-[10px] font-label font-bold uppercase"
-              style={{ color: "#1b4332" }}
-            >
+          <View className="px-3 py-1 rounded-lg bg-forest-alpha-10">
+            <Text className="text-[10px] font-label font-bold uppercase text-forest">
               This Week
             </Text>
           </View>
@@ -320,48 +265,25 @@ function WeeklyTrendCard(props: {
             enableSelection
           />
         ) : (
-          <Text
-            style={{
-              color: "#8e8e93",
-              fontWeight: "600",
-              fontSize: 13,
-              paddingVertical: 32,
-              textAlign: "center",
-            }}
-          >
+          <Text className="text-label-muted font-semibold text-[13px] py-8 text-center">
             No weekly sales data yet.
           </Text>
         )}
 
-        <View
-          className="flex-row items-center justify-between pt-2 pb-1 border-t"
-          style={{ borderColor: "rgba(0,0,0,0.06)" }}
-        >
+        <View className="flex-row items-center justify-between pt-2 pb-1 border-t border-separator">
           <View>
-            <Text
-              className="text-[11px] font-body font-medium"
-              style={{ color: "#8e8e93" }}
-            >
+            <Text className="text-[11px] font-body font-medium text-label-muted">
               Weekly Total
             </Text>
-            <Text
-              className="text-sm font-headline font-bold"
-              style={{ color: "#1c1c1e" }}
-            >
+            <Text className="text-sm font-headline font-bold text-label-primary">
               {formatPesoDisplay(weeklyTotalDisplay)}
             </Text>
           </View>
           <View>
-            <Text
-              className="text-[11px] font-body font-medium"
-              style={{ color: "#8e8e93" }}
-            >
+            <Text className="text-[11px] font-body font-medium text-label-muted">
               Daily Avg
             </Text>
-            <Text
-              className="text-sm font-headline font-bold"
-              style={{ color: "#1c1c1e" }}
-            >
+            <Text className="text-sm font-headline font-bold text-label-primary">
               {formatPesoDisplay(dailyAvgDisplay)}
             </Text>
           </View>
@@ -376,33 +298,21 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
   return (
     <Entrance delayMs={160}>
-      <View
-        className="mx-4 rounded-2xl overflow-hidden"
-        style={{ backgroundColor: GLASS.backgroundColor, borderRadius: 16 }}
-      >
+      <View className="mx-4 rounded-2xl overflow-hidden bg-glass-surface">
         <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
           <View className="flex-row items-center gap-2">
             <AppIcon
               name="warning"
               size={16}
-              color="#ff9f0a"
+              className="text-restock-icon"
               strokeWidth={2.5}
             />
-            <Text
-              className="text-base font-body font-bold"
-              style={{ color: "#1c1c1e" }}
-            >
+            <Text className="text-base font-body font-bold text-label-primary">
               Restock Required
             </Text>
           </View>
-          <View
-            className="px-3 py-1 rounded-full"
-            style={{ backgroundColor: "#ff9f0a18", borderWidth: 0 }}
-          >
-            <Text
-              className="text-[11px] font-body font-bold"
-              style={{ color: "#c97700" }}
-            >
+          <View className="px-3 py-1 rounded-full bg-status-pending-bg">
+            <Text className="text-[11px] font-body font-bold text-status-pending-text">
               {alerts.length} Alerts
             </Text>
           </View>
@@ -410,7 +320,7 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
         {alerts.length === 0 ? (
           <View className="px-4 pb-4">
-            <Text style={{ color: "#8e8e93", fontWeight: "600", fontSize: 13 }}>
+            <Text className="text-[13px] font-body-semibold text-label-muted">
               All stock levels look good.
             </Text>
           </View>
@@ -418,20 +328,9 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
           <View>
             {alerts.map((item, index) => (
               <View key={item.id}>
-                {index > 0 ? (
-                  <View
-                    style={{
-                      height: 1,
-                      backgroundColor: "rgba(0,0,0,0.06)",
-                      marginHorizontal: 16,
-                    }}
-                  />
-                ) : null}
+                {index > 0 ? <View className="mx-4 h-px bg-separator" /> : null}
                 <View className="flex-row items-center gap-3 px-4 py-3">
-                  <View
-                    className="h-12 w-12 rounded-xl overflow-hidden flex-shrink-0"
-                    style={{ backgroundColor: "rgba(0,0,0,0.06)" }}
-                  >
+                  <View className="h-12 w-12 rounded-xl overflow-hidden flex-shrink-0 bg-thumbnail-placeholder">
                     <ImageWithFallback
                       src={item.imageUrl}
                       alt={item.name}
@@ -441,26 +340,19 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
                   <View className="flex-1 min-w-0">
                     <Text
                       numberOfLines={1}
-                      style={{
-                        color: "#1c1c1e",
-                        fontSize: 15,
-                        fontWeight: "700",
-                      }}
+                      className="text-[15px] font-body-semibold text-label-primary"
                     >
                       {item.name}
                     </Text>
                     <View className="flex-row items-center gap-1.5 mt-1">
                       <View
-                        className="h-2 w-2 rounded-full"
-                        style={{
-                          backgroundColor:
-                            item.urgency === "critical" ? "#ff3b30" : "#ff9f0a",
-                        }}
+                        className={`h-2 w-2 rounded-full ${
+                          item.urgency === "critical"
+                            ? "bg-destructive"
+                            : "bg-restock-icon"
+                        }`}
                       />
-                      <Text
-                        className="text-[11px] font-body font-medium"
-                        style={{ color: "#8e8e93" }}
-                      >
+                      <Text className="text-[11px] font-body font-medium text-label-muted">
                         {item.unitsLeft} units left · {item.variant}
                       </Text>
                     </View>
@@ -468,19 +360,15 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
                   <Pressable
                     accessibilityRole="button"
-                    className="flex-row items-center gap-1 px-3 py-2 rounded-xl"
-                    style={{ backgroundColor: "#2d6a4f", marginLeft: 8 }}
+                    className="ml-2 flex-row items-center gap-1 px-3 py-2 rounded-xl bg-revenue-hero"
                   >
-                    <Text
-                      className="text-xs font-body font-bold"
-                      style={{ color: "#fff" }}
-                    >
+                    <Text className="text-xs font-body font-bold text-on-primary">
                       Quick Reorder
                     </Text>
                     <AppIcon
                       name="chevron_right"
                       size={12}
-                      color="rgba(255,255,255,0.8)"
+                      className="text-on-hero-soft"
                       strokeWidth={2.5}
                     />
                   </Pressable>
@@ -492,19 +380,15 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
         <Pressable
           accessibilityRole="button"
-          className="w-full flex-row items-center justify-center gap-2 py-3 border-t"
-          style={{ borderColor: "rgba(0,0,0,0.06)", marginTop: 4 }}
+          className="mt-1 w-full flex-row items-center justify-center gap-2 py-3 border-t border-separator"
         >
-          <Text
-            className="text-sm font-body font-bold"
-            style={{ color: "#2d6a4f" }}
-          >
+          <Text className="text-sm font-body font-bold text-revenue-hero">
             View All Stock Alerts
           </Text>
           <AppIcon
             name="chevron_right"
             size={14}
-            color="#2d6a4f"
+            className="text-revenue-hero"
             strokeWidth={2.5}
           />
         </Pressable>
@@ -519,10 +403,7 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
       className="h-9 w-9 rounded-full items-center justify-center flex-shrink-0"
       style={{ backgroundColor: color }}
     >
-      <Text
-        className="text-[11px] font-body font-bold"
-        style={{ color: "#fff" }}
-      >
+      <Text className="text-[11px] font-body font-bold text-on-primary">
         {initials}
       </Text>
     </View>
@@ -537,12 +418,12 @@ function RecentTransactionsCard(props: {
 
   return (
     <Entrance delayMs={190}>
-      <View
-        className="mx-4 rounded-2xl overflow-hidden"
-        style={{ backgroundColor: GLASS.backgroundColor, borderRadius: 16 }}
-      >
+      <View className="mx-4 rounded-2xl overflow-hidden bg-glass-surface">
         <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
-          <Text style={{ color: "#1c1c1e", fontSize: 16, fontWeight: "700" }}>
+          <Text
+            className="text-label-primary"
+            style={{ fontSize: 16, fontWeight: "700" }}
+          >
             Recent Transactions
           </Text>
           <Pressable
@@ -550,48 +431,33 @@ function RecentTransactionsCard(props: {
             className="flex-row items-center gap-1"
             style={{ gap: 4 }}
           >
-            <Text
-              className="text-sm font-body font-bold"
-              style={{ color: "#2d6a4f" }}
-            >
+            <Text className="text-sm font-body font-bold text-revenue-hero">
               View All
             </Text>
             <AppIcon
               name="chevron_right"
               size={14}
-              color="#2d6a4f"
+              className="text-revenue-hero"
               strokeWidth={2.5}
             />
           </Pressable>
         </View>
 
-        <View
-          className="flex-row items-center px-4 py-2"
-          style={{ backgroundColor: "rgba(0,0,0,0.02)" }}
-        >
-          <Text
-            className="flex-1 text-[10px] font-label font-bold uppercase"
-            style={{ color: "#8e8e93" }}
-          >
+        <View className="flex-row items-center px-4 py-2 bg-table-header-bg">
+          <Text className="flex-1 text-[10px] font-label font-bold uppercase text-label-muted">
             Customer
           </Text>
-          <Text
-            className="w-16 text-center text-[10px] font-label font-bold uppercase"
-            style={{ color: "#8e8e93" }}
-          >
+          <Text className="w-16 text-center text-[10px] font-label font-bold uppercase text-label-muted">
             Items
           </Text>
-          <Text
-            className="w-24 text-right text-[10px] font-label font-bold uppercase"
-            style={{ color: "#8e8e93" }}
-          >
+          <Text className="w-24 text-right text-[10px] font-label font-bold uppercase text-label-muted">
             Status
           </Text>
         </View>
 
         {transactions.length === 0 ? (
           <View className="px-4 py-6">
-            <Text style={{ color: "#8e8e93", fontWeight: "600", fontSize: 13 }}>
+            <Text className="text-[13px] font-body-semibold text-label-muted">
               No transactions for this period.
             </Text>
           </View>
@@ -602,56 +468,37 @@ function RecentTransactionsCard(props: {
               return (
                 <View key={tx.id}>
                   {index > 0 ? (
-                    <View
-                      style={{
-                        height: 1,
-                        backgroundColor: "rgba(0,0,0,0.05)",
-                        marginHorizontal: 16,
-                      }}
-                    />
+                    <View className="mx-4 h-px bg-separator-subtle" />
                   ) : null}
                   <View className="flex-row items-center gap-3 px-4 py-3">
                     <Avatar initials={tx.initials} color={tx.avatarColor} />
                     <View className="flex-1 min-w-0">
                       <Text
                         numberOfLines={1}
-                        style={{
-                          color: "#1c1c1e",
-                          fontSize: 14,
-                          fontWeight: "600",
-                        }}
+                        className="text-sm font-body-semibold text-label-primary"
                       >
                         {tx.customerName}
                       </Text>
-                      <Text
-                        className="text-xs font-body font-medium"
-                        style={{ color: "#aeaeb2" }}
-                      >
+                      <Text className="text-xs font-body font-medium text-time-muted">
                         {tx.timeDisplay}
                       </Text>
                     </View>
 
                     <View className="w-16 items-center">
-                      <Text
-                        className="text-xs font-body font-bold"
-                        style={{ color: "#3c3c43" }}
-                      >
+                      <Text className="text-xs font-body font-bold text-label-tertiary">
                         {tx.itemCount} {tx.itemCount === 1 ? "item" : "items"}
                       </Text>
                     </View>
 
                     <View className="w-24 flex-row justify-end">
                       <View
-                        className="flex-row items-center gap-1 px-2.5 py-1 rounded-full"
-                        style={{ backgroundColor: status.bg }}
+                        className={`flex-row items-center gap-1 px-2.5 py-1 rounded-full ${status.badgeClassName}`}
                       >
                         <View
-                          className="h-2 w-2 rounded-full"
-                          style={{ backgroundColor: status.dot }}
+                          className={`h-2 w-2 rounded-full ${status.dotClassName}`}
                         />
                         <Text
-                          className="text-xs font-body font-bold"
-                          style={{ color: status.color }}
+                          className={`text-xs font-body font-bold ${status.textClassName}`}
                         >
                           {status.label}
                         </Text>
@@ -664,26 +511,14 @@ function RecentTransactionsCard(props: {
           </View>
         )}
 
-        <View
-          className="flex-row items-center justify-between px-4 py-3 border-t"
-          style={{ borderColor: "rgba(0,0,0,0.06)" }}
-        >
-          <Text
-            className="text-xs font-body font-medium"
-            style={{ color: "#8e8e93" }}
-          >
+        <View className="flex-row items-center justify-between px-4 py-3 border-t border-separator">
+          <Text className="text-xs font-body font-medium text-label-muted">
             {totalToday > 0
               ? `Showing ${transactions.length} of ${totalToday} transactions today`
               : "Connect POS to see live transactions"}
           </Text>
-          <View
-            className="px-2 py-1 rounded-lg"
-            style={{ backgroundColor: "#1b433210", alignItems: "center" }}
-          >
-            <Text
-              className="text-xs font-body font-bold"
-              style={{ color: "#1b4332" }}
-            >
+          <View className="px-2 py-1 rounded-lg bg-forest-alpha-10 items-center">
+            <Text className="text-xs font-body font-bold text-forest">
               Today
             </Text>
           </View>
@@ -698,20 +533,20 @@ export function HomeScreen() {
   const handleRefresh = () => {};
 
   return (
-    <View className="flex-1" style={{ backgroundColor: "#f2f2f7" }}>
+    <View className="flex-1 bg-screen-grouped">
       <AppHeader onRefresh={handleRefresh} />
       <ScreenShell>
         <View className="flex-col">
           <View className="pb-4">
             <Text
-              className="text-xs font-body font-medium"
-              style={{ color: "#8e8e93", fontWeight: 500 }}
+              className="text-xs font-body font-medium text-label-muted"
+              style={{ fontWeight: 500 }}
             >
               {dashboard.dateLabel}
             </Text>
             <Text
-              className="mt-1"
-              style={{ color: "#1c1c1e", fontSize: 18, fontWeight: 800 }}
+              className="mt-1 text-label-primary"
+              style={{ fontSize: 18, fontWeight: 800 }}
             >
               {dashboard.greetingLine}
             </Text>
@@ -729,7 +564,8 @@ export function HomeScreen() {
               value={dashboard.activeStockDisplay}
               subtitle={dashboard.activeStockSubtitle}
               delayMs={50}
-              accentColor="#1b4332"
+              accentIconClassName="text-forest"
+              accentSurfaceClassName="bg-forest-alpha-14"
             />
             <MetricCard
               iconKey="payments"
@@ -737,7 +573,8 @@ export function HomeScreen() {
               value={dashboard.profitEstDisplay}
               subtitle={dashboard.profitEstSubtitle}
               delayMs={100}
-              accentColor="#2d6a4f"
+              accentIconClassName="text-revenue-hero"
+              accentSurfaceClassName="bg-forest-alpha-10"
             />
           </View>
 
@@ -746,37 +583,22 @@ export function HomeScreen() {
               amountDisplay={dashboard.gcashAmountDisplay}
               changeLabel={dashboard.gcashChangeLabel}
             />
-            <View
-              className="flex-1 rounded-2xl p-4 justify-between"
-              style={{
-                backgroundColor: GLASS.backgroundColor,
-                borderRadius: 16,
-              }}
-            >
+            <View className="flex-1 rounded-2xl p-4 justify-between bg-glass-surface">
               <View className="flex-row items-start justify-between">
-                <View
-                  className="h-8 w-8 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: "#1b433214" }}
-                >
-                  <View
-                    className="h-3 w-3 rounded-full"
-                    style={{ borderWidth: 2, borderColor: "#1b4332" }}
-                  />
+                <View className="h-8 w-8 rounded-xl items-center justify-center bg-forest-alpha-14">
+                  <View className="h-3 w-3 rounded-full border-2 border-forest" />
                 </View>
-                <Text
-                  className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
-                  style={{ color: "#8e8e93", letterSpacing: 2 }}
-                >
+                <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-label-muted">
                   Cash Sales
                 </Text>
               </View>
 
               <View>
                 <Text
+                  className="text-label-primary"
                   style={{
                     fontSize: 26,
                     fontWeight: 800,
-                    color: "#1c1c1e",
                     letterSpacing: -0.3,
                     lineHeight: 30,
                   }}
@@ -784,8 +606,8 @@ export function HomeScreen() {
                   {formatPesoDisplay(dashboard.cashSalesAmountDisplay)}
                 </Text>
                 <Text
-                  className="text-xs font-body font-medium"
-                  style={{ color: "#8e8e93", fontWeight: 500 }}
+                  className="text-xs font-body font-medium text-label-muted"
+                  style={{ fontWeight: 500 }}
                 >
                   {dashboard.cashSalesShareLabel}
                 </Text>

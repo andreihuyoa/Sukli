@@ -5,6 +5,7 @@ node_modules/
 .vscode/
 .idea/
 .cursor/
+.codex
 
 apps/mobile/assets/stitch-reference/
 apps/mobile/docs/
