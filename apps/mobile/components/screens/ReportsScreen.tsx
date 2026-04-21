@@ -38,10 +38,10 @@ export function ReportsScreen() {
 
         <View className="px-5 pb-3">
           <View
-            className="flex-row rounded-full bg-glass-surface p-1"
+            className="flex-row rounded-full border border-outline bg-glass-surface p-1"
             style={{
-              shadowColor: "#000",
-              shadowOpacity: 0.06,
+              shadowColor: "#a99f8f",
+              shadowOpacity: 0.04,
               shadowRadius: 8,
             }}
           >
@@ -54,7 +54,9 @@ export function ReportsScreen() {
                   accessibilityLabel={`Select ${value}`}
                   onPress={() => setPeriod(value)}
                   className={`flex-1 items-center justify-center rounded-full py-2.5 ${
-                    active ? "bg-glass-surface" : "bg-transparent"
+                    active
+                      ? "border border-outline bg-surface-container"
+                      : "bg-transparent"
                   }`}
                 >
                   <Text
@@ -73,24 +75,29 @@ export function ReportsScreen() {
         </View>
 
         <Entrance delayMs={80}>
-          <View className="mx-4 overflow-hidden rounded-3xl bg-revenue-hero p-5">
+          <View className="mx-4 overflow-hidden rounded-3xl border border-outline bg-glass-surface p-5">
             <View className="mb-4 flex-row items-start justify-between">
               <View className="flex-1">
-                <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-on-hero-muted">
-                  Total Net Profit
+                <View className="mb-3 self-start rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1.5">
+                  <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-accent-focus">
+                    Focus score
+                  </Text>
+                </View>
+                <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
+                  Total net profit
                 </Text>
-                <Text className="text-4xl font-black leading-9 tracking-[-0.2px] text-on-primary">
+                <Text className="text-4xl font-black leading-9 tracking-[-0.2px] text-label-primary">
                   {data.profitDisplay}
                 </Text>
               </View>
-              <View className="flex-row items-center gap-1 rounded-full border border-hero-pill-border bg-hero-pill-bg px-3 py-2">
+              <View className="flex-row items-center gap-1 rounded-full border border-status-completed-dot bg-status-completed-bg px-3 py-2">
                 <AppIcon
                   name="trending_up"
                   size={14}
-                  className="text-on-hero-strong"
+                  className="text-status-completed-text"
                   strokeWidth={2.5}
                 />
-                <Text className="text-[13px] font-label font-bold text-on-hero-strong">
+                <Text className="text-[13px] font-label font-bold text-status-completed-text">
                   {data.profitChangeDisplay}
                 </Text>
               </View>
@@ -98,19 +105,19 @@ export function ReportsScreen() {
 
             <View>
               <View className="mb-2 flex-row items-end justify-between">
-                <Text className="text-[13px] font-body-semibold text-on-hero-muted">
+                <Text className="text-[13px] font-body-semibold text-label-muted">
                   Sales Velocity vs Forecast
                 </Text>
-                <Text className="text-[13px] font-label font-bold text-on-hero-strong">
+                <Text className="text-[13px] font-label font-bold text-label-primary">
                   {data.targetProgressPercent}% Target reached
                 </Text>
               </View>
-              <View className="h-2 w-full overflow-hidden rounded-full bg-hero-pill-bg">
+              <View className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
                 <View
                   style={{
                     width: `${Math.min(100, Math.max(0, data.targetProgressPercent))}%`,
                     height: "100%",
-                    backgroundColor: "rgba(255,255,255,0.85)",
+                    backgroundColor: "#5f7d67",
                     borderRadius: 999,
                   }}
                 />
@@ -121,7 +128,7 @@ export function ReportsScreen() {
 
         <View className="mx-4 mb-4 flex-row gap-3">
           <Entrance delayMs={120}>
-            <View className="w-[120px] rounded-2xl bg-glass-surface p-3">
+            <View className="w-[120px] rounded-2xl border border-outline bg-glass-surface p-3">
               <Text className="mb-2 text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
                 Avg. Order
               </Text>
@@ -135,7 +142,7 @@ export function ReportsScreen() {
           </Entrance>
 
           <Entrance delayMs={150}>
-            <View className="flex-1 rounded-2xl bg-glass-surface p-3">
+            <View className="flex-1 rounded-2xl border border-outline bg-glass-surface p-3">
               <Text className="mb-[10px] text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
                 Sales Trends
               </Text>
@@ -156,7 +163,7 @@ export function ReportsScreen() {
         </View>
 
         <Entrance delayMs={200}>
-          <View className="mx-4 mb-4 rounded-2xl bg-glass-surface p-4">
+          <View className="mx-4 mb-4 rounded-2xl border border-outline bg-glass-surface p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-base font-body font-bold tracking-[-0.2px] text-label-primary">
                 High Velocity Items
@@ -202,7 +209,7 @@ export function ReportsScreen() {
         </Entrance>
 
         <Entrance delayMs={260}>
-          <View className="mx-4 overflow-hidden rounded-2xl bg-glass-surface">
+          <View className="mx-4 overflow-hidden rounded-2xl border border-outline bg-glass-surface">
             <View className="flex-row items-center justify-between border-b border-separator-subtle px-4 pb-3 pt-4">
               <Text className="text-base font-body font-bold tracking-[-0.2px] text-label-primary">
                 Expense Ledger
@@ -284,7 +291,7 @@ export function ReportsScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Previous"
                   onPress={() => {}}
-                  className="h-9 w-9 items-center justify-center rounded-full border border-separator bg-glass-surface"
+                  className="h-9 w-9 items-center justify-center rounded-full border border-outline bg-surface-container"
                 >
                   <AppIcon
                     name="chevron_left"
@@ -297,7 +304,7 @@ export function ReportsScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Next"
                   onPress={() => {}}
-                  className="h-9 w-9 items-center justify-center rounded-full border border-separator bg-glass-surface"
+                  className="h-9 w-9 items-center justify-center rounded-full border border-outline bg-surface-container"
                 >
                   <AppIcon
                     name="chevron_right"

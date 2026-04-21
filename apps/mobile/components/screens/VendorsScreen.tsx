@@ -58,7 +58,7 @@ export function VendorsScreen() {
             </Entrance>
 
             <Entrance delayMs={70}>
-              <View className="flex-row items-center rounded-2xl bg-glass-surface px-4 py-3">
+              <View className="flex-row items-center rounded-2xl border border-outline bg-glass-surface px-4 py-3">
                 <AppIcon
                   name="search"
                   size={16}
@@ -81,7 +81,7 @@ export function VendorsScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Add supplier"
                   onPress={() => {}}
-                  className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-forest py-3.5"
+                  className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3.5"
                 >
                   <AppIcon
                     name="person_add"
@@ -141,7 +141,7 @@ function SupplierCard(props: {
 
   return (
     <View
-      className="mb-3 overflow-hidden rounded-2xl bg-glass-surface"
+      className="mb-3 overflow-hidden rounded-2xl border border-outline bg-glass-surface"
       style={{
         borderBottomWidth: supplier.accent ? 3 : 0,
         borderBottomColor: supplier.accent ? "#6a3342" : "transparent",
@@ -206,8 +206,11 @@ function SupplierCard(props: {
           {supplier.tags.map((tag) => (
             <View
               key={tag.label}
-              className="items-center rounded-full px-2.5 py-1"
-              style={{ backgroundColor: tag.backgroundColor }}
+              className="items-center rounded-full border px-2.5 py-1"
+              style={{
+                backgroundColor: tag.backgroundColor,
+                borderColor: "#d7d2c8",
+              }}
             >
               <Text
                 className="text-xs font-label font-bold"
@@ -219,7 +222,7 @@ function SupplierCard(props: {
           ))}
         </View>
 
-        <View className="rounded-xl bg-table-header-bg p-3">
+        <View className="rounded-xl border border-outline bg-table-header-bg p-3">
           <Text className="mb-[10px] text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
             Price Catalog
           </Text>
@@ -262,7 +265,7 @@ function SupplierCard(props: {
           accessibilityRole="button"
           accessibilityLabel={expanded ? "Hide catalog" : "View catalog"}
           onPress={onToggle}
-          className="mt-3 w-full items-center justify-center rounded-xl bg-forest-alpha-10 py-3"
+          className="mt-3 w-full items-center justify-center rounded-xl border border-outline bg-surface-container py-3"
         >
           <Text className="text-[13px] font-label font-bold text-forest">
             {expanded ? "Hide Catalog" : "View Catalog"}

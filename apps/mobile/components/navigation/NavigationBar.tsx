@@ -7,12 +7,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /** Design tokens — avoid NativeWind `className` here: css-interop can break React Navigation context inside custom tab bars. */
 const COL = {
-  barFill: "rgba(242, 242, 247, 0.94)",
-  barFillAndroid: "#f2f2f7",
-  barBorder: "rgba(0, 0, 0, 0.08)",
-  activeIcon: "#1b4332",
-  inactiveIcon: "#8e8e93",
-  indicator: "rgba(27, 67, 50, 0.12)",
+  barFill: "rgba(255, 248, 239, 0.92)",
+  barFillAndroid: "#fff8ef",
+  barBorder: "rgba(184, 179, 170, 0.75)",
+  activeIcon: "#31463a",
+  inactiveIcon: "#7f847d",
+  indicator: "rgba(95, 125, 103, 0.12)",
+  shadow: "#9a8f7a",
 };
 
 const TABS: { key: string; label: string; icon: AppIconName }[] = [
@@ -128,9 +129,9 @@ const styles = StyleSheet.create({
   pillShadow: {
     borderRadius: PILL_RADIUS,
     backgroundColor: "transparent",
-    shadowColor: "#000",
+    shadowColor: COL.shadow,
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.16,
     shadowRadius: 24,
     elevation: 12,
   },

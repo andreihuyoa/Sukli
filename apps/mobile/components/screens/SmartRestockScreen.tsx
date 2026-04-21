@@ -52,7 +52,7 @@ export function SmartRestockScreen(props: { onBackPress?: () => void }) {
 
       <View className="mx-4 mb-5 flex-row gap-3">
         <Entrance delayMs={60}>
-          <View className="flex-1 rounded-2xl bg-glass-surface p-4">
+          <View className="flex-1 rounded-2xl border border-outline bg-glass-surface p-4">
             <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
               Items to Buy
             </Text>
@@ -66,18 +66,18 @@ export function SmartRestockScreen(props: { onBackPress?: () => void }) {
         </Entrance>
 
         <Entrance delayMs={90}>
-          <View className="flex-1 justify-between rounded-2xl bg-revenue-hero p-4">
-            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-on-hero-muted">
+          <View className="flex-1 justify-between rounded-2xl border border-accent-info-border bg-accent-info-soft p-4">
+            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
               Est. Total
             </Text>
             <View>
-              <Text className="text-[28px] font-black leading-[30px] tracking-[-0.2px] text-on-primary">
+              <Text className="text-[28px] font-black leading-[30px] tracking-[-0.2px] text-label-primary">
                 ₱
                 {selectedTotal.toLocaleString("en-PH", {
                   minimumFractionDigits: 2,
                 })}
               </Text>
-              <Text className="mt-0.5 text-xs font-body font-bold text-on-hero-muted">
+              <Text className="mt-0.5 text-xs font-body font-bold text-label-muted">
                 for selected
               </Text>
             </View>
@@ -114,7 +114,7 @@ export function SmartRestockScreen(props: { onBackPress?: () => void }) {
                   accessibilityRole="button"
                   accessibilityLabel={`Toggle ${item.name}`}
                   onPress={() => toggle(item.id)}
-                  className="overflow-hidden rounded-2xl bg-glass-surface"
+                  className="overflow-hidden rounded-2xl border border-outline bg-glass-surface"
                   style={{
                     borderBottomWidth: item.critical ? 3 : 0,
                     borderBottomColor: item.critical
@@ -194,17 +194,17 @@ export function SmartRestockScreen(props: { onBackPress?: () => void }) {
 
         {insight ? (
           <Entrance delayMs={420}>
-            <View className="mt-[18px] flex-row items-center gap-3 rounded-2xl border border-critical-border bg-critical-soft p-4">
+            <View className="mt-[18px] flex-row items-center gap-3 rounded-2xl border border-accent-warn-border bg-accent-warn-soft p-4">
               <View className="h-10 w-10 items-center justify-center rounded-xl bg-critical-soft-12">
                 <AppIcon
                   name="trending_down"
                   size={16}
-                  className="text-critical"
+                  className="text-accent-warn"
                   strokeWidth={2.2}
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-body font-bold text-critical">
+                <Text className="text-sm font-body font-bold text-label-primary">
                   {insight.title}
                 </Text>
                 <Text className="mt-0.5 text-xs font-body-semibold text-label-muted">

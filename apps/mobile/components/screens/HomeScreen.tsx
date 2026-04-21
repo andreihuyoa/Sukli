@@ -51,11 +51,12 @@ function MetricCard(props: {
   return (
     <Entrance delayMs={delayMs}>
       <View
-        className="flex-1 rounded-2xl p-4 bg-glass-surface"
+        className="flex-1 rounded-2xl border border-outline bg-glass-surface p-4"
         style={{
           borderRadius: 16,
-          shadowOpacity: 0.06,
-          shadowRadius: 12,
+          shadowColor: "#a99f8f",
+          shadowOpacity: 0.05,
+          shadowRadius: 10,
         }}
       >
         <View className="flex-row items-start justify-between mb-3">
@@ -70,7 +71,7 @@ function MetricCard(props: {
             />
           </View>
 
-          <Text className="text-[10px] font-label font-bold uppercase tracking-widest text-label-muted">
+          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted">
             {label}
           </Text>
         </View>
@@ -86,7 +87,7 @@ function MetricCard(props: {
         >
           {value}
         </Text>
-        <Text className="text-[11px] font-body font-medium text-label-muted">
+        <Text className="text-[11px] font-body font-medium leading-4 text-label-muted">
           {subtitle}
         </Text>
       </View>
@@ -104,13 +105,19 @@ function RevenueHeroCard(props: {
 
   return (
     <Entrance>
-      <View className="mx-4 rounded-3xl overflow-hidden bg-revenue-hero px-6 pt-6 pb-5">
-        <Text className="text-[10px] font-label font-bold uppercase tracking-widest mb-3 text-on-hero-muted">
-          Today&apos;s Revenue
+      <View className="mx-4 overflow-hidden rounded-3xl border border-outline bg-glass-surface px-6 pb-5 pt-6">
+        <View className="mb-3 self-start rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1.5">
+          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-accent-focus">
+            Focus panel
+          </Text>
+        </View>
+
+        <Text className="mb-3 text-[10px] font-label font-bold uppercase tracking-[0.18em] text-label-muted">
+          Today&apos;s revenue
         </Text>
 
         <Text
-          className="text-on-primary"
+          className="text-label-primary"
           style={{
             fontSize: 42,
             fontWeight: "900",
@@ -121,33 +128,35 @@ function RevenueHeroCard(props: {
           {formatPesoDisplay(amountDisplay)}
         </Text>
 
-        <View className="flex-row items-center gap-1.5 px-3 py-1 rounded-full mt-3 self-start border bg-hero-pill-bg border-hero-pill-border">
-          <AppIcon
-            name="trending_up"
-            size={14}
-            className="text-on-hero-strong"
-            strokeWidth={2.5}
-          />
-          <Text className="text-[11px] font-body font-bold text-on-hero-strong">
-            {percentChange === 0
-              ? "No comparison data"
-              : `+${percentChange}% from yesterday`}
-          </Text>
+        <View className="mt-3 self-start rounded-full border border-outline bg-surface-container px-3 py-1.5">
+          <View className="flex-row items-center gap-1.5">
+            <AppIcon
+              name="trending_up"
+              size={14}
+              className="text-accent-focus"
+              strokeWidth={2.5}
+            />
+            <Text className="text-[11px] font-body font-bold text-label-primary">
+              {percentChange === 0
+                ? "No comparison data"
+                : `+${percentChange}% from yesterday`}
+            </Text>
+          </View>
         </View>
 
         <View className="flex-row gap-3 mt-5">
           <Pressable
             accessibilityRole="button"
             onPress={onAddSale}
-            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl bg-hero-cta-solid"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3"
           >
             <AppIcon
               name="add"
               size={16}
-              className="text-forest"
+              className="text-on-primary"
               strokeWidth={2.5}
             />
-            <Text className="text-[13px] font-body font-bold text-forest">
+            <Text className="text-[13px] font-body font-bold text-on-primary">
               Add Sale
             </Text>
           </Pressable>
@@ -155,15 +164,15 @@ function RevenueHeroCard(props: {
           <Pressable
             accessibilityRole="button"
             onPress={onAddProduct}
-            className="flex-1 flex-row items-center justify-center gap-2 py-3 rounded-2xl border bg-hero-cta-ghost border-hero-cta-ghost-border"
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-outline bg-surface-container py-3"
           >
             <AppIcon
               name="add_box"
               size={16}
-              className="text-on-primary"
+              className="text-forest"
               strokeWidth={2}
             />
-            <Text className="text-[13px] font-body font-bold text-on-primary">
+            <Text className="text-[13px] font-body font-bold text-label-primary">
               Add Product
             </Text>
           </Pressable>
@@ -180,23 +189,23 @@ function GCashRevenueCard(props: {
   const { amountDisplay, changeLabel } = props;
   return (
     <Entrance delayMs={80}>
-      <View className="flex-1 rounded-2xl px-4 pt-4 bg-gcash">
+      <View className="flex-1 rounded-2xl border border-accent-info-border bg-accent-info-soft px-4 pt-4">
         <View className="flex-row items-start justify-between mb-3">
           <View className="h-8 w-8 rounded-xl items-center justify-center bg-gcash-icon-tile">
             <AppIcon
               name="smartphone"
               size={16}
-              className="text-on-primary"
+              className="text-accent-info"
               strokeWidth={2}
             />
           </View>
-          <Text className="text-[10px] font-label font-bold uppercase tracking-widest text-on-hero-muted">
+          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted">
             GCash
           </Text>
         </View>
 
         <Text
-          className="text-on-primary"
+          className="text-label-primary"
           style={{
             fontSize: 26,
             fontWeight: "900",
@@ -211,10 +220,10 @@ function GCashRevenueCard(props: {
           <AppIcon
             name="trending_up"
             size={12}
-            className="text-on-hero-soft"
+            className="text-accent-info"
             strokeWidth={2.5}
           />
-          <Text className="text-[11px] font-body font-bold text-on-hero-label">
+          <Text className="text-[11px] font-body font-bold text-label-primary">
             {changeLabel}
           </Text>
         </View>
@@ -233,7 +242,7 @@ function WeeklyTrendCard(props: {
   return (
     <Entrance delayMs={120}>
       <View
-        className="mx-4 rounded-2xl p-4 pb-2 bg-glass-surface"
+        className="mx-4 rounded-2xl border border-outline bg-glass-surface p-4 pb-2"
         style={{ borderRadius: 16 }}
       >
         <View className="flex-row items-center justify-between mb-4">
@@ -250,8 +259,8 @@ function WeeklyTrendCard(props: {
               Weekly Trend
             </Text>
           </View>
-          <View className="px-3 py-1 rounded-lg bg-forest-alpha-10">
-            <Text className="text-[10px] font-label font-bold uppercase text-forest">
+          <View className="rounded-lg border border-outline bg-surface-container px-3 py-1">
+            <Text className="text-[10px] font-label font-bold uppercase tracking-[0.14em] text-label-primary">
               This Week
             </Text>
           </View>
@@ -298,7 +307,7 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
   return (
     <Entrance delayMs={160}>
-      <View className="mx-4 rounded-2xl overflow-hidden bg-glass-surface">
+      <View className="mx-4 overflow-hidden rounded-2xl border border-outline bg-glass-surface">
         <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
           <View className="flex-row items-center gap-2">
             <AppIcon
@@ -311,7 +320,7 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
               Restock Required
             </Text>
           </View>
-          <View className="px-3 py-1 rounded-full bg-status-pending-bg">
+          <View className="rounded-full border border-accent-warn-border bg-status-pending-bg px-3 py-1">
             <Text className="text-[11px] font-body font-bold text-status-pending-text">
               {alerts.length} Alerts
             </Text>
@@ -360,15 +369,15 @@ function RestockAlertsCard(props: { alerts: HomeRestockAlert[] }) {
 
                   <Pressable
                     accessibilityRole="button"
-                    className="ml-2 flex-row items-center gap-1 px-3 py-2 rounded-xl bg-revenue-hero"
+                    className="ml-2 flex-row items-center gap-1 rounded-xl border border-accent-warn-border bg-accent-warn-soft px-3 py-2"
                   >
-                    <Text className="text-xs font-body font-bold text-on-primary">
+                    <Text className="text-xs font-body font-bold text-accent-warn">
                       Quick Reorder
                     </Text>
                     <AppIcon
                       name="chevron_right"
                       size={12}
-                      className="text-on-hero-soft"
+                      className="text-accent-warn"
                       strokeWidth={2.5}
                     />
                   </Pressable>
@@ -418,7 +427,7 @@ function RecentTransactionsCard(props: {
 
   return (
     <Entrance delayMs={190}>
-      <View className="mx-4 rounded-2xl overflow-hidden bg-glass-surface">
+      <View className="mx-4 overflow-hidden rounded-2xl border border-outline bg-glass-surface">
         <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
           <Text
             className="text-label-primary"
@@ -517,8 +526,8 @@ function RecentTransactionsCard(props: {
               ? `Showing ${transactions.length} of ${totalToday} transactions today`
               : "Connect POS to see live transactions"}
           </Text>
-          <View className="px-2 py-1 rounded-lg bg-forest-alpha-10 items-center">
-            <Text className="text-xs font-body font-bold text-forest">
+          <View className="items-center rounded-lg border border-outline bg-surface-container px-2 py-1">
+            <Text className="text-xs font-body font-bold text-label-primary">
               Today
             </Text>
           </View>
@@ -538,15 +547,12 @@ export function HomeScreen() {
       <ScreenShell>
         <View className="flex-col">
           <View className="pb-4">
-            <Text
-              className="text-xs font-body font-medium text-label-muted"
-              style={{ fontWeight: 500 }}
-            >
+            <Text className="text-xs font-body font-medium tracking-[0.08em] text-label-muted">
               {dashboard.dateLabel}
             </Text>
             <Text
               className="mt-1 text-label-primary"
-              style={{ fontSize: 18, fontWeight: 800 }}
+              style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.3 }}
             >
               {dashboard.greetingLine}
             </Text>
@@ -583,12 +589,12 @@ export function HomeScreen() {
               amountDisplay={dashboard.gcashAmountDisplay}
               changeLabel={dashboard.gcashChangeLabel}
             />
-            <View className="flex-1 rounded-2xl p-4 justify-between bg-glass-surface">
+            <View className="flex-1 rounded-2xl border border-outline bg-glass-surface p-4 justify-between">
               <View className="flex-row items-start justify-between">
-                <View className="h-8 w-8 rounded-xl items-center justify-center bg-forest-alpha-14">
+                <View className="h-8 w-8 rounded-xl items-center justify-center bg-accent-warn-soft">
                   <View className="h-3 w-3 rounded-full border-2 border-forest" />
                 </View>
-                <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-label-muted">
+                <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-label-muted">
                   Cash Sales
                 </Text>
               </View>

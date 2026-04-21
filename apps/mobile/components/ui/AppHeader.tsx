@@ -6,14 +6,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppIcon } from "./AppIcon";
 
 const COL = {
-  barFill: "rgba(242, 242, 247, 0.94)",
-  barFillAndroid: "#f2f2f7",
-  barBorder: "rgba(0, 0, 0, 0.08)",
-  title: "#1c1c1e",
-  accent: "#1b4332",
-  muted: "#8e8e93",
-  iconOnLight: "#1b4332",
-  subtleFill: "rgba(27, 67, 50, 0.1)",
+  barFill: "rgba(255, 248, 239, 0.9)",
+  barFillAndroid: "#fff8ef",
+  barBorder: "rgba(184, 179, 170, 0.75)",
+  title: "#2f332f",
+  accent: "#31463a",
+  muted: "#747870",
+  iconOnLight: "#31463a",
+  subtleFill: "rgba(95, 125, 103, 0.1)",
+  softOutline: "rgba(215, 210, 200, 0.92)",
 };
 
 const HEADER_BOTTOM_RADIUS = 20;
@@ -95,7 +96,7 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
           />
         </View>
         <Text style={styles.title} numberOfLines={1}>
-          Tindahan
+          Sukli
         </Text>
       </View>
 
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: COL.barBorder,
-    backgroundColor: "rgba(255, 255, 255, 0.55)",
+    backgroundColor: "rgba(255, 250, 242, 0.78)",
   },
   syncDotOuter: {
     position: "relative",
@@ -254,7 +255,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 22,
-    backgroundColor: "rgba(27, 67, 50, 0.08)",
+    backgroundColor: "rgba(95, 125, 103, 0.08)",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: COL.softOutline,
   },
   refreshPressed: {
     opacity: 0.75,
@@ -266,12 +269,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COL.barBorder,
+    borderColor: COL.softOutline,
     backgroundColor: COL.subtleFill,
   },
   avatarText: {
     fontSize: 12,
     fontWeight: "700",
-    color: COL.accent,
+    color: COL.title,
   },
 });

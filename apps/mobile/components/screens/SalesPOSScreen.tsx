@@ -120,7 +120,7 @@ export function SalesPOSScreen() {
             </View>
 
             <Entrance delayMs={40}>
-              <View className="flex-row items-center rounded-2xl bg-glass-surface px-4 py-3">
+              <View className="flex-row items-center rounded-2xl border border-outline bg-glass-surface px-4 py-3">
                 <AppIcon
                   name="search"
                   size={15}
@@ -189,7 +189,7 @@ export function SalesPOSScreen() {
             accessibilityRole="button"
             accessibilityLabel="View cart"
             onPress={() => setCartOpen(true)}
-            className="flex-row items-center gap-2 rounded-xl bg-hero-cta-ghost px-4 py-2"
+            className="flex-row items-center gap-2 rounded-xl border border-hero-cta-ghost-border bg-hero-cta-ghost px-4 py-2"
           >
             <AppIcon
               name="cart"
@@ -242,7 +242,7 @@ export function SalesPOSScreen() {
                   accessibilityRole="button"
                   accessibilityLabel="Close"
                   onPress={() => setCartOpen(false)}
-                  className="h-10 w-10 items-center justify-center rounded-full bg-overlay-muted"
+                  className="h-10 w-10 items-center justify-center rounded-full border border-outline bg-surface-container"
                 >
                   <AppIcon
                     name="x"
@@ -315,7 +315,7 @@ export function SalesPOSScreen() {
                 ))}
               </View>
 
-              <View className="mb-4 rounded-2xl border border-separator-subtle bg-glass-surface p-4">
+              <View className="mb-4 rounded-2xl border border-outline bg-glass-surface p-4">
                 <View className="mb-2 flex-row items-center justify-between">
                   <Text className="text-[13px] font-body-medium text-label-muted">
                     Subtotal
@@ -414,8 +414,10 @@ function ScrollCategories(props: {
             accessibilityRole="button"
             accessibilityLabel={`Filter ${category}`}
             onPress={() => onChange(category)}
-            className={`mr-[10px] rounded-full px-4 py-1.5 ${
-              active === category ? "bg-forest" : "bg-glass-surface"
+            className={`mr-[10px] rounded-full border px-4 py-1.5 ${
+              active === category
+                ? "border-revenue-hero bg-revenue-hero"
+                : "border-outline bg-glass-surface"
             }`}
           >
             <Text
@@ -445,7 +447,7 @@ function ProductCard(props: {
   return (
     <Entrance delayMs={40 + index * 30}>
       <View
-        className="mb-3 overflow-hidden rounded-2xl bg-glass-surface"
+        className="mb-3 overflow-hidden rounded-2xl border border-outline bg-glass-surface"
         style={{
           borderBottomWidth: product.stockLevel === "low" ? 3 : 0,
           borderBottomColor:
