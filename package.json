@@ -8,7 +8,6 @@
   ],
   "scripts": {
     "mobile:start": "npm run -w @sukli/mobile start",
-    "mobile:android": "npm run -w @sukli/mobile android",
     "mobile:lint": "npm run -w @sukli/mobile lint",
     "backend:dev": "npm run -w @sukli/backend dev",
     "backend:build": "npm run -w @sukli/backend build",
