@@ -43,11 +43,10 @@ function emptyDashboard(): HomeDashboardModel {
 
 export interface UseHomeDashboardResult {
   dashboard: HomeDashboardModel;
-  isLoading: boolean;
   error: Error | null;
 }
 
 export function useHomeDashboard(): UseHomeDashboardResult {
   const dashboard = useMemo(() => emptyDashboard(), []);
-  return { dashboard, isLoading: false, error: null };
+  return { dashboard, error: null };
 }
