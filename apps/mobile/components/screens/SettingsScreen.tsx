@@ -15,14 +15,6 @@ type SettingRow = {
 
 const rows: SettingRow[] = [
   {
-    id: "store",
-    icon: "storefront",
-    title: "Store profile",
-    subtitle: "Business name, address, and daily operating defaults.",
-    accentClassName: "text-forest",
-    accentSurfaceClassName: "bg-forest-alpha-14",
-  },
-  {
     id: "sync",
     icon: "cloud_sync",
     title: "Sync and backup",
@@ -56,7 +48,7 @@ export function SettingsScreen() {
           Settings
         </Text>
         <Text className="mt-1 text-[13px] font-body-semibold text-label-muted">
-          Keep Sukli reliable, bright, and store-ready on every device.
+          Keep Sukli reliable, bright, and stable on every device.
         </Text>
       </View>
 
@@ -72,8 +64,8 @@ export function SettingsScreen() {
             Sukli retail system
           </Text>
           <Text className="mt-1 text-[13px] font-body-medium leading-5 text-label-muted">
-            Bright retail surfaces, gray structure lines, and calm green actions
-            tuned for daily store operations.
+            Bright working surfaces, gray structure lines, and calm green
+            actions for everyday inventory and sales.
           </Text>
 
           <View className="mt-4 flex-row gap-3">

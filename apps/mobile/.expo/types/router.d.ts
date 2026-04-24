@@ -16,30 +16,6 @@ declare module "expo-router" {
             params?: Router.UnknownInputParams;
           }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
-        | {
-            pathname: `/../components/home/SectionEmptyState`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/home.utils`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/GreetingSection`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/StatsContainer`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/TransactionSection`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/Card`;
-            params?: Router.UnknownInputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
         | {
@@ -72,30 +48,6 @@ declare module "expo-router" {
             params?: Router.UnknownOutputParams;
           }
         | { pathname: `/smart-restock`; params?: Router.UnknownOutputParams }
-        | {
-            pathname: `/../components/home/SectionEmptyState`;
-            params?: Router.UnknownOutputParams;
-          }
-        | {
-            pathname: `/../components/home/home.utils`;
-            params?: Router.UnknownOutputParams;
-          }
-        | {
-            pathname: `/../components/home/GreetingSection`;
-            params?: Router.UnknownOutputParams;
-          }
-        | {
-            pathname: `/../components/home/StatsContainer`;
-            params?: Router.UnknownOutputParams;
-          }
-        | {
-            pathname: `/../components/home/TransactionSection`;
-            params?: Router.UnknownOutputParams;
-          }
-        | {
-            pathname: `/../components/home/Card`;
-            params?: Router.UnknownOutputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownOutputParams }
         | {
             pathname: `${"/(tabs)"}` | `/`;
@@ -125,12 +77,6 @@ declare module "expo-router" {
         | Router.RelativePathString
         | Router.ExternalPathString
         | `/smart-restock${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/SectionEmptyState${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/home.utils${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/GreetingSection${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/StatsContainer${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/TransactionSection${`?${string}` | `#${string}` | ""}`
-        | `/../components/home/Card${`?${string}` | `#${string}` | ""}`
         | `/_sitemap${`?${string}` | `#${string}` | ""}`
         | `${"/(tabs)"}${`?${string}` | `#${string}` | ""}`
         | `/${`?${string}` | `#${string}` | ""}`
@@ -153,30 +99,6 @@ declare module "expo-router" {
             params?: Router.UnknownInputParams;
           }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
-        | {
-            pathname: `/../components/home/SectionEmptyState`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/home.utils`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/GreetingSection`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/StatsContainer`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/TransactionSection`;
-            params?: Router.UnknownInputParams;
-          }
-        | {
-            pathname: `/../components/home/Card`;
-            params?: Router.UnknownInputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
         | {

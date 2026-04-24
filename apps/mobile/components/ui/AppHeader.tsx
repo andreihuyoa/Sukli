@@ -89,7 +89,7 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
         ) : null}
         <View style={styles.brandIcon}>
           <AppIcon
-            name="storefront"
+            name="inventory_2"
             size={18}
             color={COL.accent}
             strokeWidth={2.5}
