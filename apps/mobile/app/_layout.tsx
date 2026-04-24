@@ -1,6 +1,6 @@
 import { StoreProvider } from "@/context/StoreContext";
-import { getDb } from "@/db/client";
-import { migrations } from "@/db/migrations";
+import { getDb } from "@/lib/db/client";
+import { migrations } from "@/lib/db/migrations";
 import {
   NotoSans_400Regular,
   NotoSans_500Medium,

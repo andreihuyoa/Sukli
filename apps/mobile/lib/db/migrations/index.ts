@@ -247,7 +247,12 @@ CREATE INDEX IF NOT EXISTS \`expenses_created_idx\` ON \`expenses\` (\`created_a
 export const migrations: DrizzleMigrations = {
   journal: {
     entries: [
-      { idx: 0, when: 1744300000000, tag: "0000_initial_schema", breakpoints: true },
+      {
+        idx: 0,
+        when: 1744300000000,
+        tag: "0000_initial_schema",
+        breakpoints: true,
+      },
     ],
   },
   migrations: {

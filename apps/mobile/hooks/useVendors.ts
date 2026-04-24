@@ -1,14 +1,14 @@
-import { useMemo } from "react";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { getDb } from "@/db/client";
 import { useStore } from "@/context/StoreContext";
+import { getDb } from "@/lib/db/client";
 import {
-  buildVendorsQuery,
   buildPriceListQuery,
+  buildVendorsQuery,
   mapToSupplier,
   mapToVendorPriceListRow,
-} from "@/db/repositories/vendors.repository";
+} from "@/lib/db/repositories/vendors.repository";
 import type { Supplier, VendorPriceListRow } from "@/types";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { useMemo } from "react";
 
 export interface UseVendorsResult {
   suppliers: Supplier[];
@@ -25,20 +25,27 @@ export function useVendors(): UseVendorsResult {
   const db = getDb();
   const { storeId } = useStore();
 
-  const vendorQuery    = useMemo(() => buildVendorsQuery(db, storeId), [db, storeId]);
-  const priceListQuery = useMemo(() => buildPriceListQuery(db, storeId), [db, storeId]);
+  const vendorQuery = useMemo(
+    () => buildVendorsQuery(db, storeId),
+    [db, storeId]
+  );
+  const priceListQuery = useMemo(
+    () => buildPriceListQuery(db, storeId),
+    [db, storeId]
+  );
 
-  const { data: vendorData,    error: vendorError    } = useLiveQuery(vendorQuery);
-  const { data: priceListData, error: priceListError } = useLiveQuery(priceListQuery);
+  const { data: vendorData, error: vendorError } = useLiveQuery(vendorQuery);
+  const { data: priceListData, error: priceListError } =
+    useLiveQuery(priceListQuery);
 
   const suppliers: Supplier[] = useMemo(
     () => (vendorData ?? []).map(mapToSupplier),
-    [vendorData],
+    [vendorData]
   );
 
   const priceList: VendorPriceListRow[] = useMemo(
     () => (priceListData ?? []).map(mapToVendorPriceListRow),
-    [priceListData],
+    [priceListData]
   );
 
   const error = vendorError ?? priceListError ?? null;

@@ -12,11 +12,7 @@
  */
 
 import type { Supplier, VendorPriceListRow } from "@/types";
-import {
-  purchaseOrderItems,
-  purchaseOrders,
-  vendors,
-} from "../schema";
+import { purchaseOrderItems, purchaseOrders, vendors } from "../schema";
 import { desc, eq } from "drizzle-orm";
 import type { Db } from "../client";
 

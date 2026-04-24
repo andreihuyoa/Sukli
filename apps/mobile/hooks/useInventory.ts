@@ -1,12 +1,12 @@
-import { useMemo } from "react";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { getDb } from "@/db/client";
 import { useStore } from "@/context/StoreContext";
+import { getDb } from "@/lib/db/client";
 import {
   buildInventoryQuery,
   mapToInventoryItem,
-} from "@/db/repositories/inventory.repository";
+} from "@/lib/db/repositories/inventory.repository";
 import type { InventoryItem } from "@/types";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { useMemo } from "react";
 
 export interface UseInventoryResult {
   items: InventoryItem[];
@@ -29,7 +29,7 @@ export function useInventory(): UseInventoryResult {
 
   const items: InventoryItem[] = useMemo(
     () => (data ?? []).map(mapToInventoryItem),
-    [data],
+    [data]
   );
 
   return {

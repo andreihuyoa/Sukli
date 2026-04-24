@@ -1,12 +1,12 @@
-import { useMemo } from "react";
-import { useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { getDb } from "@/db/client";
 import { useStore } from "@/context/StoreContext";
+import { getDb } from "@/lib/db/client";
 import {
   buildPosCatalogQuery,
   mapToPosProduct,
-} from "@/db/repositories/catalog.repository";
+} from "@/lib/db/repositories/catalog.repository";
 import type { PosProduct } from "@/types";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { useMemo } from "react";
 
 export interface UsePosCatalogResult {
   products: PosProduct[];
@@ -27,7 +27,7 @@ export function usePosCatalog(): UsePosCatalogResult {
 
   const products: PosProduct[] = useMemo(
     () => (data ?? []).map(mapToPosProduct),
-    [data],
+    [data]
   );
 
   return {

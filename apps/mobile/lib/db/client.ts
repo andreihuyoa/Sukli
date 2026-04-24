@@ -9,12 +9,12 @@
  * referential integrity on every write.
  */
 
-import { openDatabaseSync } from 'expo-sqlite';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
-import * as schema from './schema';
-import * as relations from './relations';
+import { openDatabaseSync } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import * as schema from "./schema";
+import * as relations from "./relations";
 
-const DB_NAME = 'sukli.db';
+const DB_NAME = "sukli.db";
 
 // Lazy singleton — created on first import, reused thereafter.
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -26,8 +26,8 @@ export function getDb() {
 
   // Connection-level settings applied every open (not in migrations).
   // WAL improves concurrent read performance; FK enforcement is off by default.
-  sqlite.execSync('PRAGMA journal_mode = WAL;');
-  sqlite.execSync('PRAGMA foreign_keys = ON;');
+  sqlite.execSync("PRAGMA journal_mode = WAL;");
+  sqlite.execSync("PRAGMA foreign_keys = ON;");
 
   _db = drizzle(sqlite, { schema: { ...schema, ...relations } });
   return _db;
