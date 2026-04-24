@@ -39,6 +39,7 @@ export default function RootLayout() {
   // applies any outstanding migration SQL before the first screen renders.
   const db = getDb();
   const { success: dbReady, error: dbError } = useMigrations(db, migrations);
+
   const [setupReady, setSetupReady] = useState(false);
   const [setupError, setSetupError] = useState<Error | null>(null);
 
