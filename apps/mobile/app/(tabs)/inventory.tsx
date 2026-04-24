@@ -5,12 +5,13 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
+import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { useInventory } from "@/hooks/useInventory";
 import type { InventoryItem } from "@/types";
 
+const HEADER_BODY = 56;
 const TAB_BAR = 88;
-const TOP_CONTENT_INSET = 16;
 
 export default function InventoryScreen() {
   const { items } = useInventory();
@@ -34,12 +35,13 @@ export default function InventoryScreen() {
   const totalSkus = items.length;
 
   return (
-    <View className="flex-1 bg-screen-grouped">
+    <View className="flex-1 bg-background">
+      <AppHeader />
       <FlashList
         data={filtered}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + TOP_CONTENT_INSET,
+          paddingTop: insets.top + HEADER_BODY + 8,
           paddingBottom: TAB_BAR + insets.bottom + 24,
         }}
         ListHeaderComponent={
@@ -65,7 +67,10 @@ export default function InventoryScreen() {
 
             <View className="flex-row gap-3 mx-4 mb-5">
               <Entrance delayMs={50}>
-                <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-outline bg-glass-surface p-4">
+                <View
+                  className="flex-1 rounded-2xl p-4 flex-row items-center gap-3"
+                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+                >
                   <View
                     className="h-10 w-10 rounded-xl items-center justify-center"
                     style={{ backgroundColor: "#2d6a4f" }}
@@ -95,7 +100,14 @@ export default function InventoryScreen() {
               </Entrance>
 
               <Entrance delayMs={100}>
-                <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-critical-border bg-glass-surface p-4">
+                <View
+                  className="flex-1 rounded-2xl p-4 flex-row items-center gap-3"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.82)",
+                    borderColor: "rgba(106,51,66,0.15)",
+                    borderWidth: 1,
+                  }}
+                >
                   <View
                     className="h-10 w-10 rounded-xl items-center justify-center"
                     style={{ backgroundColor: "rgba(106,51,66,0.12)" }}
@@ -127,7 +139,10 @@ export default function InventoryScreen() {
 
             <View className="mx-4 mb-3">
               <Entrance delayMs={150}>
-                <View className="flex-row items-center gap-3 rounded-2xl border border-outline bg-glass-surface px-4 py-3">
+                <View
+                  className="flex-row items-center gap-3 px-4 py-3 rounded-2xl"
+                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+                >
                   <AppIcon
                     name="search"
                     size={16}
@@ -151,7 +166,8 @@ export default function InventoryScreen() {
               <Entrance delayMs={180}>
                 <Pressable
                   accessibilityRole="button"
-                  className="flex-1 flex-row items-center justify-center rounded-xl border border-outline bg-glass-surface py-2.5"
+                  className="flex-1 rounded-xl py-2.5 flex-row items-center justify-center"
+                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
                 >
                   <AppIcon
                     name="filter_list"
@@ -171,7 +187,8 @@ export default function InventoryScreen() {
               <Entrance delayMs={220}>
                 <Pressable
                   accessibilityRole="button"
-                  className="flex-1 flex-row items-center justify-center rounded-xl border border-outline bg-glass-surface py-2.5"
+                  className="flex-1 rounded-xl py-2.5 flex-row items-center justify-center"
+                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
                 >
                   <AppIcon
                     name="sort"
@@ -221,10 +238,10 @@ export default function InventoryScreen() {
               accessibilityLabel="Add new product"
               className="mx-4 mt-5 flex-row items-center justify-center gap-2 py-4 rounded-2xl"
               style={{
-                backgroundColor: "#fffaf2",
+                backgroundColor: "rgba(255,255,255,0.82)",
                 borderStyle: "dashed",
                 borderWidth: 1.5,
-                borderColor: "#b8b3aa",
+                borderColor: "rgba(27,67,50,0.25)",
               }}
               onPress={() => {
                 // Wire to catalog / API create flow.
@@ -256,9 +273,9 @@ function InventoryRow(props: { item: InventoryItem; index: number }) {
   return (
     <Entrance delayMs={100 + index * 60}>
       <View
-        className="overflow-hidden rounded-2xl border border-outline"
+        className="rounded-2xl overflow-hidden"
         style={{
-          backgroundColor: "#fffaf2",
+          backgroundColor: "rgba(255,255,255,0.82)",
           borderBottomWidth: isLow ? 3 : 0,
           borderBottomColor: isLow ? "rgba(106,51,66,0.3)" : "transparent",
         }}
