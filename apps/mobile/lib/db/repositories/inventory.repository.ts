@@ -66,17 +66,24 @@ export interface InventoryMutationResult {
 }
 
 export function mapToInventoryItem(row: InventoryRow): InventoryItem {
-  const qty = row.quantityOnHand ?? 0;
-  const reorderPoint = row.reorderPoint ?? 0;
+  const qty = requireNumber(
+    row.quantityOnHand,
+    "stock_levels.quantity_on_hand"
+  );
+  const reorderPoint = requireNumber(
+    row.reorderPoint,
+    "stock_levels.reorder_point"
+  );
 
   const status: InventoryStockStatus = qty > reorderPoint ? "optimal" : "low";
 
-  const imageUrls = safeParseJsonArray(row.imageUrls);
+  const imageUrls = parseJsonArray(row.imageUrls, "products.image_urls");
+  const imageUrl = getOptionalImageUri(imageUrls, "products.image_urls");
 
   return {
     id: row.id,
     name: row.name,
-    category: row.categoryName ?? "Uncategorised",
+    category: row.categoryName ?? "",
     price: row.price,
     costPrice: row.costPrice,
     reorderPoint,
@@ -84,7 +91,7 @@ export function mapToInventoryItem(row: InventoryRow): InventoryItem {
     available: qty,
     unit: row.unit,
     status,
-    imageUrl: imageUrls[0] ?? "",
+    imageUrl,
   };
 }
 
@@ -206,69 +213,38 @@ export function updateInventoryProduct(
       )
       .get();
 
-    if (existingStock) {
-      tx.update(stockLevels)
-        .set({
-          quantityOnHand: value.quantityOnHand,
-          reorderPoint: value.reorderPoint,
-          syncStatus: "pending",
-          lastSyncedAt: null,
-          updatedAt: now,
-        })
-        .where(eq(stockLevels.id, existingStock.id))
-        .run();
+    if (!existingStock) {
+      throw new Error("Base stock level not found.");
+    }
 
-      const delta = value.quantityOnHand - existingStock.quantityOnHand;
-      if (delta !== 0) {
-        tx.insert(stockMovements)
-          .values({
-            id: createLocalId(),
-            productId: input.id,
-            variantId: null,
-            movementType: "adjustment",
-            quantityDelta: delta,
-            referenceId: null,
-            note: "Inventory count updated",
-            performedBy: null,
-            syncStatus: "pending",
-            lastSyncedAt: null,
-            createdAt: now,
-          })
-          .run();
-      }
-    } else {
-      tx.insert(stockLevels)
+    tx.update(stockLevels)
+      .set({
+        quantityOnHand: value.quantityOnHand,
+        reorderPoint: value.reorderPoint,
+        syncStatus: "pending",
+        lastSyncedAt: null,
+        updatedAt: now,
+      })
+      .where(eq(stockLevels.id, existingStock.id))
+      .run();
+
+    const delta = value.quantityOnHand - existingStock.quantityOnHand;
+    if (delta !== 0) {
+      tx.insert(stockMovements)
         .values({
           id: createLocalId(),
           productId: input.id,
           variantId: null,
-          quantityOnHand: value.quantityOnHand,
-          reorderPoint: value.reorderPoint,
-          reorderQuantity: 0,
-          location: null,
+          movementType: "adjustment",
+          quantityDelta: delta,
+          referenceId: null,
+          note: "Inventory count updated",
+          performedBy: null,
           syncStatus: "pending",
           lastSyncedAt: null,
-          updatedAt: now,
+          createdAt: now,
         })
         .run();
-
-      if (value.quantityOnHand !== 0) {
-        tx.insert(stockMovements)
-          .values({
-            id: createLocalId(),
-            productId: input.id,
-            variantId: null,
-            movementType: "adjustment",
-            quantityDelta: value.quantityOnHand,
-            referenceId: null,
-            note: "Inventory count restored",
-            performedBy: null,
-            syncStatus: "pending",
-            lastSyncedAt: null,
-            createdAt: now,
-          })
-          .run();
-      }
     }
   });
 
@@ -281,15 +257,27 @@ export function deleteInventoryProduct(
 ): InventoryMutationResult {
   const now = new Date();
 
-  db.update(products)
-    .set({
-      isActive: false,
-      syncStatus: "pending",
-      lastSyncedAt: null,
-      updatedAt: now,
-    })
-    .where(and(eq(products.id, input.id), eq(products.isActive, true)))
-    .run();
+  db.transaction((tx) => {
+    const existing = tx
+      .select({ id: products.id })
+      .from(products)
+      .where(and(eq(products.id, input.id), eq(products.isActive, true)))
+      .get();
+
+    if (!existing) {
+      throw new Error("Product not found.");
+    }
+
+    tx.update(products)
+      .set({
+        isActive: false,
+        syncStatus: "pending",
+        lastSyncedAt: null,
+        updatedAt: now,
+      })
+      .where(eq(products.id, input.id))
+      .run();
+  });
 
   return { id: input.id };
 }
@@ -327,8 +315,8 @@ function getOrCreateCategoryId(
 function normalizeProductInput(input: InventoryProductInput) {
   const name = input.name.trim();
   const categoryName = input.categoryName.trim();
-  const unit = input.unit.trim() || "pc";
-  const imageUrl = input.imageUrl?.trim() || null;
+  const unit = input.unit.trim();
+  const imageUrl = input.imageUrl ? input.imageUrl.trim() : null;
 
   assertFinitePositive(input.price, "Price");
   assertFiniteNonNegative(input.costPrice, "Cost price");
@@ -337,6 +325,10 @@ function normalizeProductInput(input: InventoryProductInput) {
 
   if (!name) {
     throw new Error("Product name is required.");
+  }
+
+  if (!unit) {
+    throw new Error("Product unit is required.");
   }
 
   return {
@@ -382,14 +374,38 @@ function formatPeso(value: number): string {
   })}`;
 }
 
-function safeParseJsonArray(raw: string | null): string[] {
-  if (!raw) return [];
+function parseJsonArray(raw: string, fieldName: string): string[] {
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+    if (!Array.isArray(parsed)) {
+      throw new Error(`${fieldName} must contain a JSON array.`);
+    }
+
+    return parsed;
+  } catch (error) {
+    throw new Error(`Invalid JSON in ${fieldName}.`, { cause: error });
   }
+}
+
+function requireNumber(value: number | null, fieldName: string): number {
+  if (value === null) {
+    throw new Error(`Missing required database value: ${fieldName}.`);
+  }
+
+  return value;
+}
+
+function getOptionalImageUri(values: string[], fieldName: string): string {
+  if (values.length === 0) {
+    return "";
+  }
+
+  const [uri] = values;
+  if (typeof uri !== "string") {
+    throw new Error(`${fieldName} must contain image URI strings.`);
+  }
+
+  return uri;
 }
 
 const ULID_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";

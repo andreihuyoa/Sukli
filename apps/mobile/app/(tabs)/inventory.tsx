@@ -1,5 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -104,6 +105,72 @@ export default function InventoryScreen() {
 
   const setFormField = (field: keyof InventoryFormState, value: string) => {
     setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const setImageFromPickerResult = (result: ImagePicker.ImagePickerResult) => {
+    if (result.canceled) return;
+
+    const imageUri = result.assets[0]?.uri;
+    if (!imageUri) {
+      throw new Error("Selected image did not return a local URI.");
+    }
+
+    setFormField("imageUrl", imageUri);
+  };
+
+  const pickImageFromGallery = async () => {
+    setFormError(null);
+
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        throw new Error("Gallery permission is required to choose an image.");
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85,
+      });
+
+      setImageFromPickerResult(result);
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Image selection failed."
+      );
+    }
+  };
+
+  const takePhoto = async () => {
+    setFormError(null);
+
+    try {
+      const permission = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permission.granted) {
+        throw new Error(
+          "Camera permission is required to take a product photo."
+        );
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.85,
+      });
+
+      setImageFromPickerResult(result);
+    } catch (error) {
+      setFormError(
+        error instanceof Error ? error.message : "Camera capture failed."
+      );
+    }
+  };
+
+  const removeImage = () => {
+    setFormField("imageUrl", "");
   };
 
   const handleSubmit = () => {
@@ -393,6 +460,9 @@ export default function InventoryScreen() {
         isSaving={isSaving}
         canDelete={editorMode === "edit"}
         onChange={setFormField}
+        onPickImage={pickImageFromGallery}
+        onTakePhoto={takePhoto}
+        onRemoveImage={removeImage}
         onClose={closeEditor}
         onSubmit={handleSubmit}
         onDelete={handleDelete}
@@ -525,6 +595,9 @@ function InventoryEditorModal(props: {
   isSaving: boolean;
   canDelete: boolean;
   onChange: (field: keyof InventoryFormState, value: string) => void;
+  onPickImage: () => void;
+  onTakePhoto: () => void;
+  onRemoveImage: () => void;
   onClose: () => void;
   onSubmit: () => void;
   onDelete: () => void;
@@ -537,6 +610,9 @@ function InventoryEditorModal(props: {
     isSaving,
     canDelete,
     onChange,
+    onPickImage,
+    onTakePhoto,
+    onRemoveImage,
     onClose,
     onSubmit,
     onDelete,
@@ -656,13 +732,11 @@ function InventoryEditorModal(props: {
                   containerClassName="flex-1"
                 />
               </View>
-              <InventoryField
-                label="Image URL"
-                value={form.imageUrl}
-                onChangeText={(value) => onChange("imageUrl", value)}
-                placeholder="https://..."
-                autoCapitalize="none"
-                keyboardType="url"
+              <InventoryImagePicker
+                imageUri={form.imageUrl}
+                onPickImage={onPickImage}
+                onTakePhoto={onTakePhoto}
+                onRemoveImage={onRemoveImage}
               />
             </View>
 
@@ -742,7 +816,7 @@ function InventoryField(props: {
   value: string;
   onChangeText: (value: string) => void;
   placeholder: string;
-  keyboardType?: "default" | "decimal-pad" | "url";
+  keyboardType?: "default" | "decimal-pad";
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   containerClassName?: string;
 }) {
@@ -782,10 +856,120 @@ function InventoryField(props: {
   );
 }
 
+function InventoryImagePicker(props: {
+  imageUri: string;
+  onPickImage: () => void;
+  onTakePhoto: () => void;
+  onRemoveImage: () => void;
+}) {
+  const { imageUri, onPickImage, onTakePhoto, onRemoveImage } = props;
+
+  return (
+    <View>
+      <Text
+        className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em]"
+        style={{ color: "#8e8e93" }}
+      >
+        Product image
+      </Text>
+      <View
+        className="rounded-2xl p-3"
+        style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+      >
+        <View className="flex-row items-center gap-3">
+          <View
+            className="h-16 w-16 rounded-xl overflow-hidden shrink-0"
+            style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
+          >
+            {imageUri ? (
+              <Image
+                source={{ uri: imageUri }}
+                style={{ width: 64, height: 64 }}
+                contentFit="cover"
+              />
+            ) : (
+              <View className="h-16 w-16 items-center justify-center">
+                <AppIcon
+                  name="inventory_2"
+                  size={24}
+                  color="#8e8e93"
+                  strokeWidth={1.8}
+                />
+              </View>
+            )}
+          </View>
+
+          <View className="flex-1 gap-2">
+            <View className="flex-row gap-2">
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Choose product image from gallery"
+                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl"
+                style={{ backgroundColor: "rgba(27,67,50,0.1)" }}
+                onPress={onPickImage}
+              >
+                <AppIcon
+                  name="photo_library"
+                  size={16}
+                  color="#1b4332"
+                  strokeWidth={2.4}
+                />
+                <Text
+                  className="font-body-medium font-bold"
+                  style={{ color: "#1b4332", fontSize: 12 }}
+                >
+                  Gallery
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Take product photo"
+                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl"
+                style={{ backgroundColor: "rgba(27,67,50,0.1)" }}
+                onPress={onTakePhoto}
+              >
+                <AppIcon
+                  name="photo_camera"
+                  size={16}
+                  color="#1b4332"
+                  strokeWidth={2.4}
+                />
+                <Text
+                  className="font-body-medium font-bold"
+                  style={{ color: "#1b4332", fontSize: 12 }}
+                >
+                  Camera
+                </Text>
+              </Pressable>
+            </View>
+
+            {imageUri ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Remove product image"
+                className="h-9 items-center justify-center rounded-xl"
+                style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
+                onPress={onRemoveImage}
+              >
+                <Text
+                  className="font-body-medium font-bold"
+                  style={{ color: "#6a3342", fontSize: 12 }}
+                >
+                  Remove Image
+                </Text>
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 function formFromItem(item: InventoryItem): InventoryFormState {
   return {
     name: item.name,
-    category: item.category === "Uncategorised" ? "" : item.category,
+    category: item.category,
     unit: item.unit,
     price: String(item.price),
     costPrice: String(item.costPrice),
