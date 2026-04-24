@@ -13,7 +13,6 @@ type SQLiteTableInfo = {
 
 type LegacyTableColumn = {
   name: string;
-  fallbackSql?: string;
 };
 
 type LegacyTableDefinition = {
@@ -31,7 +30,7 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`id\` TEXT PRIMARY KEY NOT NULL,
         \`name\` TEXT NOT NULL,
         \`parent_id\` TEXT,
-        \`sort_order\` INTEGER NOT NULL DEFAULT 0,
+        \`sort_order\` INTEGER NOT NULL,
         \`created_at\` INTEGER NOT NULL,
         \`updated_at\` INTEGER NOT NULL
       );
@@ -41,7 +40,7 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "id" },
       { name: "name" },
       { name: "parent_id" },
-      { name: "sort_order", fallbackSql: "0" },
+      { name: "sort_order" },
       { name: "created_at" },
       { name: "updated_at" },
     ],
@@ -56,12 +55,12 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`description\` TEXT,
         \`sku\` TEXT,
         \`barcode\` TEXT,
-        \`unit\` TEXT NOT NULL DEFAULT 'pc',
-        \`price\` REAL NOT NULL DEFAULT 0,
-        \`cost_price\` REAL NOT NULL DEFAULT 0,
-        \`image_urls\` TEXT NOT NULL DEFAULT '[]',
-        \`is_active\` INTEGER NOT NULL DEFAULT 1,
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`unit\` TEXT NOT NULL,
+        \`price\` REAL NOT NULL,
+        \`cost_price\` REAL NOT NULL,
+        \`image_urls\` TEXT NOT NULL,
+        \`is_active\` INTEGER NOT NULL,
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL,
         \`updated_at\` INTEGER NOT NULL
@@ -79,13 +78,13 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "description" },
       { name: "sku" },
       { name: "barcode" },
-      { name: "unit", fallbackSql: "'pc'" },
-      { name: "price", fallbackSql: "0" },
-      { name: "cost_price", fallbackSql: "0" },
-      { name: "image_urls", fallbackSql: "'[]'" },
-      { name: "is_active", fallbackSql: "1" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "unit" },
+      { name: "price" },
+      { name: "cost_price" },
+      { name: "image_urls" },
+      { name: "is_active" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
       { name: "updated_at" },
     ],
@@ -97,11 +96,11 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`id\` TEXT PRIMARY KEY NOT NULL,
         \`product_id\` TEXT NOT NULL REFERENCES \`products\`(\`id\`),
         \`variant_id\` TEXT REFERENCES \`product_variants\`(\`id\`),
-        \`quantity_on_hand\` REAL NOT NULL DEFAULT 0,
-        \`reorder_point\` REAL NOT NULL DEFAULT 0,
-        \`reorder_quantity\` REAL NOT NULL DEFAULT 0,
+        \`quantity_on_hand\` REAL NOT NULL,
+        \`reorder_point\` REAL NOT NULL,
+        \`reorder_quantity\` REAL NOT NULL,
         \`location\` TEXT,
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`updated_at\` INTEGER NOT NULL
       );
@@ -114,12 +113,12 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "id" },
       { name: "product_id" },
       { name: "variant_id" },
-      { name: "quantity_on_hand", fallbackSql: "0" },
-      { name: "reorder_point", fallbackSql: "0" },
-      { name: "reorder_quantity", fallbackSql: "0" },
+      { name: "quantity_on_hand" },
+      { name: "reorder_point" },
+      { name: "reorder_quantity" },
       { name: "location" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "updated_at" },
     ],
   },
@@ -135,7 +134,7 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`reference_id\` TEXT,
         \`note\` TEXT,
         \`performed_by\` TEXT REFERENCES \`users\`(\`id\`),
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL
       );
@@ -153,8 +152,8 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "reference_id" },
       { name: "note" },
       { name: "performed_by" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
     ],
   },
@@ -164,14 +163,14 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       CREATE TABLE \`sale_orders\` (
         \`id\` TEXT PRIMARY KEY NOT NULL,
         \`order_number\` TEXT NOT NULL,
-        \`status\` TEXT NOT NULL DEFAULT 'draft' CHECK (\`status\` IN ('draft','confirmed','voided')),
-        \`total_amount\` REAL NOT NULL DEFAULT 0,
-        \`discount_amount\` REAL NOT NULL DEFAULT 0,
-        \`tax_amount\` REAL NOT NULL DEFAULT 0,
+        \`status\` TEXT NOT NULL CHECK (\`status\` IN ('draft','confirmed','voided')),
+        \`total_amount\` REAL NOT NULL,
+        \`discount_amount\` REAL NOT NULL,
+        \`tax_amount\` REAL NOT NULL,
         \`payment_method\` TEXT CHECK (\`payment_method\` IN ('cash','card','gcash','maya','credit','other')),
         \`cashier_id\` TEXT REFERENCES \`users\`(\`id\`),
         \`note\` TEXT,
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL,
         \`updated_at\` INTEGER NOT NULL
@@ -184,15 +183,15 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
     columns: [
       { name: "id" },
       { name: "order_number" },
-      { name: "status", fallbackSql: "'draft'" },
-      { name: "total_amount", fallbackSql: "0" },
-      { name: "discount_amount", fallbackSql: "0" },
-      { name: "tax_amount", fallbackSql: "0" },
+      { name: "status" },
+      { name: "total_amount" },
+      { name: "discount_amount" },
+      { name: "tax_amount" },
       { name: "payment_method" },
       { name: "cashier_id" },
       { name: "note" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
       { name: "updated_at" },
     ],
@@ -208,8 +207,8 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`email\` TEXT,
         \`address\` TEXT,
         \`notes\` TEXT,
-        \`is_active\` INTEGER NOT NULL DEFAULT 1,
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`is_active\` INTEGER NOT NULL,
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL,
         \`updated_at\` INTEGER NOT NULL
@@ -224,9 +223,9 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "email" },
       { name: "address" },
       { name: "notes" },
-      { name: "is_active", fallbackSql: "1" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "is_active" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
       { name: "updated_at" },
     ],
@@ -238,12 +237,12 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`id\` TEXT PRIMARY KEY NOT NULL,
         \`vendor_id\` TEXT REFERENCES \`vendors\`(\`id\`),
         \`po_number\` TEXT NOT NULL,
-        \`status\` TEXT NOT NULL DEFAULT 'draft' CHECK (\`status\` IN ('draft','sent','received','cancelled')),
-        \`total_amount\` REAL NOT NULL DEFAULT 0,
+        \`status\` TEXT NOT NULL CHECK (\`status\` IN ('draft','sent','received','cancelled')),
+        \`total_amount\` REAL NOT NULL,
         \`expected_date\` INTEGER,
         \`received_date\` INTEGER,
         \`note\` TEXT,
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL,
         \`updated_at\` INTEGER NOT NULL
@@ -257,13 +256,13 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "id" },
       { name: "vendor_id" },
       { name: "po_number" },
-      { name: "status", fallbackSql: "'draft'" },
-      { name: "total_amount", fallbackSql: "0" },
+      { name: "status" },
+      { name: "total_amount" },
       { name: "expected_date" },
       { name: "received_date" },
       { name: "note" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
       { name: "updated_at" },
     ],
@@ -277,7 +276,7 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
         \`amount\` REAL NOT NULL,
         \`description\` TEXT,
         \`performed_by\` TEXT REFERENCES \`users\`(\`id\`),
-        \`sync_status\` TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+        \`sync_status\` TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
         \`last_synced_at\` INTEGER,
         \`created_at\` INTEGER NOT NULL
       );
@@ -291,8 +290,8 @@ const LEGACY_STORE_TABLES: LegacyTableDefinition[] = [
       { name: "amount" },
       { name: "description" },
       { name: "performed_by" },
-      { name: "sync_status", fallbackSql: "'pending'" },
-      { name: "last_synced_at", fallbackSql: "NULL" },
+      { name: "sync_status" },
+      { name: "last_synced_at" },
       { name: "created_at" },
     ],
   },
@@ -302,7 +301,6 @@ export function ensureDatabaseCompatibility(db: Db): void {
   const sqlite = db.$client;
 
   migrateLegacyStoreScope(sqlite);
-  ensureProductPricingColumns(sqlite);
   ensureCurrentSchema(sqlite);
 }
 
@@ -337,26 +335,6 @@ function migrateLegacyStoreScope(sqlite: SQLiteClient): void {
   }
 }
 
-function ensureProductPricingColumns(sqlite: SQLiteClient): void {
-  if (!tableExists(sqlite, "products")) {
-    return;
-  }
-
-  const columns = getTableColumns(sqlite, "products");
-
-  if (!columns.has("price")) {
-    sqlite.execSync(
-      "ALTER TABLE `products` ADD COLUMN `price` REAL NOT NULL DEFAULT 0;"
-    );
-  }
-
-  if (!columns.has("cost_price")) {
-    sqlite.execSync(
-      "ALTER TABLE `products` ADD COLUMN `cost_price` REAL NOT NULL DEFAULT 0;"
-    );
-  }
-}
-
 function ensureCurrentSchema(sqlite: SQLiteClient): void {
   sqlite.execSync(baseSchemaSql);
 }
@@ -370,16 +348,24 @@ function rebuildLegacyTable(
   }
 
   const currentColumns = getTableColumns(sqlite, definition.name);
+  const missingColumns = definition.columns
+    .filter((column) => !currentColumns.has(column.name))
+    .map((column) => column.name);
+
+  if (missingColumns.length > 0) {
+    throw new Error(
+      `Cannot rebuild legacy table "${definition.name}"; missing columns: ${missingColumns.join(
+        ", "
+      )}.`
+    );
+  }
+
   const legacyName = `${definition.name}__legacy`;
   const insertColumns = definition.columns
     .map((column) => `\`${column.name}\``)
     .join(", ");
   const selectColumns = definition.columns
-    .map((column) =>
-      currentColumns.has(column.name)
-        ? `\`${column.name}\``
-        : `${column.fallbackSql ?? "NULL"} AS \`${column.name}\``
-    )
+    .map((column) => `\`${column.name}\``)
     .join(", ");
 
   sqlite.execSync(
@@ -419,12 +405,16 @@ function tableHasColumn(
   tableName: string,
   columnName: string
 ): boolean {
+  if (!tableExists(sqlite, tableName)) {
+    return false;
+  }
+
   return getTableColumns(sqlite, tableName).has(columnName);
 }
 
 function getTableColumns(sqlite: SQLiteClient, tableName: string): Set<string> {
   if (!tableExists(sqlite, tableName)) {
-    return new Set();
+    throw new Error(`Table "${tableName}" does not exist.`);
   }
 
   return new Set(

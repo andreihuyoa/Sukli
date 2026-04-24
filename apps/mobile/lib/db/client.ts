@@ -25,7 +25,7 @@ export function getDb() {
   const sqlite = openDatabaseSync(DB_NAME, { enableChangeListener: true });
 
   // Connection-level settings applied every open (not in migrations).
-  // WAL improves concurrent read performance; FK enforcement is off by default.
+  // WAL improves concurrent read performance; FK enforcement is per connection.
   sqlite.execSync("PRAGMA journal_mode = WAL;");
   sqlite.execSync("PRAGMA foreign_keys = ON;");
 

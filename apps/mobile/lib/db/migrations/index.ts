@@ -28,14 +28,13 @@ export interface DrizzleMigrations {
   migrations: Record<string, string>;
 }
 
-// ─── 0000: Initial schema ─────────────────────────────────────────────────────
-
+// Initial schema
 export const baseSchemaSql = `
 CREATE TABLE IF NOT EXISTS \`users\` (
   \`id\`            TEXT PRIMARY KEY NOT NULL,
   \`email\`         TEXT NOT NULL UNIQUE,
   \`password_hash\` TEXT NOT NULL,
-  \`role\`          TEXT NOT NULL DEFAULT 'staff' CHECK (\`role\` IN ('owner','manager','staff')),
+  \`role\`          TEXT NOT NULL CHECK (\`role\` IN ('owner','manager','staff')),
   \`created_at\`    INTEGER NOT NULL,
   \`updated_at\`    INTEGER NOT NULL
 );
@@ -45,7 +44,7 @@ CREATE TABLE IF NOT EXISTS \`categories\` (
   \`id\`         TEXT PRIMARY KEY NOT NULL,
   \`name\`       TEXT NOT NULL,
   \`parent_id\`  TEXT,
-  \`sort_order\` INTEGER NOT NULL DEFAULT 0,
+  \`sort_order\` INTEGER NOT NULL,
   \`created_at\` INTEGER NOT NULL,
   \`updated_at\` INTEGER NOT NULL
 );
@@ -57,12 +56,12 @@ CREATE TABLE IF NOT EXISTS \`products\` (
   \`description\`    TEXT,
   \`sku\`            TEXT,
   \`barcode\`        TEXT,
-  \`unit\`           TEXT NOT NULL DEFAULT 'pc',
-  \`price\`          REAL NOT NULL DEFAULT 0,
-  \`cost_price\`     REAL NOT NULL DEFAULT 0,
-  \`image_urls\`     TEXT NOT NULL DEFAULT '[]',
-  \`is_active\`      INTEGER NOT NULL DEFAULT 1,
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`unit\`           TEXT NOT NULL,
+  \`price\`          REAL NOT NULL,
+  \`cost_price\`     REAL NOT NULL,
+  \`image_urls\`     TEXT NOT NULL,
+  \`is_active\`      INTEGER NOT NULL,
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL,
   \`updated_at\`     INTEGER NOT NULL
@@ -74,10 +73,10 @@ CREATE INDEX IF NOT EXISTS \`products_barcode_idx\` ON \`products\` (\`barcode\`
 CREATE TABLE IF NOT EXISTS \`product_variants\` (
   \`id\`             TEXT PRIMARY KEY NOT NULL,
   \`product_id\`     TEXT NOT NULL REFERENCES \`products\`(\`id\`),
-  \`attributes\`     TEXT NOT NULL DEFAULT '{}',
+  \`attributes\`     TEXT NOT NULL,
   \`sku\`            TEXT,
   \`barcode\`        TEXT,
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL,
   \`updated_at\`     INTEGER NOT NULL
@@ -88,11 +87,11 @@ CREATE TABLE IF NOT EXISTS \`stock_levels\` (
   \`id\`               TEXT PRIMARY KEY NOT NULL,
   \`product_id\`       TEXT NOT NULL REFERENCES \`products\`(\`id\`),
   \`variant_id\`       TEXT REFERENCES \`product_variants\`(\`id\`),
-  \`quantity_on_hand\` REAL NOT NULL DEFAULT 0,
-  \`reorder_point\`    REAL NOT NULL DEFAULT 0,
-  \`reorder_quantity\` REAL NOT NULL DEFAULT 0,
+  \`quantity_on_hand\` REAL NOT NULL,
+  \`reorder_point\`    REAL NOT NULL,
+  \`reorder_quantity\` REAL NOT NULL,
   \`location\`         TEXT,
-  \`sync_status\`      TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`      TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\`   INTEGER,
   \`updated_at\`       INTEGER NOT NULL
 );
@@ -109,7 +108,7 @@ CREATE TABLE IF NOT EXISTS \`stock_movements\` (
   \`reference_id\`   TEXT,
   \`note\`           TEXT,
   \`performed_by\`   TEXT REFERENCES \`users\`(\`id\`),
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL
 );
@@ -119,14 +118,14 @@ CREATE INDEX IF NOT EXISTS \`stock_movements_created_idx\` ON \`stock_movements\
 CREATE TABLE IF NOT EXISTS \`sale_orders\` (
   \`id\`              TEXT PRIMARY KEY NOT NULL,
   \`order_number\`    TEXT NOT NULL,
-  \`status\`          TEXT NOT NULL DEFAULT 'draft' CHECK (\`status\` IN ('draft','confirmed','voided')),
-  \`total_amount\`    REAL NOT NULL DEFAULT 0,
-  \`discount_amount\` REAL NOT NULL DEFAULT 0,
-  \`tax_amount\`      REAL NOT NULL DEFAULT 0,
+  \`status\`          TEXT NOT NULL CHECK (\`status\` IN ('draft','confirmed','voided')),
+  \`total_amount\`    REAL NOT NULL,
+  \`discount_amount\` REAL NOT NULL,
+  \`tax_amount\`      REAL NOT NULL,
   \`payment_method\`  TEXT CHECK (\`payment_method\` IN ('cash','card','gcash','maya','credit','other')),
   \`cashier_id\`      TEXT REFERENCES \`users\`(\`id\`),
   \`note\`            TEXT,
-  \`sync_status\`     TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`     TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\`  INTEGER,
   \`created_at\`      INTEGER NOT NULL,
   \`updated_at\`      INTEGER NOT NULL
@@ -144,7 +143,7 @@ CREATE TABLE IF NOT EXISTS \`sale_order_items\` (
   \`sku\`          TEXT,
   \`quantity\`     REAL NOT NULL,
   \`unit_price\`   REAL NOT NULL,
-  \`discount\`     REAL NOT NULL DEFAULT 0,
+  \`discount\`     REAL NOT NULL,
   \`total\`        REAL NOT NULL
 );
 CREATE INDEX IF NOT EXISTS \`sale_order_items_order_idx\` ON \`sale_order_items\` (\`order_id\`);
@@ -158,8 +157,8 @@ CREATE TABLE IF NOT EXISTS \`vendors\` (
   \`email\`          TEXT,
   \`address\`        TEXT,
   \`notes\`          TEXT,
-  \`is_active\`      INTEGER NOT NULL DEFAULT 1,
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`is_active\`      INTEGER NOT NULL,
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL,
   \`updated_at\`     INTEGER NOT NULL
@@ -169,12 +168,12 @@ CREATE TABLE IF NOT EXISTS \`purchase_orders\` (
   \`id\`             TEXT PRIMARY KEY NOT NULL,
   \`vendor_id\`      TEXT REFERENCES \`vendors\`(\`id\`),
   \`po_number\`      TEXT NOT NULL,
-  \`status\`         TEXT NOT NULL DEFAULT 'draft' CHECK (\`status\` IN ('draft','sent','received','cancelled')),
-  \`total_amount\`   REAL NOT NULL DEFAULT 0,
+  \`status\`         TEXT NOT NULL CHECK (\`status\` IN ('draft','sent','received','cancelled')),
+  \`total_amount\`   REAL NOT NULL,
   \`expected_date\`  INTEGER,
   \`received_date\`  INTEGER,
   \`note\`           TEXT,
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL,
   \`updated_at\`     INTEGER NOT NULL
@@ -202,7 +201,7 @@ CREATE TABLE IF NOT EXISTS \`expenses\` (
   \`amount\`         REAL NOT NULL,
   \`description\`    TEXT,
   \`performed_by\`   TEXT REFERENCES \`users\`(\`id\`),
-  \`sync_status\`    TEXT NOT NULL DEFAULT 'pending' CHECK (\`sync_status\` IN ('synced','pending','conflict')),
+  \`sync_status\`    TEXT NOT NULL CHECK (\`sync_status\` IN ('synced','pending','conflict')),
   \`last_synced_at\` INTEGER,
   \`created_at\`     INTEGER NOT NULL
 );

@@ -51,13 +51,20 @@ export function buildPosCatalogQuery(db: Db) {
 type PosCatalogRow = Awaited<ReturnType<typeof buildPosCatalogQuery>>[number];
 
 export function mapToPosProduct(row: PosCatalogRow): PosProduct {
-  const qty = row.quantityOnHand ?? 0;
-  const reorderPoint = row.reorderPoint ?? 0;
+  const qty = requireNumber(
+    row.quantityOnHand,
+    "stock_levels.quantity_on_hand"
+  );
+  const reorderPoint = requireNumber(
+    row.reorderPoint,
+    "stock_levels.reorder_point"
+  );
 
   const stockLevel: PosProductStockLevel =
     qty > reorderPoint ? "in-stock" : "low";
 
-  const imageUrls = safeParseJsonArray(row.imageUrls);
+  const imageUrls = parseJsonArray(row.imageUrls, "products.image_urls");
+  const imageUrl = getOptionalImageUri(imageUrls, "products.image_urls");
 
   return {
     id: row.id,
@@ -65,17 +72,41 @@ export function mapToPosProduct(row: PosCatalogRow): PosProduct {
     variant: "", // base product — no variant label
     unitPricePhp: row.price,
     stockLevel,
-    category: row.categoryName ?? "Uncategorised",
-    imageUrl: imageUrls[0] ?? "",
+    category: row.categoryName ?? "",
+    imageUrl,
   };
 }
 
-function safeParseJsonArray(raw: string | null): string[] {
-  if (!raw) return [];
+function parseJsonArray(raw: string, fieldName: string): string[] {
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+    if (!Array.isArray(parsed)) {
+      throw new Error(`${fieldName} must contain a JSON array.`);
+    }
+
+    return parsed;
+  } catch (error) {
+    throw new Error(`Invalid JSON in ${fieldName}.`, { cause: error });
   }
+}
+
+function requireNumber(value: number | null, fieldName: string): number {
+  if (value === null) {
+    throw new Error(`Missing required database value: ${fieldName}.`);
+  }
+
+  return value;
+}
+
+function getOptionalImageUri(values: string[], fieldName: string): string {
+  if (values.length === 0) {
+    return "";
+  }
+
+  const [uri] = values;
+  if (typeof uri !== "string") {
+    throw new Error(`${fieldName} must contain image URI strings.`);
+  }
+
+  return uri;
 }

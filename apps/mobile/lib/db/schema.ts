@@ -29,9 +29,7 @@ export const users = sqliteTable(
     id: text("id").primaryKey(), // ULID
     email: text("email").notNull().unique(),
     passwordHash: text("password_hash").notNull(),
-    role: text("role", { enum: ["owner", "manager", "staff"] })
-      .notNull()
-      .default("staff"),
+    role: text("role", { enum: ["owner", "manager", "staff"] }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
@@ -46,7 +44,7 @@ export const categories = sqliteTable("categories", {
   id: text("id").primaryKey(), // ULID
   name: text("name").notNull(),
   parentId: text("parent_id"), // self-ref — no FK to avoid circular dependency
-  sortOrder: integer("sort_order").notNull().default(0),
+  sortOrder: integer("sort_order").notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
 });
@@ -60,15 +58,15 @@ export const products = sqliteTable(
     description: text("description"),
     sku: text("sku"),
     barcode: text("barcode"),
-    unit: text("unit").notNull().default("pc"),
-    price: real("price").notNull().default(0),
-    costPrice: real("cost_price").notNull().default(0),
+    unit: text("unit").notNull(),
+    price: real("price").notNull(),
+    costPrice: real("cost_price").notNull(),
     /** Stored as JSON array string: string[] */
-    imageUrls: text("image_urls").notNull().default("[]"),
-    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    imageUrls: text("image_urls").notNull(),
+    isActive: integer("is_active", { mode: "boolean" }).notNull(),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -88,12 +86,12 @@ export const productVariants = sqliteTable(
       .notNull()
       .references(() => products.id),
     /** Stored as JSON object string: Record<string, string> e.g. {"Size":"L","Color":"Red"} */
-    attributes: text("attributes").notNull().default("{}"),
+    attributes: text("attributes").notNull(),
     sku: text("sku"),
     barcode: text("barcode"),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -113,13 +111,13 @@ export const stockLevels = sqliteTable(
       .notNull()
       .references(() => products.id),
     variantId: text("variant_id").references(() => productVariants.id),
-    quantityOnHand: real("quantity_on_hand").notNull().default(0),
-    reorderPoint: real("reorder_point").notNull().default(0),
-    reorderQuantity: real("reorder_quantity").notNull().default(0),
+    quantityOnHand: real("quantity_on_hand").notNull(),
+    reorderPoint: real("reorder_point").notNull(),
+    reorderQuantity: real("reorder_quantity").notNull(),
     location: text("location"),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
@@ -147,9 +145,9 @@ export const stockMovements = sqliteTable(
     referenceId: text("reference_id"), // e.g. sale order / PO ULID
     note: text("note"),
     performedBy: text("performed_by").references(() => users.id),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },
@@ -170,20 +168,18 @@ export const saleOrders = sqliteTable(
     orderNumber: text("order_number").notNull(),
     status: text("status", {
       enum: ["draft", "confirmed", "voided"],
-    })
-      .notNull()
-      .default("draft"),
-    totalAmount: real("total_amount").notNull().default(0),
-    discountAmount: real("discount_amount").notNull().default(0),
-    taxAmount: real("tax_amount").notNull().default(0),
+    }).notNull(),
+    totalAmount: real("total_amount").notNull(),
+    discountAmount: real("discount_amount").notNull(),
+    taxAmount: real("tax_amount").notNull(),
     paymentMethod: text("payment_method", {
       enum: ["cash", "card", "gcash", "maya", "credit", "other"],
     }),
     cashierId: text("cashier_id").references(() => users.id),
     note: text("note"),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -209,7 +205,7 @@ export const saleOrderItems = sqliteTable(
     sku: text("sku"),
     quantity: real("quantity").notNull(),
     unitPrice: real("unit_price").notNull(),
-    discount: real("discount").notNull().default(0),
+    discount: real("discount").notNull(),
     total: real("total").notNull(),
   },
   (t) => [
@@ -230,10 +226,10 @@ export const vendors = sqliteTable("vendors", {
   email: text("email"),
   address: text("address"),
   notes: text("notes"),
-  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-  syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-    .notNull()
-    .default("pending"),
+  isActive: integer("is_active", { mode: "boolean" }).notNull(),
+  syncStatus: text("sync_status", {
+    enum: ["synced", "pending", "conflict"],
+  }).notNull(),
   lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -247,16 +243,14 @@ export const purchaseOrders = sqliteTable(
     poNumber: text("po_number").notNull(),
     status: text("status", {
       enum: ["draft", "sent", "received", "cancelled"],
-    })
-      .notNull()
-      .default("draft"),
-    totalAmount: real("total_amount").notNull().default(0),
+    }).notNull(),
+    totalAmount: real("total_amount").notNull(),
     expectedDate: integer("expected_date", { mode: "timestamp_ms" }),
     receivedDate: integer("received_date", { mode: "timestamp_ms" }),
     note: text("note"),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -301,9 +295,9 @@ export const expenses = sqliteTable(
     amount: real("amount").notNull(),
     description: text("description"),
     performedBy: text("performed_by").references(() => users.id),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
+    syncStatus: text("sync_status", {
+      enum: ["synced", "pending", "conflict"],
+    }).notNull(),
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },

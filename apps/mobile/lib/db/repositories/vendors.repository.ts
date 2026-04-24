@@ -7,8 +7,7 @@
  *  - mapToSupplier()             — maps a vendor row to the Supplier view model
  *  - mapToVendorPriceListRow()   — maps a PO-item row to VendorPriceListRow
  *
- * Vendor conflicts resolve "client wins" per DDD-Architecture.md, so all
- * local writes default to sync_status = 'pending'.
+ * Vendor conflicts resolve "client wins" per DDD-Architecture.md.
  */
 
 import type { Supplier, VendorPriceListRow } from "@/types";
@@ -69,8 +68,16 @@ export function mapToSupplier(row: VendorRow): Supplier {
 export function mapToVendorPriceListRow(row: PriceListRow): VendorPriceListRow {
   return {
     productName: row.productName,
-    vendorName: row.vendorName ?? "—",
+    vendorName: requireString(row.vendorName, "vendors.name"),
     priceDisplay: `₱${row.unitCost.toFixed(2)}`,
-    minOrderDisplay: "—", // TODO: add min_order_qty column in future migration
+    minOrderDisplay: "—",
   };
+}
+
+function requireString(value: string | null, fieldName: string): string {
+  if (!value) {
+    throw new Error(`Missing required database value: ${fieldName}.`);
+  }
+
+  return value;
 }
