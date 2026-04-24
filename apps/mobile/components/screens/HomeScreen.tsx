@@ -3,15 +3,13 @@ import { GreetingSection } from "@/components/home/GreetingSection";
 import { SectionEmptyState } from "@/components/home/SectionEmptyState";
 import { StatsContainer } from "@/components/home/StatsContainer";
 import { TransactionSection } from "@/components/home/TransactionSection";
-import { hasDashboardData } from "@/components/home/home.utils";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { ScreenShell } from "@/components/ui/ScreenShell";
 import { useHomeDashboard } from "@/hooks/useHomeDashboard";
 import { View } from "react-native";
 
 export function HomeScreen() {
-  const { dashboard, error } = useHomeDashboard();
-  const isEmpty = !error && !hasDashboardData(dashboard);
+  const { dashboard, error, isEmpty, isLoading } = useHomeDashboard();
   const handleRefresh = () => {};
 
   return (
@@ -19,12 +17,21 @@ export function HomeScreen() {
       <AppHeader onRefresh={handleRefresh} />
       <ScreenShell bottomExtra={60}>
         <View className="gap-4 pb-6">
-          {error ? (
+          {isLoading ? (
+            <Card className="p-4">
+              <SectionEmptyState
+                iconKey="sync"
+                title="Loading dashboard"
+                body="Reading local data from this device."
+                tone="forest"
+              />
+            </Card>
+          ) : error ? (
             <Card className="p-4">
               <SectionEmptyState
                 iconKey="warning"
                 title="Dashboard unavailable"
-                body="We couldn't load the dashboard right now. Pull to retry when the connection is back."
+                body="We couldn't load the local dashboard right now."
                 tone="warn"
               />
             </Card>

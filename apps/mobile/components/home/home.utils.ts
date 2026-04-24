@@ -6,7 +6,8 @@ export function formatPesoDisplay(value: string): string {
 }
 
 export function isPlaceholderValue(value: string): boolean {
-  return value.trim() === "—";
+  const normalized = value.trim();
+  return normalized === "—" || normalized === "-";
 }
 
 export function hasDashboardData(dashboard: HomeDashboardModel): boolean {
