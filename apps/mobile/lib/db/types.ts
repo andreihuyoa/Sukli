@@ -4,32 +4,25 @@
  * with the schema automatically.
  */
 
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import type {
-  users,
-  stores,
-  storeMembers,
   categories,
-  products,
+  expenses,
   productVariants,
+  products,
+  purchaseOrderItems,
+  purchaseOrders,
+  saleOrderItems,
+  saleOrders,
   stockLevels,
   stockMovements,
-  saleOrders,
-  saleOrderItems,
+  users,
   vendors,
-  purchaseOrders,
-  purchaseOrderItems,
-  expenses,
 } from "./schema";
 
 // IAM
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
-
-// Store
-export type Store = InferSelectModel<typeof stores>;
-export type NewStore = InferInsertModel<typeof stores>;
-export type StoreMember = InferSelectModel<typeof storeMembers>;
 
 // Catalog
 export type Category = InferSelectModel<typeof categories>;

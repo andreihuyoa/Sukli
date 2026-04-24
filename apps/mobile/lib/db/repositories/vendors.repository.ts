@@ -16,7 +16,7 @@ import { purchaseOrderItems, purchaseOrders, vendors } from "../schema";
 import { desc, eq } from "drizzle-orm";
 import type { Db } from "../client";
 
-export function buildVendorsQuery(db: Db, storeId: string) {
+export function buildVendorsQuery(db: Db) {
   return db
     .select({
       id: vendors.id,
@@ -26,17 +26,16 @@ export function buildVendorsQuery(db: Db, storeId: string) {
       email: vendors.email,
       isActive: vendors.isActive,
     })
-    .from(vendors)
-    .where(eq(vendors.storeId, storeId));
+    .from(vendors);
 }
 
 type VendorRow = Awaited<ReturnType<typeof buildVendorsQuery>>[number];
 
 /**
- * Last-unit-cost per product from the most recent PO items for this store.
+ * Last-unit-cost per product from the most recent PO items.
  * Used to build the price list view.
  */
-export function buildPriceListQuery(db: Db, storeId: string) {
+export function buildPriceListQuery(db: Db) {
   return db
     .select({
       productName: purchaseOrderItems.productName,
@@ -49,7 +48,6 @@ export function buildPriceListQuery(db: Db, storeId: string) {
       eq(purchaseOrders.id, purchaseOrderItems.purchaseOrderId)
     )
     .innerJoin(vendors, eq(vendors.id, purchaseOrders.vendorId))
-    .where(eq(purchaseOrders.storeId, storeId))
     .orderBy(desc(purchaseOrders.createdAt));
 }
 

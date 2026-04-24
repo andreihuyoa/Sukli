@@ -1,4 +1,3 @@
-import { useStore } from "@/context/StoreContext";
 import { getDb } from "@/lib/db/client";
 import {
   buildPosCatalogQuery,
@@ -15,14 +14,12 @@ export interface UsePosCatalogResult {
 }
 
 /**
- * Returns a live-reactive list of PosProduct view models for the POS grid,
- * scoped to the active store.
+ * Returns a live-reactive list of PosProduct view models for the POS grid.
  */
 export function usePosCatalog(): UsePosCatalogResult {
   const db = getDb();
-  const { storeId } = useStore();
 
-  const query = useMemo(() => buildPosCatalogQuery(db, storeId), [db, storeId]);
+  const query = useMemo(() => buildPosCatalogQuery(db), [db]);
   const { data, error } = useLiveQuery(query);
 
   const products: PosProduct[] = useMemo(

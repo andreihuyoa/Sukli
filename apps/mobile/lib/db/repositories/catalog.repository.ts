@@ -22,14 +22,15 @@ import type { Db } from "../client";
  *  products → stockLevels (LEFT, no variant — base stock)
  *  products → categories  (LEFT)
  *
- * Filtered to: storeId, isActive = true
+ * Filtered to active products only.
  */
-export function buildPosCatalogQuery(db: Db, storeId: string) {
+export function buildPosCatalogQuery(db: Db) {
   return db
     .select({
       id: products.id,
       name: products.name,
       unit: products.unit,
+      price: products.price,
       imageUrls: products.imageUrls,
       categoryName: categories.name,
       quantityOnHand: stockLevels.quantityOnHand,
@@ -44,7 +45,7 @@ export function buildPosCatalogQuery(db: Db, storeId: string) {
       )
     )
     .leftJoin(categories, eq(categories.id, products.categoryId))
-    .where(and(eq(products.storeId, storeId), eq(products.isActive, true)));
+    .where(eq(products.isActive, true));
 }
 
 type PosCatalogRow = Awaited<ReturnType<typeof buildPosCatalogQuery>>[number];
@@ -62,7 +63,7 @@ export function mapToPosProduct(row: PosCatalogRow): PosProduct {
     id: row.id,
     name: row.name,
     variant: "", // base product — no variant label
-    unitPricePhp: 0, // TODO: link product price table
+    unitPricePhp: row.price,
     stockLevel,
     category: row.categoryName ?? "Uncategorised",
     imageUrl: imageUrls[0] ?? "",

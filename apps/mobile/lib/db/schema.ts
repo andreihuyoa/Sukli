@@ -3,11 +3,11 @@
  *
  * Single source of truth for all table definitions used by the mobile app.
  * Types are mapped to SQLite storage:
- *  - ULID PKs          → text
- *  - TIMESTAMPTZ       → integer (mode: 'timestamp_ms') — Unix epoch ms
- *  - NUMERIC / DECIMAL → real
- *  - ENUMs             → text (validated at the application layer)
- *  - JSONB arrays      → text (JSON.stringify / JSON.parse at repo layer)
+ *  - ULID PKs          -> text
+ *  - TIMESTAMPTZ       -> integer (mode: "timestamp_ms") — Unix epoch ms
+ *  - NUMERIC / DECIMAL -> real
+ *  - ENUMs             -> text (validated at the application layer)
+ *  - JSONB arrays      -> text (JSON.stringify / JSON.parse at repo layer)
  */
 
 import {
@@ -39,80 +39,30 @@ export const users = sqliteTable(
 );
 
 // ---------------------------------------------------------------------------
-// Store Bounded Context
-// ---------------------------------------------------------------------------
-
-export const stores = sqliteTable(
-  "stores",
-  {
-    id: text("id").primaryKey(), // ULID
-    name: text("name").notNull(),
-    address: text("address"),
-    currency: text("currency").notNull().default("PHP"),
-    ownerId: text("owner_id")
-      .notNull()
-      .references(() => users.id),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
-    lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
-    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (t) => [index("stores_owner_idx").on(t.ownerId)]
-);
-
-export const storeMembers = sqliteTable(
-  "store_members",
-  {
-    id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id),
-    role: text("role", { enum: ["manager", "staff"] })
-      .notNull()
-      .default("staff"),
-    joinedAt: integer("joined_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (t) => [uniqueIndex("store_members_store_user_idx").on(t.storeId, t.userId)]
-);
-
-// ---------------------------------------------------------------------------
 // Catalog Bounded Context
 // ---------------------------------------------------------------------------
 
-export const categories = sqliteTable(
-  "categories",
-  {
-    id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
-    name: text("name").notNull(),
-    parentId: text("parent_id"), // self-ref — no FK to avoid circular dependency
-    sortOrder: integer("sort_order").notNull().default(0),
-    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (t) => [index("categories_store_idx").on(t.storeId)]
-);
+export const categories = sqliteTable("categories", {
+  id: text("id").primaryKey(), // ULID
+  name: text("name").notNull(),
+  parentId: text("parent_id"), // self-ref — no FK to avoid circular dependency
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+});
 
 export const products = sqliteTable(
   "products",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     categoryId: text("category_id").references(() => categories.id),
     name: text("name").notNull(),
     description: text("description"),
     sku: text("sku"),
     barcode: text("barcode"),
     unit: text("unit").notNull().default("pc"),
+    price: real("price").notNull().default(0),
+    costPrice: real("cost_price").notNull().default(0),
     /** Stored as JSON array string: string[] */
     imageUrls: text("image_urls").notNull().default("[]"),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
@@ -124,10 +74,9 @@ export const products = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [
-    index("products_store_idx").on(t.storeId),
     index("products_category_idx").on(t.categoryId),
-    index("products_sku_idx").on(t.storeId, t.sku),
-    index("products_barcode_idx").on(t.storeId, t.barcode),
+    index("products_sku_idx").on(t.sku),
+    index("products_barcode_idx").on(t.barcode),
   ]
 );
 
@@ -160,9 +109,6 @@ export const stockLevels = sqliteTable(
   "stock_levels",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     productId: text("product_id")
       .notNull()
       .references(() => products.id),
@@ -178,12 +124,11 @@ export const stockLevels = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [
-    uniqueIndex("stock_levels_store_product_variant_idx").on(
-      t.storeId,
+    uniqueIndex("stock_levels_product_variant_idx").on(
       t.productId,
       t.variantId
     ),
-    index("stock_levels_store_idx").on(t.storeId),
+    index("stock_levels_product_idx").on(t.productId),
   ]
 );
 
@@ -191,9 +136,6 @@ export const stockMovements = sqliteTable(
   "stock_movements",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     productId: text("product_id")
       .notNull()
       .references(() => products.id),
@@ -212,7 +154,6 @@ export const stockMovements = sqliteTable(
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [
-    index("stock_movements_store_idx").on(t.storeId),
     index("stock_movements_product_idx").on(t.productId),
     index("stock_movements_created_idx").on(t.createdAt),
   ]
@@ -226,9 +167,6 @@ export const saleOrders = sqliteTable(
   "sale_orders",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     orderNumber: text("order_number").notNull(),
     status: text("status", {
       enum: ["draft", "confirmed", "voided"],
@@ -251,9 +189,8 @@ export const saleOrders = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [
-    index("sale_orders_store_idx").on(t.storeId),
     index("sale_orders_created_idx").on(t.createdAt),
-    uniqueIndex("sale_orders_store_number_idx").on(t.storeId, t.orderNumber),
+    index("sale_orders_number_idx").on(t.orderNumber),
   ]
 );
 
@@ -285,37 +222,27 @@ export const saleOrderItems = sqliteTable(
 // Procurement Bounded Context
 // ---------------------------------------------------------------------------
 
-export const vendors = sqliteTable(
-  "vendors",
-  {
-    id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
-    name: text("name").notNull(),
-    contactName: text("contact_name"),
-    phone: text("phone"),
-    email: text("email"),
-    address: text("address"),
-    notes: text("notes"),
-    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
-    syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
-      .notNull()
-      .default("pending"),
-    lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
-    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
-  },
-  (t) => [index("vendors_store_idx").on(t.storeId)]
-);
+export const vendors = sqliteTable("vendors", {
+  id: text("id").primaryKey(), // ULID
+  name: text("name").notNull(),
+  contactName: text("contact_name"),
+  phone: text("phone"),
+  email: text("email"),
+  address: text("address"),
+  notes: text("notes"),
+  isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  syncStatus: text("sync_status", { enum: ["synced", "pending", "conflict"] })
+    .notNull()
+    .default("pending"),
+  lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+});
 
 export const purchaseOrders = sqliteTable(
   "purchase_orders",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     vendorId: text("vendor_id").references(() => vendors.id),
     poNumber: text("po_number").notNull(),
     status: text("status", {
@@ -335,9 +262,8 @@ export const purchaseOrders = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
   },
   (t) => [
-    index("purchase_orders_store_idx").on(t.storeId),
     index("purchase_orders_vendor_idx").on(t.vendorId),
-    uniqueIndex("purchase_orders_store_number_idx").on(t.storeId, t.poNumber),
+    index("purchase_orders_number_idx").on(t.poNumber),
   ]
 );
 
@@ -371,9 +297,6 @@ export const expenses = sqliteTable(
   "expenses",
   {
     id: text("id").primaryKey(), // ULID
-    storeId: text("store_id")
-      .notNull()
-      .references(() => stores.id),
     category: text("category").notNull(),
     amount: real("amount").notNull(),
     description: text("description"),
@@ -384,8 +307,5 @@ export const expenses = sqliteTable(
     lastSyncedAt: integer("last_synced_at", { mode: "timestamp_ms" }),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   },
-  (t) => [
-    index("expenses_store_idx").on(t.storeId),
-    index("expenses_created_idx").on(t.createdAt),
-  ]
+  (t) => [index("expenses_created_idx").on(t.createdAt)]
 );

@@ -1,4 +1,3 @@
-import { useStore } from "@/context/StoreContext";
 import { getDb } from "@/lib/db/client";
 import {
   buildPriceListQuery,
@@ -18,21 +17,14 @@ export interface UseVendorsResult {
 }
 
 /**
- * Returns live-reactive supplier and price-list data scoped to the active
- * store.  Both queries update automatically when rows change.
+ * Returns live-reactive supplier and price-list data. Both queries update
+ * automatically when rows change.
  */
 export function useVendors(): UseVendorsResult {
   const db = getDb();
-  const { storeId } = useStore();
 
-  const vendorQuery = useMemo(
-    () => buildVendorsQuery(db, storeId),
-    [db, storeId]
-  );
-  const priceListQuery = useMemo(
-    () => buildPriceListQuery(db, storeId),
-    [db, storeId]
-  );
+  const vendorQuery = useMemo(() => buildVendorsQuery(db), [db]);
+  const priceListQuery = useMemo(() => buildPriceListQuery(db), [db]);
 
   const { data: vendorData, error: vendorError } = useLiveQuery(vendorQuery);
   const { data: priceListData, error: priceListError } =
