@@ -4,7 +4,9 @@ export interface InventoryItem {
   id: string;
   name: string;
   category: string;
-  /** Display-ready price, e.g. from API formatted field */
+  price: number;
+  costPrice: number;
+  reorderPoint: number;
   priceDisplay: string;
   available: number;
   unit: string;

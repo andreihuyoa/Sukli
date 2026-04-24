@@ -1,21 +1,67 @@
 import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useMemo, useState } from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
-import { useInventory } from "@/hooks/useInventory";
+import {
+  useInventory,
+  type InventoryProductFormInput,
+} from "@/hooks/useInventory";
 import type { InventoryItem } from "@/types";
 
 const HEADER_BODY = 56;
 const TAB_BAR = 88;
 
+type InventoryEditorMode = "create" | "edit";
+
+interface InventoryFormState {
+  name: string;
+  category: string;
+  unit: string;
+  price: string;
+  costPrice: string;
+  quantityOnHand: string;
+  reorderPoint: string;
+  imageUrl: string;
+}
+
+const EMPTY_FORM: InventoryFormState = {
+  name: "",
+  category: "",
+  unit: "pc",
+  price: "",
+  costPrice: "0",
+  quantityOnHand: "0",
+  reorderPoint: "0",
+  imageUrl: "",
+};
+
 export default function InventoryScreen() {
-  const { items } = useInventory();
+  const { items, isLoading, error, createItem, updateItem, deleteItem } =
+    useInventory();
   const [query, setQuery] = useState("");
+  const [editorMode, setEditorMode] = useState<InventoryEditorMode | null>(
+    null
+  );
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [form, setForm] = useState<InventoryFormState>(EMPTY_FORM);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const insets = useSafeAreaInsets();
 
   const filtered = useMemo(() => {
@@ -33,6 +79,79 @@ export default function InventoryScreen() {
     [items]
   );
   const totalSkus = items.length;
+  const isEditorVisible = editorMode !== null;
+
+  const openCreateEditor = () => {
+    setEditorMode("create");
+    setEditingItem(null);
+    setForm(EMPTY_FORM);
+    setFormError(null);
+  };
+
+  const openEditEditor = (item: InventoryItem) => {
+    setEditorMode("edit");
+    setEditingItem(item);
+    setForm(formFromItem(item));
+    setFormError(null);
+  };
+
+  const closeEditor = () => {
+    if (isSaving) return;
+    setEditorMode(null);
+    setEditingItem(null);
+    setFormError(null);
+  };
+
+  const setFormField = (field: keyof InventoryFormState, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!editorMode) return;
+
+    setIsSaving(true);
+    setFormError(null);
+
+    try {
+      const input = formToMutationInput(form);
+      if (editorMode === "edit" && editingItem) {
+        updateItem(editingItem.id, input);
+      } else {
+        createItem(input);
+      }
+      setEditorMode(null);
+      setEditingItem(null);
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (!editingItem) return;
+
+    Alert.alert(
+      "Delete product",
+      `Remove ${editingItem.name} from active inventory?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            try {
+              deleteItem(editingItem.id);
+              setEditorMode(null);
+              setEditingItem(null);
+            } catch (err) {
+              setFormError(err instanceof Error ? err.message : String(err));
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View className="flex-1 bg-background">
@@ -218,8 +337,9 @@ export default function InventoryScreen() {
             </Entrance>
           </View>
         }
+        keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
-          <InventoryRow item={item} index={index} />
+          <InventoryRow item={item} index={index} onEdit={openEditEditor} />
         )}
         ListEmptyComponent={
           <View className="px-6 py-10 items-center">
@@ -227,7 +347,11 @@ export default function InventoryScreen() {
               className="text-sm font-body text-center"
               style={{ color: "#8e8e93" }}
             >
-              No inventory yet. Connect your store data to see SKUs here.
+              {isLoading
+                ? "Loading inventory from this device..."
+                : error
+                  ? "Inventory unavailable right now."
+                  : "No inventory yet. Add your first product to start tracking stock."}
             </Text>
           </View>
         }
@@ -243,9 +367,7 @@ export default function InventoryScreen() {
                 borderWidth: 1.5,
                 borderColor: "rgba(27,67,50,0.25)",
               }}
-              onPress={() => {
-                // Wire to catalog / API create flow.
-              }}
+              onPress={openCreateEditor}
             >
               <AppIcon
                 name="add_box"
@@ -263,12 +385,28 @@ export default function InventoryScreen() {
           </Entrance>
         }
       />
+      <InventoryEditorModal
+        visible={isEditorVisible}
+        mode={editorMode ?? "create"}
+        form={form}
+        error={formError}
+        isSaving={isSaving}
+        canDelete={editorMode === "edit"}
+        onChange={setFormField}
+        onClose={closeEditor}
+        onSubmit={handleSubmit}
+        onDelete={handleDelete}
+      />
     </View>
   );
 }
 
-function InventoryRow(props: { item: InventoryItem; index: number }) {
-  const { item, index } = props;
+function InventoryRow(props: {
+  item: InventoryItem;
+  index: number;
+  onEdit: (item: InventoryItem) => void;
+}) {
+  const { item, index, onEdit } = props;
   const isLow = item.status === "low";
   return (
     <Entrance delayMs={100 + index * 60}>
@@ -285,11 +423,22 @@ function InventoryRow(props: { item: InventoryItem; index: number }) {
             className="h-16 w-16 rounded-xl overflow-hidden shrink-0"
             style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
           >
-            <Image
-              source={{ uri: item.imageUrl }}
-              style={{ width: 64, height: 64 }}
-              contentFit="cover"
-            />
+            {item.imageUrl ? (
+              <Image
+                source={{ uri: item.imageUrl }}
+                style={{ width: 64, height: 64 }}
+                contentFit="cover"
+              />
+            ) : (
+              <View className="h-16 w-16 items-center justify-center">
+                <AppIcon
+                  name="inventory_2"
+                  size={24}
+                  color="#8e8e93"
+                  strokeWidth={1.8}
+                />
+              </View>
+            )}
           </View>
 
           <View className="flex-1 min-w-0">
@@ -349,9 +498,10 @@ function InventoryRow(props: { item: InventoryItem; index: number }) {
 
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="More options"
+              accessibilityLabel={`Edit ${item.name}`}
               className="h-7 w-7 rounded-full items-center justify-center"
               style={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+              onPress={() => onEdit(item)}
             >
               <AppIcon
                 name="more_vert"
@@ -365,4 +515,305 @@ function InventoryRow(props: { item: InventoryItem; index: number }) {
       </View>
     </Entrance>
   );
+}
+
+function InventoryEditorModal(props: {
+  visible: boolean;
+  mode: InventoryEditorMode;
+  form: InventoryFormState;
+  error: string | null;
+  isSaving: boolean;
+  canDelete: boolean;
+  onChange: (field: keyof InventoryFormState, value: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+  onDelete: () => void;
+}) {
+  const {
+    visible,
+    mode,
+    form,
+    error,
+    isSaving,
+    canDelete,
+    onChange,
+    onClose,
+    onSubmit,
+    onDelete,
+  } = props;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1 justify-end"
+        style={{ backgroundColor: "rgba(0,0,0,0.22)" }}
+      >
+        <Pressable className="flex-1" onPress={onClose} />
+        <View
+          className="bg-background px-5 pt-4"
+          style={{
+            borderTopLeftRadius: 22,
+            borderTopRightRadius: 22,
+            maxHeight: "88%",
+          }}
+        >
+          <View className="mb-4 flex-row items-center justify-between">
+            <View className="min-w-0 flex-1">
+              <Text
+                className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
+                style={{ color: "#8e8e93" }}
+              >
+                {mode === "create" ? "New product" : "Edit product"}
+              </Text>
+              <Text
+                className="font-headline text-2xl font-extrabold"
+                style={{ color: "#1b4332", lineHeight: 30 }}
+              >
+                {mode === "create" ? "Add Inventory" : "Update Inventory"}
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Close editor"
+              className="h-10 w-10 items-center justify-center rounded-full"
+              style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+              onPress={onClose}
+            >
+              <AppIcon name="x" size={18} color="#1c1c1e" strokeWidth={2.5} />
+            </Pressable>
+          </View>
+
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 28 }}
+          >
+            <View className="gap-3">
+              <InventoryField
+                label="Product name"
+                value={form.name}
+                onChangeText={(value) => onChange("name", value)}
+                placeholder="e.g. Instant Coffee"
+                autoCapitalize="words"
+              />
+              <View className="flex-row gap-3">
+                <InventoryField
+                  label="Category"
+                  value={form.category}
+                  onChangeText={(value) => onChange("category", value)}
+                  placeholder="Beverages"
+                  autoCapitalize="words"
+                  containerClassName="flex-1"
+                />
+                <InventoryField
+                  label="Unit"
+                  value={form.unit}
+                  onChangeText={(value) => onChange("unit", value)}
+                  placeholder="pc"
+                  autoCapitalize="none"
+                  containerClassName="w-24"
+                />
+              </View>
+              <View className="flex-row gap-3">
+                <InventoryField
+                  label="Price"
+                  value={form.price}
+                  onChangeText={(value) => onChange("price", value)}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  containerClassName="flex-1"
+                />
+                <InventoryField
+                  label="Cost"
+                  value={form.costPrice}
+                  onChangeText={(value) => onChange("costPrice", value)}
+                  placeholder="0.00"
+                  keyboardType="decimal-pad"
+                  containerClassName="flex-1"
+                />
+              </View>
+              <View className="flex-row gap-3">
+                <InventoryField
+                  label="On hand"
+                  value={form.quantityOnHand}
+                  onChangeText={(value) => onChange("quantityOnHand", value)}
+                  placeholder="0"
+                  keyboardType="decimal-pad"
+                  containerClassName="flex-1"
+                />
+                <InventoryField
+                  label="Low alert"
+                  value={form.reorderPoint}
+                  onChangeText={(value) => onChange("reorderPoint", value)}
+                  placeholder="0"
+                  keyboardType="decimal-pad"
+                  containerClassName="flex-1"
+                />
+              </View>
+              <InventoryField
+                label="Image URL"
+                value={form.imageUrl}
+                onChangeText={(value) => onChange("imageUrl", value)}
+                placeholder="https://..."
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+            </View>
+
+            {error ? (
+              <View
+                className="mt-4 rounded-2xl px-4 py-3"
+                style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
+              >
+                <Text
+                  className="text-sm font-body font-bold"
+                  style={{ color: "#6a3342" }}
+                >
+                  {error}
+                </Text>
+              </View>
+            ) : null}
+
+            <View className="mt-5 gap-3">
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={
+                  mode === "create" ? "Save product" : "Update product"
+                }
+                disabled={isSaving}
+                className="h-14 flex-row items-center justify-center gap-2 rounded-2xl"
+                style={{
+                  backgroundColor: "#1b4332",
+                  opacity: isSaving ? 0.72 : 1,
+                }}
+                onPress={onSubmit}
+              >
+                {isSaving ? (
+                  <ActivityIndicator color="#ffffff" size="small" />
+                ) : (
+                  <AppIcon
+                    name={mode === "create" ? "add_box" : "check"}
+                    size={17}
+                    color="#ffffff"
+                    strokeWidth={2.5}
+                  />
+                )}
+                <Text
+                  className="font-body-medium font-bold"
+                  style={{ color: "#ffffff", fontSize: 14 }}
+                >
+                  {mode === "create" ? "Save Product" : "Save Changes"}
+                </Text>
+              </Pressable>
+
+              {canDelete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Delete product"
+                  disabled={isSaving}
+                  className="h-12 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
+                  onPress={onDelete}
+                >
+                  <Text
+                    className="font-body-medium font-bold"
+                    style={{ color: "#6a3342", fontSize: 14 }}
+                  >
+                    Delete Product
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+function InventoryField(props: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+  keyboardType?: "default" | "decimal-pad" | "url";
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  containerClassName?: string;
+}) {
+  const {
+    label,
+    value,
+    onChangeText,
+    placeholder,
+    keyboardType = "default",
+    autoCapitalize = "sentences",
+    containerClassName,
+  } = props;
+
+  return (
+    <View className={containerClassName}>
+      <Text
+        className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em]"
+        style={{ color: "#8e8e93" }}
+      >
+        {label}
+      </Text>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#8e8e93"
+        keyboardType={keyboardType}
+        autoCapitalize={autoCapitalize}
+        className="h-12 rounded-2xl px-4 text-sm font-body"
+        style={{
+          backgroundColor: "rgba(255,255,255,0.82)",
+          color: "#1c1c1e",
+          fontWeight: "600",
+        }}
+      />
+    </View>
+  );
+}
+
+function formFromItem(item: InventoryItem): InventoryFormState {
+  return {
+    name: item.name,
+    category: item.category === "Uncategorised" ? "" : item.category,
+    unit: item.unit,
+    price: String(item.price),
+    costPrice: String(item.costPrice),
+    quantityOnHand: String(item.available),
+    reorderPoint: String(item.reorderPoint),
+    imageUrl: item.imageUrl,
+  };
+}
+
+function formToMutationInput(
+  form: InventoryFormState
+): InventoryProductFormInput {
+  return {
+    name: form.name,
+    categoryName: form.category,
+    unit: form.unit,
+    price: parseDecimalField(form.price, "Price"),
+    costPrice: parseDecimalField(form.costPrice || "0", "Cost price"),
+    quantityOnHand: parseDecimalField(form.quantityOnHand || "0", "Stock"),
+    reorderPoint: parseDecimalField(form.reorderPoint || "0", "Low alert"),
+    imageUrl: form.imageUrl,
+  };
+}
+
+function parseDecimalField(value: string, label: string): number {
+  const parsed = Number(value.replace(/,/g, "").trim());
+  if (!Number.isFinite(parsed)) {
+    throw new Error(`${label} must be a valid number.`);
+  }
+  return parsed;
 }
