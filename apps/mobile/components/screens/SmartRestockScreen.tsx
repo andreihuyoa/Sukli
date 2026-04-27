@@ -4,8 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
-import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
+import { Header } from "@/components/ui/Header";
 import { useRestockSuggestions } from "@/hooks/useRestockSuggestions";
 
 const TAB_BAR = 88;
@@ -32,7 +32,7 @@ export function SmartRestockScreen(props: { onBackPress?: () => void }) {
 
   return (
     <View className="flex-1 bg-screen-grouped">
-      <AppHeader onBackPress={props.onBackPress} />
+      <Header onBackPress={props.onBackPress} />
 
       <View className="px-5 pt-2 pb-3">
         <Entrance>

@@ -17,7 +17,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
-import { AppHeader } from "@/components/ui/AppHeader";
 import { AppIcon } from "@/components/ui/AppIcon";
 import {
   useInventory,
@@ -222,7 +221,7 @@ export default function InventoryScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <AppHeader />
+      {/* <AppHeader /> */}
       <FlashList
         data={filtered}
         showsVerticalScrollIndicator={false}

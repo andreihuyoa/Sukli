@@ -3,7 +3,7 @@ import { GreetingSection } from "@/components/home/GreetingSection";
 import { SectionEmptyState } from "@/components/home/SectionEmptyState";
 import { StatsContainer } from "@/components/home/StatsContainer";
 import { TransactionSection } from "@/components/home/TransactionSection";
-import { AppHeader } from "@/components/ui/AppHeader";
+import { Header } from "@/components/ui/Header";
 import { ScreenShell } from "@/components/ui/ScreenShell";
 import { useHomeDashboard } from "@/hooks/useHomeDashboard";
 import { View } from "react-native";
@@ -14,7 +14,7 @@ export function HomeScreen() {
 
   return (
     <View className="flex-1 bg-screen-grouped">
-      <AppHeader onRefresh={handleRefresh} />
+      <Header onRefresh={handleRefresh} />
       <ScreenShell bottomExtra={60}>
         <View className="gap-4 pb-6">
           {isLoading ? (

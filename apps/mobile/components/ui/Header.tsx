@@ -1,5 +1,6 @@
 import { BlurView } from "expo-blur";
 import { GlassView, isGlassEffectAPIAvailable } from "expo-glass-effect";
+import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,47 +8,17 @@ import { AppIcon } from "./AppIcon";
 
 const COL = {
   barFill: "rgba(255, 248, 239, 0.9)",
-  barFillAndroid: "#fff8ef",
-  barBorder: "rgba(184, 179, 170, 0.75)",
+  barBorder: "rgba(184, 179, 170, 1)",
   title: "#2f332f",
   accent: "#31463a",
   muted: "#747870",
   iconOnLight: "#31463a",
   subtleFill: "rgba(95, 125, 103, 0.1)",
-  softOutline: "rgba(215, 210, 200, 0.92)",
+  softOutline: "rgba(215, 210, 200, 0.1)",
 };
 
 const HEADER_BOTTOM_RADIUS = 20;
 const TOOLBAR_MIN_HEIGHT = 56;
-
-function HeaderFallbackFill() {
-  return (
-    <>
-      <BlurView
-        intensity={Platform.OS === "android" ? 40 : 72}
-        tint="light"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
-            borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
-          },
-        ]}
-      />
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
-            borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
-            backgroundColor:
-              Platform.OS === "android" ? COL.barFillAndroid : COL.barFill,
-          },
-        ]}
-      />
-    </>
-  );
-}
 
 type Props = {
   onBackPress?: () => void;
@@ -56,8 +27,9 @@ type Props = {
   syncPill?: boolean;
 };
 
-export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
+export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const useNativeGlass = Platform.OS === "ios" && isGlassEffectAPIAvailable();
 
   const toolbar = (
@@ -89,6 +61,7 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
         ) : null}
         <View style={styles.brandIcon}>
           <AppIcon
+            // replace this with product icon later on
             name="inventory_2"
             size={18}
             color={COL.accent}
@@ -134,9 +107,15 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
               strokeWidth={2.25}
             />
           </Pressable>
-          <View style={styles.avatar}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
+            hitSlop={12}
+            onPress={() => router.push("/(tabs)/settings")}
+            style={styles.avatar}
+          >
             <Text style={styles.avatarText}>JD</Text>
-          </View>
+          </Pressable>
         </View>
       )}
     </View>
@@ -144,20 +123,25 @@ export function AppHeader({ onBackPress, right, onRefresh, syncPill }: Props) {
 
   return (
     <View style={styles.shell} pointerEvents="box-none">
-      {useNativeGlass ? (
-        <GlassView
-          style={styles.bar}
-          glassEffectStyle="regular"
-          colorScheme="light"
-        >
-          {toolbar}
-        </GlassView>
-      ) : (
-        <View style={styles.bar}>
-          <HeaderFallbackFill />
-          {toolbar}
-        </View>
-      )}
+      <View style={styles.bar}>
+        {useNativeGlass ? (
+          <GlassView
+            style={styles.barInner}
+            glassEffectStyle="clear"
+            colorScheme="light"
+          >
+            {toolbar}
+          </GlassView>
+        ) : (
+          <BlurView
+            intensity={Platform.OS === "android" ? 40 : 72}
+            tint="light"
+            style={styles.barInner}
+          >
+            {toolbar}
+          </BlurView>
+        )}
+      </View>
     </View>
   );
 }
@@ -171,9 +155,14 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   bar: {
-    overflow: "hidden",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 0,
     borderColor: COL.barBorder,
+    borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
+    borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+  },
+  barInner: {
+    overflow: "hidden",
     borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
     borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
   },
@@ -198,16 +187,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   brandIcon: {
-    height: 36,
-    width: 36,
+    height: 40,
+    width: 40,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 12,
+    borderRadius: 10,
     backgroundColor: COL.subtleFill,
   },
   title: {
     fontFamily: "Vollkorn_700Bold",
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: "700",
     letterSpacing: -0.2,
     color: COL.title,
