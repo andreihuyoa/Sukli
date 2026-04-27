@@ -1,14 +1,16 @@
 import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
-import { GlassView, isGlassEffectAPIAvailable } from "expo-glass-effect";
+import { isGlassEffectAPIAvailable } from "expo-glass-effect";
+import { Tabs } from "expo-router";
+import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /** Design tokens — avoid NativeWind `className` here: css-interop can break React Navigation context inside custom tab bars. */
 const COL = {
+  appAccent: "#5f7d67",
   barFill: "rgba(255, 248, 239, 0.92)",
-  barFillAndroid: "#fff8ef",
   barBorder: "rgba(184, 179, 170, 0.75)",
   activeIcon: "#31463a",
   inactiveIcon: "#7f847d",
@@ -16,45 +18,98 @@ const COL = {
   shadow: "#9a8f7a",
 };
 
-const TABS: { key: string; label: string; icon: AppIconName }[] = [
-  { key: "index", label: "Home", icon: "home_app_logo" },
-  { key: "sales", label: "Sales", icon: "point_of_sale" },
-  { key: "inventory", label: "Stock", icon: "inventory_2" },
-  { key: "vendors", label: "Vendors", icon: "local_shipping" },
-  { key: "stats", label: "Stats", icon: "analytics" },
-  { key: "settings", label: "Settings", icon: "settings" },
+const TABS: readonly {
+  key: string;
+  label: string;
+  icon: AppIconName;
+  sf: any;
+}[] = [
+  {
+    key: "index",
+    label: "Home",
+    icon: "home_app_logo",
+    sf: { default: "house", selected: "house.fill" },
+  },
+  {
+    key: "sales",
+    label: "Sales",
+    icon: "point_of_sale",
+    sf: { default: "cart", selected: "cart.fill" },
+  },
+  {
+    key: "inventory",
+    label: "Stock",
+    icon: "inventory_2",
+    sf: { default: "shippingbox", selected: "shippingbox.fill" },
+  },
+  {
+    key: "vendors",
+    label: "Vendors",
+    icon: "local_shipping",
+    sf: { default: "truck.box", selected: "truck.box.fill" },
+  },
+  {
+    key: "stats",
+    label: "Stats",
+    icon: "analytics",
+    sf: { default: "chart.bar", selected: "chart.bar.fill" },
+  },
 ];
 
-const PILL_RADIUS = 34;
-const FLOAT_ABOVE_SAFE = 5;
+const PILL_RADIUS = 50;
 
-// used when native glass is not available
-function PillFill() {
+function getIOSMajorVersion(version: string | number): number {
+  if (typeof version === "number") return version;
+  const major = Number.parseInt(version.split(".")[0] ?? "", 10);
+  return Number.isNaN(major) ? 0 : major;
+}
+
+export function TabsNavigator() {
+  // expo-glass-effect may report false on some builds even when Liquid Glass works.
+  const hasLiquidGlass =
+    Platform.OS === "ios" &&
+    (isGlassEffectAPIAvailable() || getIOSMajorVersion(Platform.Version) >= 26);
+  const useNativeTabs = hasLiquidGlass;
+
+  if (useNativeTabs) {
+    return (
+      <NativeTabs
+        tintColor={COL.appAccent}
+        labelStyle={{ color: COL.appAccent }}
+      >
+        {TABS.map((tab) => (
+          <NativeTabs.Trigger key={tab.key} name={tab.key}>
+            <Icon sf={tab.sf} />
+            <Label>{tab.label}</Label>
+          </NativeTabs.Trigger>
+        ))}
+      </NativeTabs>
+    );
+  }
+
   return (
-    <>
-      <BlurView
-        intensity={Platform.OS === "android" ? 40 : 72}
-        tint="light"
-        style={[StyleSheet.absoluteFill, { borderRadius: PILL_RADIUS }]}
-      />
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            borderRadius: PILL_RADIUS,
-            backgroundColor:
-              Platform.OS === "android" ? COL.barFillAndroid : COL.barFill,
-          },
-        ]}
-      />
-    </>
+    <Tabs
+      tabBar={(props) => <NavigationBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+        animation: "shift",
+      }}
+    >
+      {TABS.map((tab) => (
+        <Tabs.Screen
+          key={tab.key}
+          name={tab.key}
+          options={{ title: tab.label }}
+        />
+      ))}
+    </Tabs>
   );
 }
 
 export function NavigationBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const useNativeGlass = Platform.OS === "ios" && isGlassEffectAPIAvailable();
-  const bottomInset = Math.max(insets.bottom, FLOAT_ABOVE_SAFE);
+  const bottomInset = Math.max(insets.bottom);
+  const blurViewFallback = Platform.OS === "android";
 
   const tabRow = (
     <View style={styles.row}>
@@ -93,23 +148,18 @@ export function NavigationBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <View
-      style={[styles.shell, { paddingBottom: bottomInset + FLOAT_ABOVE_SAFE }]}
+      style={[styles.shell, { paddingBottom: bottomInset }]}
       pointerEvents="box-none"
     >
       <View style={styles.pillShadow}>
-        {useNativeGlass ? (
-          <GlassView
-            style={styles.pill}
-            glassEffectStyle="regular"
-            colorScheme="auto"
-          >
-            {tabRow}
-          </GlassView>
+        {blurViewFallback ? (
+          // blur view fallback is used for android software renderer
+          <View style={[styles.pill, styles.pillAndroid]}>{tabRow}</View>
         ) : (
-          <View style={styles.pill}>
-            <PillFill />
+          // blur view is used for android hardware renderer
+          <BlurView intensity={72} tint="light" style={styles.pill}>
             {tabRow}
-          </View>
+          </BlurView>
         )}
       </View>
     </View>
@@ -143,6 +193,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 6,
     minHeight: 70,
+  },
+  pillAndroid: {
+    backgroundColor: COL.barFill,
   },
   row: {
     flexDirection: "row",
