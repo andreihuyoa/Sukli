@@ -27,6 +27,7 @@ export interface HomeTransaction {
 export interface HomeDashboardModel {
   dateLabel: string;
   greetingLine: string;
+  displayName: string;
   revenueTodayDisplay: string;
   revenueChangePercent: number;
   activeStockDisplay: string;

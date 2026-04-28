@@ -40,6 +40,7 @@ export function HomeScreen() {
               <GreetingSection
                 dateLabel={dashboard.dateLabel}
                 greetingLine={dashboard.greetingLine}
+                displayName={dashboard.displayName}
                 amountDisplay={dashboard.revenueTodayDisplay}
                 percentChange={dashboard.revenueChangePercent}
                 isEmpty={isEmpty}

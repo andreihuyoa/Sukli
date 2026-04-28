@@ -7,6 +7,10 @@ import {
   type HomeSalesRow,
   type HomeStockRow,
 } from "@/lib/db/repositories/home.repository";
+import {
+  getCurrentUserId,
+  getSetupProfile,
+} from "@/lib/db/repositories/setup.repository";
 import type {
   HomeDashboardModel,
   HomeRestockAlert,
@@ -45,6 +49,7 @@ function emptyDashboard(): HomeDashboardModel {
   return {
     dateLabel: formatTodayLabel(),
     greetingLine: timeBasedGreeting(),
+    displayName: "",
     revenueTodayDisplay: EMPTY_VALUE,
     revenueChangePercent: 0,
     activeStockDisplay: EMPTY_VALUE,
@@ -73,6 +78,7 @@ export interface UseHomeDashboardResult {
 
 export function useHomeDashboard(): UseHomeDashboardResult {
   const db = getDb();
+  const setupProfile = getSetupProfile(db, getCurrentUserId());
   const range = useMemo(() => buildDateRange(new Date()), []);
 
   const stockQuery = useMemo(() => buildHomeStockQuery(db), [db]);
@@ -90,8 +96,20 @@ export function useHomeDashboard(): UseHomeDashboardResult {
 
   const dashboard = useMemo(() => {
     if (isLoading || error) return emptyDashboard();
-    return buildDashboard(stockRows ?? [], salesRows ?? [], range);
-  }, [error, isLoading, range, salesRows, stockRows]);
+    return buildDashboard(
+      stockRows ?? [],
+      salesRows ?? [],
+      range,
+      setupProfile?.displayName ?? ""
+    );
+  }, [
+    error,
+    isLoading,
+    range,
+    salesRows,
+    setupProfile?.displayName,
+    stockRows,
+  ]);
 
   return {
     dashboard,
@@ -104,7 +122,8 @@ export function useHomeDashboard(): UseHomeDashboardResult {
 function buildDashboard(
   stockRows: HomeStockRow[],
   salesRows: HomeSalesRow[],
-  range: DashboardDateRange
+  range: DashboardDateRange,
+  displayName: string
 ): HomeDashboardModel {
   const orders = aggregateOrders(salesRows);
   const todayOrders = orders.filter((order) =>
@@ -154,6 +173,7 @@ function buildDashboard(
   return {
     dateLabel: formatTodayLabel(),
     greetingLine: timeBasedGreeting(),
+    displayName,
     revenueTodayDisplay:
       revenueToday > 0 ? formatCurrency(revenueToday) : EMPTY_VALUE,
     revenueChangePercent: getPercentChange(revenueToday, revenueYesterday),

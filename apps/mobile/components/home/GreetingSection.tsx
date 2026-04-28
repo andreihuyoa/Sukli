@@ -6,6 +6,7 @@ import { formatPesoDisplay } from "@/components/home/home.utils";
 import { AppIcon } from "@/components/ui/AppIcon";
 
 type Props = {
+  displayName: string;
   dateLabel: string;
   greetingLine: string;
   amountDisplay: string;
@@ -18,6 +19,7 @@ type Props = {
 export function GreetingSection({
   dateLabel,
   greetingLine,
+  displayName,
   amountDisplay,
   percentChange,
   isEmpty,
@@ -34,7 +36,7 @@ export function GreetingSection({
           className="mt-1 text-label-primary"
           style={{ fontSize: 20, fontWeight: "800", letterSpacing: -0.3 }}
         >
-          {greetingLine}
+          {greetingLine} {displayName}
         </Text>
       </View>
 

@@ -1,8 +1,12 @@
-import { Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
 import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
+import { getDb } from "@/lib/db/client";
+import { getCurrentUserId } from "@/lib/db/repositories/setup.repository";
+import { rerunUserSetup, resetUserLocalData } from "@/lib/db/reset";
+import { router } from "expo-router";
 
 type SettingRow = {
   id: string;
@@ -30,10 +34,58 @@ const rows: SettingRow[] = [
     accentClassName: "text-accent-warn",
     accentSurfaceClassName: "bg-accent-warn-soft",
   },
+  {
+    id: "setup",
+    icon: "storefront",
+    title: "Run setup",
+    subtitle: "Update your store name, icon, and display name.",
+    accentClassName: "text-accent-focus",
+    accentSurfaceClassName: "bg-accent-focus-soft",
+  },
+  {
+    id: "rerun-setup",
+    icon: "sync",
+    title: "Rerun setup",
+    subtitle: "Clear setup for the current local user and restart setup.",
+    accentClassName: "text-accent-info",
+    accentSurfaceClassName: "bg-accent-info-soft",
+  },
+  {
+    id: "reset-user-local-data",
+    icon: "warning",
+    title: "Delete user local data",
+    subtitle: "Wipe all local data for the current user and restart setup.",
+    accentClassName: "text-accent-danger",
+    accentSurfaceClassName: "bg-accent-danger-soft",
+  },
 ];
 
 export function SettingsScreen() {
   const insets = useSafeAreaInsets();
+
+  function handleRowPress(rowId: string) {
+    void handleSettingsAction(rowId).catch((error) => {
+      Alert.alert(
+        "Action failed",
+        error instanceof Error ? error.message : "Unable to complete action."
+      );
+    });
+  }
+
+  async function handleSettingsAction(rowId: string) {
+    switch (rowId) {
+      case "setup":
+        router.push({ pathname: "/onboarding", params: { mode: "edit" } });
+        return;
+      case "rerun-setup":
+        await rerunUserSetup(getDb(), getCurrentUserId());
+        return;
+      case "reset-user-local-data":
+        await resetUserLocalData(getDb(), getCurrentUserId());
+        return;
+      default:
+    }
+  }
 
   return (
     <View
@@ -95,6 +147,7 @@ export function SettingsScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={row.title}
+              onPress={() => handleRowPress(row.id)}
               className="flex-row items-center gap-3 rounded-2xl border border-outline bg-glass-surface px-4 py-4"
             >
               <View
