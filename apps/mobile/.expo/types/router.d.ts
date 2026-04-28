@@ -15,6 +15,7 @@ declare module "expo-router" {
             pathname: Router.ExternalPathString;
             params?: Router.UnknownInputParams;
           }
+        | { pathname: `/onboarding`; params?: Router.UnknownInputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
@@ -47,6 +48,7 @@ declare module "expo-router" {
             pathname: Router.ExternalPathString;
             params?: Router.UnknownOutputParams;
           }
+        | { pathname: `/onboarding`; params?: Router.UnknownOutputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownOutputParams }
         | { pathname: `/_sitemap`; params?: Router.UnknownOutputParams }
         | {
@@ -76,6 +78,7 @@ declare module "expo-router" {
       href:
         | Router.RelativePathString
         | Router.ExternalPathString
+        | `/onboarding${`?${string}` | `#${string}` | ""}`
         | `/smart-restock${`?${string}` | `#${string}` | ""}`
         | `/_sitemap${`?${string}` | `#${string}` | ""}`
         | `${"/(tabs)"}${`?${string}` | `#${string}` | ""}`
@@ -98,6 +101,7 @@ declare module "expo-router" {
             pathname: Router.ExternalPathString;
             params?: Router.UnknownInputParams;
           }
+        | { pathname: `/onboarding`; params?: Router.UnknownInputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
