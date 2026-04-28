@@ -16,13 +16,18 @@ import type {
   saleOrders,
   stockLevels,
   stockMovements,
+  appSetupFlags,
   users,
+  userSetupProfiles,
   vendors,
 } from "./schema";
 
 // IAM
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
+export type UserSetupProfile = InferSelectModel<typeof userSetupProfiles>;
+export type NewUserSetupProfile = InferInsertModel<typeof userSetupProfiles>;
+export type AppSetupFlag = InferSelectModel<typeof appSetupFlags>;
 
 // Catalog
 export type Category = InferSelectModel<typeof categories>;

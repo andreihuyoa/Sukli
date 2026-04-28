@@ -40,6 +40,25 @@ CREATE TABLE IF NOT EXISTS \`users\` (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS \`users_email_idx\` ON \`users\` (\`email\`);
 
+CREATE TABLE IF NOT EXISTS \`user_setup_profiles\` (
+  \`user_id\`         TEXT PRIMARY KEY NOT NULL,
+  \`store_name\`      TEXT NOT NULL,
+  \`icon_uri\`        TEXT,
+  \`display_name\`    TEXT NOT NULL,
+  \`setup_completed\` INTEGER NOT NULL,
+  \`created_at\`      INTEGER NOT NULL,
+  \`updated_at\`      INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS \`app_setup_flags\` (
+  \`user_id\`    TEXT NOT NULL,
+  \`key\`        TEXT NOT NULL,
+  \`value\`      TEXT NOT NULL,
+  \`updated_at\` INTEGER NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS \`app_setup_flags_user_key_idx\`
+  ON \`app_setup_flags\` (\`user_id\`, \`key\`);
+
 CREATE TABLE IF NOT EXISTS \`categories\` (
   \`id\`         TEXT PRIMARY KEY NOT NULL,
   \`name\`       TEXT NOT NULL,

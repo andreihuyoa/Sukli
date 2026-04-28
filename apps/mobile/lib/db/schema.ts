@@ -36,6 +36,27 @@ export const users = sqliteTable(
   (t) => [uniqueIndex("users_email_idx").on(t.email)]
 );
 
+export const userSetupProfiles = sqliteTable("user_setup_profiles", {
+  userId: text("user_id").primaryKey(),
+  storeName: text("store_name").notNull(),
+  iconUri: text("icon_uri"),
+  displayName: text("display_name").notNull(),
+  setupCompleted: integer("setup_completed", { mode: "boolean" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+});
+
+export const appSetupFlags = sqliteTable(
+  "app_setup_flags",
+  {
+    userId: text("user_id").notNull(),
+    key: text("key").notNull(),
+    value: text("value").notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (t) => [uniqueIndex("app_setup_flags_user_key_idx").on(t.userId, t.key)]
+);
+
 // ---------------------------------------------------------------------------
 // Catalog Bounded Context
 // ---------------------------------------------------------------------------
