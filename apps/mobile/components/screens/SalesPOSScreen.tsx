@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
-import { usePosCatalog } from "@/hooks/usePosCatalog";
+import { usePosCatalog } from "@/lib/hooks/api/catalog/usePosCatalog";
 import { POS_ALL_CATEGORY, type PosCartLine, type PosProduct } from "@/types";
 
 const POS_VAT_RATE = 0.12;

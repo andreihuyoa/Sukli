@@ -6,7 +6,7 @@ import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Header } from "@/components/ui/Header";
-import { useRestockSuggestions } from "@/hooks/useRestockSuggestions";
+import { useRestockSuggestions } from "@/lib/hooks/api/reporting/useRestockSuggestions";
 
 const TAB_BAR = 88;
 

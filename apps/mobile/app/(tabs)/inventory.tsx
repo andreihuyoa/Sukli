@@ -21,7 +21,7 @@ import { AppIcon } from "@/components/ui/AppIcon";
 import {
   useInventory,
   type InventoryProductFormInput,
-} from "@/hooks/useInventory";
+} from "@/lib/hooks/api/inventory/useInventory";
 import type { InventoryItem } from "@/types";
 
 const HEADER_BODY = 56;

@@ -1,5 +1,5 @@
 import { TabsNavigator } from "@/components/navigation/NavigationBar";
-import { useSetupGate } from "@/hooks/useSetupGate";
+import { useSetupGate } from "@/lib/hooks/api/setup/useSetupGate";
 import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 

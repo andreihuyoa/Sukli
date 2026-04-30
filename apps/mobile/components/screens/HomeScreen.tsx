@@ -5,7 +5,7 @@ import { StatsContainer } from "@/components/home/StatsContainer";
 import { TransactionSection } from "@/components/home/TransactionSection";
 import { Header } from "@/components/ui/Header";
 import { ScreenShell } from "@/components/ui/ScreenShell";
-import { useHomeDashboard } from "@/hooks/useHomeDashboard";
+import { useHomeDashboard } from "@/lib/hooks/api/reporting/useHomeDashboard";
 import { View } from "react-native";
 
 export function HomeScreen() {

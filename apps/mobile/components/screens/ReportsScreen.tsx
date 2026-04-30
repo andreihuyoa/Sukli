@@ -8,7 +8,7 @@ import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
 import {
   REPORT_PERIODS,
   useReportsAnalytics,
-} from "@/hooks/useReportsAnalytics";
+} from "@/lib/hooks/api/reporting/useReportsAnalytics";
 import type { ReportPeriod } from "@/types";
 
 export function ReportsScreen() {

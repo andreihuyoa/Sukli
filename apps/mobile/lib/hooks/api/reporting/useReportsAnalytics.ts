@@ -1,6 +1,10 @@
 import type { ReportPeriod, ReportPeriodSnapshot } from "@/types";
 
-export const REPORT_PERIODS = ["Monthly", "Quarterly", "Yearly"] as const satisfies readonly ReportPeriod[];
+export const REPORT_PERIODS = [
+  "Monthly",
+  "Quarterly",
+  "Yearly",
+] as const satisfies readonly ReportPeriod[];
 
 function emptySnapshot(): ReportPeriodSnapshot {
   return {

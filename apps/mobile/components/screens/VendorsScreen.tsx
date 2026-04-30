@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
-import { useVendors } from "@/hooks/useVendors";
+import { useVendors } from "@/lib/hooks/api/procurement/useVendors";
 import type { Supplier, VendorCatalogLine, VendorPriceListRow } from "@/types";
 
 const TAB_BAR = 88;
