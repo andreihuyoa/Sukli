@@ -3,7 +3,7 @@ import {
   buildPosCatalogQuery,
   mapToPosProduct,
 } from "@/lib/db/repositories/catalog.repository";
-import type { PosProduct } from "@/types";
+import type { PosProduct } from "@/lib/types/api/catalog";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
 

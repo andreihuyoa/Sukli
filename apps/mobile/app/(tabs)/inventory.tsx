@@ -22,7 +22,7 @@ import {
   useInventory,
   type InventoryProductFormInput,
 } from "@/lib/hooks/api/inventory/useInventory";
-import type { InventoryItem } from "@/types";
+import type { InventoryItem } from "@/lib/types/api/inventory";
 
 const HEADER_BODY = 56;
 const TAB_BAR = 88;

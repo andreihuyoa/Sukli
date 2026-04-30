@@ -1,4 +1,7 @@
-import type { RestockInsight, RestockSuggestion } from "@/types";
+import type {
+  RestockInsight,
+  RestockSuggestion,
+} from "@/lib/types/api/reporting";
 
 export interface UseRestockSuggestionsResult {
   items: RestockSuggestion[];

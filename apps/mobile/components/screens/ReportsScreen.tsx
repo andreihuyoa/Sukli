@@ -9,7 +9,7 @@ import {
   REPORT_PERIODS,
   useReportsAnalytics,
 } from "@/lib/hooks/api/reporting/useReportsAnalytics";
-import type { ReportPeriod } from "@/types";
+import type { ReportPeriod } from "@/lib/types/api/reporting";
 
 export function ReportsScreen() {
   const insets = useSafeAreaInsets();

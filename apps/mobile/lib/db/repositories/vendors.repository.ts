@@ -10,7 +10,7 @@
  * Vendor conflicts resolve "client wins" per DDD-Architecture.md.
  */
 
-import type { Supplier, VendorPriceListRow } from "@/types";
+import type { Supplier, VendorPriceListRow } from "@/lib/types/api/procurement";
 import { purchaseOrderItems, purchaseOrders, vendors } from "../schema";
 import { desc, eq } from "drizzle-orm";
 import type { Db } from "../client";

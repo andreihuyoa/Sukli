@@ -6,7 +6,11 @@ import { Card } from "@/components/home/Card";
 import { SectionEmptyState } from "@/components/home/SectionEmptyState";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
-import type { ChartBarPoint, HomeRestockAlert, HomeTransaction } from "@/types";
+import type {
+  ChartBarPoint,
+  HomeRestockAlert,
+  HomeTransaction,
+} from "@/lib/types/api/reporting";
 
 const statusConfig = {
   completed: {

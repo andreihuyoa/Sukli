@@ -1,4 +1,4 @@
-import type { HomeDashboardModel } from "@/types";
+import type { HomeDashboardModel } from "@/lib/types/api/reporting";
 
 export function formatPesoDisplay(value: string): string {
   if (value === "—" || value.startsWith("₱")) return value;

@@ -9,7 +9,7 @@
  * the builder directly to useLiveQuery without wrapping it in a closure.
  */
 
-import type { PosProduct, PosProductStockLevel } from "@/types";
+import type { PosProduct, PosProductStockLevel } from "@/lib/types/api/catalog";
 import { categories, products, stockLevels } from "../schema";
 import { and, eq, isNull } from "drizzle-orm";
 import type { Db } from "../client";

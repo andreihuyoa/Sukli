@@ -1,4 +1,7 @@
-import type { ReportPeriod, ReportPeriodSnapshot } from "@/types";
+import type {
+  ReportPeriod,
+  ReportPeriodSnapshot,
+} from "@/lib/types/api/reporting";
 
 export const REPORT_PERIODS = [
   "Monthly",

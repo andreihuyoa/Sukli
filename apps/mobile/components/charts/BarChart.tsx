@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import type { ChartBarPoint } from "@/types";
+import type { ChartBarPoint } from "@/lib/types/api/reporting";
 
 type Props = {
   data: ChartBarPoint[];
@@ -27,7 +27,12 @@ const COLORS = {
   axis: "#8e8e93",
 };
 
-export function BarChart({ data, highlightLastTwo = false, barAreaHeight = 120, enableSelection = true }: Props) {
+export function BarChart({
+  data,
+  highlightLastTwo = false,
+  barAreaHeight = 120,
+  enableSelection = true,
+}: Props) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const maxValue = useMemo(() => {
@@ -73,7 +78,15 @@ export function BarChart({ data, highlightLastTwo = false, barAreaHeight = 120, 
               borderRadius: 12,
             }}
           >
-            <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: "600" }}>{selected.label}</Text>
+            <Text
+              style={{
+                color: "rgba(255,255,255,0.7)",
+                fontSize: 12,
+                fontWeight: "600",
+              }}
+            >
+              {selected.label}
+            </Text>
             <Text style={{ color: "#fff", fontSize: 13, fontWeight: "800" }}>
               ₱{selected.value.toLocaleString("en-PH")}
             </Text>
@@ -81,7 +94,10 @@ export function BarChart({ data, highlightLastTwo = false, barAreaHeight = 120, 
         </View>
       ) : null}
 
-      <View style={{ height: barAreaHeight }} className="flex-row items-end gap-2 px-1">
+      <View
+        style={{ height: barAreaHeight }}
+        className="flex-row items-end gap-2 px-1"
+      >
         {bars.map((b) => {
           const pressProps = enableSelection
             ? {
@@ -90,9 +106,28 @@ export function BarChart({ data, highlightLastTwo = false, barAreaHeight = 120, 
             : {};
 
           return (
-            <Pressable key={`${b.label}-${b.index}`} className="flex-1" {...pressProps} accessibilityRole="button">
-              <View style={{ height: b.h, backgroundColor: b.color, borderRadius: 8 }} />
-              <Text style={{ marginTop: 8, textAlign: "center", color: COLORS.axis, fontSize: 10, fontWeight: "500" }}>
+            <Pressable
+              key={`${b.label}-${b.index}`}
+              className="flex-1"
+              {...pressProps}
+              accessibilityRole="button"
+            >
+              <View
+                style={{
+                  height: b.h,
+                  backgroundColor: b.color,
+                  borderRadius: 8,
+                }}
+              />
+              <Text
+                style={{
+                  marginTop: 8,
+                  textAlign: "center",
+                  color: COLORS.axis,
+                  fontSize: 10,
+                  fontWeight: "500",
+                }}
+              >
                 {b.label.toUpperCase()}
               </Text>
             </Pressable>
@@ -102,4 +137,3 @@ export function BarChart({ data, highlightLastTwo = false, barAreaHeight = 120, 
     </View>
   );
 }
-

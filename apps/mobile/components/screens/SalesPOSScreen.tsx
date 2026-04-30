@@ -7,11 +7,16 @@ import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { usePosCatalog } from "@/lib/hooks/api/catalog/usePosCatalog";
-import { POS_ALL_CATEGORY, type PosCartLine, type PosProduct } from "@/types";
+import { POS_ALL_CATEGORY, type PosProduct } from "@/lib/types/api/catalog";
 
 const POS_VAT_RATE = 0.12;
 const TAB_BAR = 88;
 const TOP_CONTENT_INSET = 16;
+
+interface PosCartLine {
+  product: PosProduct;
+  qty: number;
+}
 
 function useCart() {
   const [items, setItems] = useState<PosCartLine[]>([]);

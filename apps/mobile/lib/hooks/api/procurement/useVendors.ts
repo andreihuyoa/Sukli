@@ -5,7 +5,7 @@ import {
   mapToSupplier,
   mapToVendorPriceListRow,
 } from "@/lib/db/repositories/vendors.repository";
-import type { Supplier, VendorPriceListRow } from "@/types";
+import type { Supplier, VendorPriceListRow } from "@/lib/types/api/procurement";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
 

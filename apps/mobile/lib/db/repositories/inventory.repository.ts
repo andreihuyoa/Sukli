@@ -6,7 +6,10 @@
  *  - mapToInventoryItem()   — maps a joined row to the InventoryItem view model
  */
 
-import type { InventoryItem, InventoryStockStatus } from "@/types";
+import type {
+  InventoryItem,
+  InventoryStockStatus,
+} from "@/lib/types/api/inventory";
 import { categories, products, stockLevels, stockMovements } from "../schema";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { Db } from "../client";

@@ -7,7 +7,7 @@ import {
   type InventoryProductInput,
   updateInventoryProduct,
 } from "@/lib/db/repositories/inventory.repository";
-import type { InventoryItem } from "@/types";
+import type { InventoryItem } from "@/lib/types/api/inventory";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useCallback, useMemo } from "react";
 

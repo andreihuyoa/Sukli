@@ -11,9 +11,4 @@ export interface PosProduct {
   imageUrl: string;
 }
 
-export interface PosCartLine {
-  product: PosProduct;
-  qty: number;
-}
-
 export const POS_ALL_CATEGORY = "All Items" as const;

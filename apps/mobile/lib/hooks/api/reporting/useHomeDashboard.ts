@@ -15,7 +15,7 @@ import type {
   HomeDashboardModel,
   HomeRestockAlert,
   HomeTransactionStatus,
-} from "@/types";
+} from "@/lib/types/api/reporting";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 
 const EMPTY_VALUE = "—";

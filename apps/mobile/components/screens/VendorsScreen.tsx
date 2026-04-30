@@ -7,7 +7,11 @@ import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { useVendors } from "@/lib/hooks/api/procurement/useVendors";
-import type { Supplier, VendorCatalogLine, VendorPriceListRow } from "@/types";
+import type {
+  Supplier,
+  VendorCatalogLine,
+  VendorPriceListRow,
+} from "@/lib/types/api/procurement";
 
 const TAB_BAR = 88;
 const TOP_CONTENT_INSET = 16;
