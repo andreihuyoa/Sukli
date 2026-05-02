@@ -24,7 +24,7 @@ import {
 } from "@/lib/hooks/api/inventory/useInventory";
 import type { InventoryItem } from "@/lib/types/api/inventory";
 
-const HEADER_BODY = 56;
+const TOP_CONTENT_INSET = 16;
 const TAB_BAR = 88;
 
 type InventoryEditorMode = "create" | "edit";
@@ -220,46 +220,31 @@ export default function InventoryScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background">
+    <View className="flex-1 bg-screen-grouped">
       {/* <AppHeader /> */}
       <FlashList
         data={filtered}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + HEADER_BODY + 8,
+          paddingTop: insets.top + TOP_CONTENT_INSET,
           paddingBottom: TAB_BAR + insets.bottom + 24,
+          paddingHorizontal: 16,
         }}
         ListHeaderComponent={
           <View>
-            <View className="px-5 pt-2 pb-5">
-              <Text
-                className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
-                style={{ color: "#8e8e93" }}
-              >
+            <View className="px-1 pt-1 pb-3">
+              <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
                 Manage
               </Text>
-              <Text
-                className="font-headline text-3xl font-extrabold"
-                style={{
-                  color: "#1b4332",
-                  letterSpacing: -0.2,
-                  lineHeight: 1.15,
-                }}
-              >
-                Current Stock
+              <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+                Inventory
               </Text>
             </View>
 
-            <View className="flex-row gap-3 mx-4 mb-5">
+            <View className="mb-5 flex-row gap-3">
               <Entrance delayMs={50}>
-                <View
-                  className="flex-1 rounded-2xl p-4 flex-row items-center gap-3"
-                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
-                >
-                  <View
-                    className="h-10 w-10 rounded-xl items-center justify-center"
-                    style={{ backgroundColor: "#2d6a4f" }}
-                  >
+                <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)]">
+                  <View className="h-10 w-10 rounded-xl items-center justify-center bg-[#2d6a4f]">
                     <AppIcon
                       name="category"
                       size={18}
@@ -268,16 +253,10 @@ export default function InventoryScreen() {
                     />
                   </View>
                   <View>
-                    <Text
-                      className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
-                      style={{ color: "#8e8e93" }}
-                    >
+                    <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
                       Total SKUs
                     </Text>
-                    <Text
-                      className="font-headline text-[30px] font-extrabold"
-                      style={{ color: "#1b4332", lineHeight: 1.1 }}
-                    >
+                    <Text className="font-headline text-[30px] font-extrabold text-[#1b4332] leading-[34px]">
                       {totalSkus.toLocaleString("en-PH")}
                     </Text>
                   </View>
@@ -285,18 +264,8 @@ export default function InventoryScreen() {
               </Entrance>
 
               <Entrance delayMs={100}>
-                <View
-                  className="flex-1 rounded-2xl p-4 flex-row items-center gap-3"
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.82)",
-                    borderColor: "rgba(106,51,66,0.15)",
-                    borderWidth: 1,
-                  }}
-                >
-                  <View
-                    className="h-10 w-10 rounded-xl items-center justify-center"
-                    style={{ backgroundColor: "rgba(106,51,66,0.12)" }}
-                  >
+                <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)] border border-[rgba(106,51,66,0.15)]">
+                  <View className="h-10 w-10 rounded-xl items-center justify-center bg-[rgba(106,51,66,0.12)]">
                     <AppIcon
                       name="warning"
                       size={18}
@@ -305,16 +274,10 @@ export default function InventoryScreen() {
                     />
                   </View>
                   <View>
-                    <Text
-                      className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
-                      style={{ color: "#8e8e93" }}
-                    >
+                    <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
                       Low Stock
                     </Text>
-                    <Text
-                      className="font-headline text-[30px] font-extrabold"
-                      style={{ color: "#6a3342", lineHeight: 1.1 }}
-                    >
+                    <Text className="font-headline text-[30px] font-extrabold text-[#6a3342] leading-[34px]">
                       {lowStockCount}
                     </Text>
                   </View>
@@ -322,12 +285,9 @@ export default function InventoryScreen() {
               </Entrance>
             </View>
 
-            <View className="mx-4 mb-3">
+            <View className="mb-3">
               <Entrance delayMs={150}>
-                <View
-                  className="flex-row items-center gap-3 px-4 py-3 rounded-2xl"
-                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
-                >
+                <View className="flex-row items-center gap-3 px-4 py-3 rounded-2xl bg-[rgba(255,255,255,0.82)]">
                   <AppIcon
                     name="search"
                     size={16}
@@ -339,20 +299,18 @@ export default function InventoryScreen() {
                     onChangeText={setQuery}
                     placeholder="Search inventory..."
                     placeholderTextColor="#8e8e93"
-                    className="flex-1 bg-transparent text-sm font-body"
-                    style={{ color: "#1c1c1e", fontWeight: "500" }}
+                    className="flex-1 bg-transparent text-sm font-body text-[#1c1c1e] font-medium"
                     accessibilityLabel="Search inventory"
                   />
                 </View>
               </Entrance>
             </View>
 
-            <View className="flex-row gap-2 mx-4 mb-5">
+            <View className="mb-5 flex-row gap-2">
               <Entrance delayMs={180}>
                 <Pressable
                   accessibilityRole="button"
-                  className="flex-1 rounded-xl py-2.5 flex-row items-center justify-center"
-                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+                  className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
                 >
                   <AppIcon
                     name="filter_list"
@@ -360,10 +318,7 @@ export default function InventoryScreen() {
                     color="#1b4332"
                     strokeWidth={2.5}
                   />
-                  <Text
-                    className="text-[13px] font-bold"
-                    style={{ color: "#1c1c1e" }}
-                  >
+                  <Text className="text-[13px] font-bold text-[#1c1c1e]">
                     Filters
                   </Text>
                 </Pressable>
@@ -372,8 +327,7 @@ export default function InventoryScreen() {
               <Entrance delayMs={220}>
                 <Pressable
                   accessibilityRole="button"
-                  className="flex-1 rounded-xl py-2.5 flex-row items-center justify-center"
-                  style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+                  className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
                 >
                   <AppIcon
                     name="sort"
@@ -381,10 +335,7 @@ export default function InventoryScreen() {
                     color="#1b4332"
                     strokeWidth={2.5}
                   />
-                  <Text
-                    className="text-[13px] font-bold"
-                    style={{ color: "#1c1c1e" }}
-                  >
+                  <Text className="text-[13px] font-bold text-[#1c1c1e]">
                     Sort
                   </Text>
                 </Pressable>
@@ -392,11 +343,8 @@ export default function InventoryScreen() {
             </View>
 
             <Entrance delayMs={250}>
-              <View className="px-4 mb-3">
-                <Text
-                  className="font-body-medium text-[17px] font-bold"
-                  style={{ color: "#1b4332", letterSpacing: -0.1 }}
-                >
+              <View className="mb-3 px-1">
+                <Text className="font-body-medium text-[17px] font-bold text-[#1b4332] tracking-[-0.1px]">
                   {query ? `Results for \"${query}\"` : "All Items"}
                 </Text>
               </View>
@@ -408,11 +356,8 @@ export default function InventoryScreen() {
           <InventoryRow item={item} index={index} onEdit={openEditEditor} />
         )}
         ListEmptyComponent={
-          <View className="px-6 py-10 items-center">
-            <Text
-              className="text-sm font-body text-center"
-              style={{ color: "#8e8e93" }}
-            >
+          <View className="items-center px-2 py-8">
+            <Text className="text-sm font-body text-center text-[#8e8e93]">
               {isLoading
                 ? "Loading inventory from this device..."
                 : error
@@ -426,13 +371,7 @@ export default function InventoryScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Add new product"
-              className="mx-4 mt-5 flex-row items-center justify-center gap-2 py-4 rounded-2xl"
-              style={{
-                backgroundColor: "rgba(255,255,255,0.82)",
-                borderStyle: "dashed",
-                borderWidth: 1.5,
-                borderColor: "rgba(27,67,50,0.25)",
-              }}
+              className="mt-5 flex-row items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-[rgba(27,67,50,0.25)] bg-[rgba(255,255,255,0.82)] py-4"
               onPress={openCreateEditor}
             >
               <AppIcon
@@ -441,10 +380,7 @@ export default function InventoryScreen() {
                 color="#1b4332"
                 strokeWidth={2.5}
               />
-              <Text
-                className="font-body-medium font-bold"
-                style={{ color: "#1b4332", fontSize: 14 }}
-              >
+              <Text className="font-body-medium font-bold text-[#1b4332] text-sm">
                 Add New Product
               </Text>
             </Pressable>
@@ -480,18 +416,10 @@ function InventoryRow(props: {
   return (
     <Entrance delayMs={100 + index * 60}>
       <View
-        className="rounded-2xl overflow-hidden"
-        style={{
-          backgroundColor: "rgba(255,255,255,0.82)",
-          borderBottomWidth: isLow ? 3 : 0,
-          borderBottomColor: isLow ? "rgba(106,51,66,0.3)" : "transparent",
-        }}
+        className={`mb-3 overflow-hidden rounded-2xl bg-[rgba(255,255,255,0.82)] ${isLow ? "border-b-[3px] border-b-[rgba(106,51,66,0.3)]" : ""}`}
       >
         <View className="flex-row items-center gap-3 p-4">
-          <View
-            className="h-16 w-16 rounded-xl overflow-hidden shrink-0"
-            style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
-          >
+          <View className="h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-[rgba(0,0,0,0.03)]">
             {item.imageUrl ? (
               <Image
                 source={{ uri: item.imageUrl }}
@@ -512,33 +440,24 @@ function InventoryRow(props: {
 
           <View className="flex-1 min-w-0">
             <Text
-              className="font-body-medium mb-1"
+              className="font-body-medium mb-1 text-[#1c1c1e] font-bold text-sm"
               numberOfLines={1}
-              style={{ color: "#1c1c1e", fontWeight: "700", fontSize: 14 }}
             >
               {item.name}
             </Text>
             <Text
-              className="text-xs mb-2"
+              className="text-xs mb-2 text-[#8e8e93] font-medium"
               numberOfLines={1}
-              style={{ color: "#8e8e93", fontWeight: "500" }}
             >
               {item.category}
             </Text>
 
             <View className="flex-row items-center gap-2">
-              <Text
-                className="font-headline font-bold"
-                style={{ color: "#1b4332", fontSize: 15 }}
-              >
+              <Text className="font-headline font-bold text-[#1b4332] text-[15px]">
                 {item.priceDisplay}
               </Text>
               <Text
-                className="text-xs font-semibold"
-                style={{
-                  color: isLow ? "#6a3342" : "#8e8e93",
-                  fontWeight: "600",
-                }}
+                className={`text-xs font-semibold ${isLow ? "text-[#6a3342]" : "text-[#8e8e93]"}`}
               >
                 · {item.available} {item.unit}
               </Text>
@@ -547,19 +466,10 @@ function InventoryRow(props: {
 
           <View className="flex-col items-end gap-2 shrink-0">
             <View
-              className="px-2.5 py-1 rounded-full"
-              style={{
-                backgroundColor: isLow
-                  ? "rgba(106,51,66,0.1)"
-                  : "rgba(27,67,50,0.1)",
-              }}
+              className={`px-2.5 py-1 rounded-full ${isLow ? "bg-[rgba(106,51,66,0.1)]" : "bg-[rgba(27,67,50,0.1)]"}`}
             >
               <Text
-                className="text-[10px] font-label font-bold uppercase"
-                style={{
-                  color: isLow ? "#6a3342" : "#1b4332",
-                  fontWeight: "800",
-                }}
+                className={`text-[10px] font-label font-extrabold uppercase ${isLow ? "text-[#6a3342]" : "text-[#1b4332]"}`}
               >
                 {isLow ? "Low Stock" : "Optimal"}
               </Text>
@@ -568,8 +478,7 @@ function InventoryRow(props: {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`Edit ${item.name}`}
-              className="h-7 w-7 rounded-full items-center justify-center"
-              style={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+              className="h-7 w-7 rounded-full items-center justify-center bg-[rgba(0,0,0,0.02)]"
               onPress={() => onEdit(item)}
             >
               <AppIcon
@@ -626,38 +535,23 @@ function InventoryEditorModal(props: {
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1 justify-end"
-        style={{ backgroundColor: "rgba(0,0,0,0.22)" }}
+        className="flex-1 justify-end bg-[rgba(0,0,0,0.22)]"
       >
         <Pressable className="flex-1" onPress={onClose} />
-        <View
-          className="bg-background px-5 pt-4"
-          style={{
-            borderTopLeftRadius: 22,
-            borderTopRightRadius: 22,
-            maxHeight: "88%",
-          }}
-        >
+        <View className="bg-background px-5 pt-4 rounded-t-[22px] max-h-[88%]">
           <View className="mb-4 flex-row items-center justify-between">
             <View className="min-w-0 flex-1">
-              <Text
-                className="text-[10px] font-label font-bold uppercase tracking-[0.2em]"
-                style={{ color: "#8e8e93" }}
-              >
+              <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
                 {mode === "create" ? "New product" : "Edit product"}
               </Text>
-              <Text
-                className="font-headline text-2xl font-extrabold"
-                style={{ color: "#1b4332", lineHeight: 30 }}
-              >
+              <Text className="font-headline text-2xl font-extrabold text-[#1b4332] leading-[30px]">
                 {mode === "create" ? "Add Inventory" : "Update Inventory"}
               </Text>
             </View>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Close editor"
-              className="h-10 w-10 items-center justify-center rounded-full"
-              style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
+              className="h-10 w-10 items-center justify-center rounded-full bg-[rgba(255,255,255,0.82)]"
               onPress={onClose}
             >
               <AppIcon name="x" size={18} color="#1c1c1e" strokeWidth={2.5} />
@@ -740,14 +634,8 @@ function InventoryEditorModal(props: {
             </View>
 
             {error ? (
-              <View
-                className="mt-4 rounded-2xl px-4 py-3"
-                style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
-              >
-                <Text
-                  className="text-sm font-body font-bold"
-                  style={{ color: "#6a3342" }}
-                >
+              <View className="mt-4 rounded-2xl px-4 py-3 bg-[rgba(106,51,66,0.1)]">
+                <Text className="text-sm font-body font-bold text-[#6a3342]">
                   {error}
                 </Text>
               </View>
@@ -760,11 +648,7 @@ function InventoryEditorModal(props: {
                   mode === "create" ? "Save product" : "Update product"
                 }
                 disabled={isSaving}
-                className="h-14 flex-row items-center justify-center gap-2 rounded-2xl"
-                style={{
-                  backgroundColor: "#1b4332",
-                  opacity: isSaving ? 0.72 : 1,
-                }}
+                className={`h-14 flex-row items-center justify-center gap-2 rounded-2xl bg-[#1b4332] ${isSaving ? "opacity-70" : "opacity-100"}`}
                 onPress={onSubmit}
               >
                 {isSaving ? (
@@ -777,10 +661,7 @@ function InventoryEditorModal(props: {
                     strokeWidth={2.5}
                   />
                 )}
-                <Text
-                  className="font-body-medium font-bold"
-                  style={{ color: "#ffffff", fontSize: 14 }}
-                >
+                <Text className="font-body-medium font-bold text-white text-sm">
                   {mode === "create" ? "Save Product" : "Save Changes"}
                 </Text>
               </Pressable>
@@ -790,14 +671,10 @@ function InventoryEditorModal(props: {
                   accessibilityRole="button"
                   accessibilityLabel="Delete product"
                   disabled={isSaving}
-                  className="h-12 items-center justify-center rounded-2xl"
-                  style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
+                  className="h-12 items-center justify-center rounded-2xl bg-[rgba(106,51,66,0.1)]"
                   onPress={onDelete}
                 >
-                  <Text
-                    className="font-body-medium font-bold"
-                    style={{ color: "#6a3342", fontSize: 14 }}
-                  >
+                  <Text className="font-body-medium font-bold text-[#6a3342] text-sm">
                     Delete Product
                   </Text>
                 </Pressable>
@@ -831,10 +708,7 @@ function InventoryField(props: {
 
   return (
     <View className={containerClassName}>
-      <Text
-        className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em]"
-        style={{ color: "#8e8e93" }}
-      >
+      <Text className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em] text-[#8e8e93]">
         {label}
       </Text>
       <TextInput
@@ -844,12 +718,7 @@ function InventoryField(props: {
         placeholderTextColor="#8e8e93"
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
-        className="h-12 rounded-2xl px-4 text-sm font-body"
-        style={{
-          backgroundColor: "rgba(255,255,255,0.82)",
-          color: "#1c1c1e",
-          fontWeight: "600",
-        }}
+        className="h-12 rounded-2xl px-4 text-sm font-body bg-[rgba(255,255,255,0.82)] text-[#1c1c1e] font-semibold"
       />
     </View>
   );
@@ -865,21 +734,12 @@ function InventoryImagePicker(props: {
 
   return (
     <View>
-      <Text
-        className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em]"
-        style={{ color: "#8e8e93" }}
-      >
+      <Text className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em] text-[#8e8e93]">
         Product image
       </Text>
-      <View
-        className="rounded-2xl p-3"
-        style={{ backgroundColor: "rgba(255,255,255,0.82)" }}
-      >
+      <View className="rounded-2xl p-3 bg-[rgba(255,255,255,0.82)]">
         <View className="flex-row items-center gap-3">
-          <View
-            className="h-16 w-16 rounded-xl overflow-hidden shrink-0"
-            style={{ backgroundColor: "rgba(0,0,0,0.03)" }}
-          >
+          <View className="h-16 w-16 rounded-xl overflow-hidden shrink-0 bg-[rgba(0,0,0,0.03)]">
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
@@ -903,8 +763,7 @@ function InventoryImagePicker(props: {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Choose product image from gallery"
-                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl"
-                style={{ backgroundColor: "rgba(27,67,50,0.1)" }}
+                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl bg-[rgba(27,67,50,0.1)]"
                 onPress={onPickImage}
               >
                 <AppIcon
@@ -913,18 +772,14 @@ function InventoryImagePicker(props: {
                   color="#1b4332"
                   strokeWidth={2.4}
                 />
-                <Text
-                  className="font-body-medium font-bold"
-                  style={{ color: "#1b4332", fontSize: 12 }}
-                >
+                <Text className="font-body-medium font-bold text-[#1b4332] text-xs">
                   Gallery
                 </Text>
               </Pressable>
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Take product photo"
-                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl"
-                style={{ backgroundColor: "rgba(27,67,50,0.1)" }}
+                className="h-10 flex-1 flex-row items-center justify-center gap-2 rounded-xl bg-[rgba(27,67,50,0.1)]"
                 onPress={onTakePhoto}
               >
                 <AppIcon
@@ -933,10 +788,7 @@ function InventoryImagePicker(props: {
                   color="#1b4332"
                   strokeWidth={2.4}
                 />
-                <Text
-                  className="font-body-medium font-bold"
-                  style={{ color: "#1b4332", fontSize: 12 }}
-                >
+                <Text className="font-body-medium font-bold text-[#1b4332] text-xs">
                   Camera
                 </Text>
               </Pressable>
@@ -946,14 +798,10 @@ function InventoryImagePicker(props: {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Remove product image"
-                className="h-9 items-center justify-center rounded-xl"
-                style={{ backgroundColor: "rgba(106,51,66,0.1)" }}
+                className="h-9 items-center justify-center rounded-xl bg-[rgba(106,51,66,0.1)]"
                 onPress={onRemoveImage}
               >
-                <Text
-                  className="font-body-medium font-bold"
-                  style={{ color: "#6a3342", fontSize: 12 }}
-                >
+                <Text className="font-body-medium font-bold text-[#6a3342] text-xs">
                   Remove Image
                 </Text>
               </Pressable>
