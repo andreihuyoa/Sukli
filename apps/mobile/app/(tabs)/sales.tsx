@@ -1,4 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
+import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -7,9 +8,9 @@ import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { usePosCatalog } from "@/lib/hooks/api/catalog/usePosCatalog";
+import { useStoreTaxRate } from "@/lib/hooks/api/store/useStoreTaxRate";
 import { POS_ALL_CATEGORY, type PosProduct } from "@/lib/types/api/catalog";
 
-const POS_VAT_RATE = 0.12;
 const TAB_BAR = 88;
 const TOP_CONTENT_INSET = 16;
 
@@ -18,7 +19,7 @@ interface PosCartLine {
   qty: number;
 }
 
-function useCart() {
+function useCart(taxRate: number) {
   const [items, setItems] = useState<PosCartLine[]>([]);
 
   const add = (product: PosProduct) => {
@@ -54,13 +55,18 @@ function useCart() {
     0
   );
   const count = items.reduce((sum, item) => sum + item.qty, 0);
-  const tax = total * POS_VAT_RATE;
+  const tax = total * taxRate;
 
   return { items, add, remove, clear, qty, total, tax, count };
 }
 
 export default function SalesPOSScreen() {
   const { products } = usePosCatalog();
+  const {
+    taxRate,
+    isLoading: isTaxLoading,
+    error: taxError,
+  } = useStoreTaxRate();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] =
     useState<string>(POS_ALL_CATEGORY);
@@ -68,7 +74,7 @@ export default function SalesPOSScreen() {
   const [checkoutDone, setCheckoutDone] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const cart = useCart();
+  const cart = useCart(taxRate ?? Number.NaN);
 
   const categories = useMemo(() => {
     const unique = [
@@ -100,6 +106,44 @@ export default function SalesPOSScreen() {
       setCheckoutDone(false);
     }, 1800);
   };
+
+  if (isTaxLoading) {
+    return (
+      <View className="flex-1 bg-screen-grouped items-center justify-center px-6">
+        <Text className="text-sm font-body-medium text-label-muted text-center">
+          Loading store tax configuration...
+        </Text>
+      </View>
+    );
+  }
+
+  if (taxRate === null || taxError) {
+    return (
+      <View className="flex-1 bg-screen-grouped px-4 pt-10">
+        <View className="rounded-2xl border border-accent-warn-border bg-accent-warn-soft p-4">
+          <Text className="text-base font-body-semibold text-label-primary">
+            Sales is blocked
+          </Text>
+          <Text className="mt-1 text-sm font-body text-label-muted">
+            {taxError ??
+              "Tax configuration is missing. Please update setup before using sales."}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open setup"
+            onPress={() =>
+              router.push({ pathname: "/onboarding", params: { mode: "edit" } })
+            }
+            className="mt-4 rounded-xl bg-revenue-hero px-4 py-3 items-center"
+          >
+            <Text className="text-sm font-label font-bold text-on-primary">
+              Open Setup
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-screen-grouped">
@@ -331,7 +375,7 @@ export default function SalesPOSScreen() {
                 </View>
                 <View className="mb-3 flex-row items-center justify-between">
                   <Text className="text-[13px] font-body-medium text-label-muted">
-                    Tax ({Math.round(POS_VAT_RATE * 100)}%)
+                    Tax ({Math.round(taxRate * 100)}%)
                   </Text>
                   <Text className="text-[13px] font-body font-bold text-label-primary">
                     ₱{cart.tax.toFixed(2)}

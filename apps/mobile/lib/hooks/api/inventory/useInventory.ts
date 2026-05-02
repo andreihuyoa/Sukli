@@ -1,17 +1,23 @@
 import { getDb } from "@/lib/db/client";
 import {
+  archiveCatalogProduct,
+  createCatalogProduct,
+  updateCatalogProduct,
+  type CatalogProductInput,
+} from "@/lib/db/repositories/catalog.repository";
+import {
   buildInventoryQuery,
-  createInventoryProduct,
-  deleteInventoryProduct,
   mapToInventoryItem,
-  type InventoryProductInput,
-  updateInventoryProduct,
+  upsertBaseStockLevel,
 } from "@/lib/db/repositories/inventory.repository";
 import type { InventoryItem } from "@/lib/types/api/inventory";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useCallback, useMemo } from "react";
 
-export type InventoryProductFormInput = InventoryProductInput;
+export type InventoryProductFormInput = CatalogProductInput & {
+  quantityOnHand: number;
+  reorderPoint: number;
+};
 
 export interface UseInventoryResult {
   items: InventoryItem[];
@@ -41,21 +47,35 @@ export function useInventory(): UseInventoryResult {
 
   const createItem = useCallback(
     (input: InventoryProductFormInput) => {
-      createInventoryProduct(db, input);
+      const { quantityOnHand, reorderPoint, ...catalogInput } = input;
+      const { id } = createCatalogProduct(db, catalogInput);
+      upsertBaseStockLevel(db, {
+        productId: id,
+        quantityOnHand,
+        reorderPoint,
+        movementNoteWhenChanged: "Initial stock count",
+      });
     },
     [db]
   );
 
   const updateItem = useCallback(
     (id: string, input: InventoryProductFormInput) => {
-      updateInventoryProduct(db, { ...input, id });
+      const { quantityOnHand, reorderPoint, ...catalogInput } = input;
+      updateCatalogProduct(db, { ...catalogInput, id });
+      upsertBaseStockLevel(db, {
+        productId: id,
+        quantityOnHand,
+        reorderPoint,
+        movementNoteWhenChanged: "Inventory count updated",
+      });
     },
     [db]
   );
 
   const deleteItem = useCallback(
     (id: string) => {
-      deleteInventoryProduct(db, { id });
+      archiveCatalogProduct(db, { id });
     },
     [db]
   );

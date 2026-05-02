@@ -22,6 +22,7 @@ import {
 } from "@/lib/db/repositories/setup.repository";
 
 const TOTAL_STEPS = 3;
+const DEFAULT_TAX_RATE_PERCENT = "12";
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
@@ -33,6 +34,9 @@ export default function OnboardingScreen() {
   const [storeName, setStoreName] = useState("");
   const [iconUri, setIconUri] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("");
+  const [taxRatePercent, setTaxRatePercent] = useState(
+    DEFAULT_TAX_RATE_PERCENT
+  );
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function OnboardingScreen() {
       setStoreName(profile.storeName);
       setIconUri(profile.iconUri);
       setDisplayName(profile.displayName);
+      setTaxRatePercent(formatTaxRatePercent(profile.taxRate));
     }
 
     setSetupComplete(isSetupComplete(db, userId));
@@ -88,6 +93,17 @@ export default function OnboardingScreen() {
       return;
     }
 
+    if (step === 3) {
+      if (!displayName.trim()) {
+        Alert.alert("Display name required", "Enter your display name.");
+        return;
+      }
+      if (!isValidTaxRatePercent(taxRatePercent)) {
+        Alert.alert("Invalid tax rate", "Tax rate must be zero or greater.");
+        return;
+      }
+    }
+
     setStep((current) => Math.min(current + 1, TOTAL_STEPS));
   }
 
@@ -98,11 +114,14 @@ export default function OnboardingScreen() {
     setIsSaving(true);
 
     try {
-      saveSetupProfile(db, userId, {
+      const taxRate = parseTaxRatePercentToDecimal(taxRatePercent);
+      const setupInput = {
         storeName,
         iconUri,
         displayName,
-      });
+        taxRate,
+      };
+      saveSetupProfile(db, userId, setupInput);
       router.replace("/(tabs)");
     } catch (error) {
       Alert.alert(
@@ -193,6 +212,20 @@ export default function OnboardingScreen() {
               placeholderTextColor="#8a8f87"
               value={displayName}
             />
+            <Text className="mt-2 text-[17px] font-body-semibold text-label-primary">
+              Tax rate (%)
+            </Text>
+            <TextInput
+              keyboardType="decimal-pad"
+              className="rounded-2xl border border-outline bg-glass-surface px-4 py-4 text-[18px] font-body-semibold text-label-primary"
+              onChangeText={setTaxRatePercent}
+              placeholder={DEFAULT_TAX_RATE_PERCENT}
+              placeholderTextColor="#8a8f87"
+              value={taxRatePercent}
+            />
+            <Text className="text-[12px] font-body-medium text-label-muted">
+              Use 12 for 12%, or 0 for no tax.
+            </Text>
           </View>
         ) : null}
       </View>
@@ -221,4 +254,22 @@ export default function OnboardingScreen() {
       </View>
     </View>
   );
+}
+
+function isValidTaxRatePercent(raw: string): boolean {
+  const value = Number(raw.trim());
+  return Number.isFinite(value) && value >= 0;
+}
+
+function parseTaxRatePercentToDecimal(raw: string): number {
+  const value = Number(raw.trim());
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error("Tax rate must be zero or greater.");
+  }
+  return value / 100;
+}
+
+function formatTaxRatePercent(decimalTaxRate: number): string {
+  const percent = decimalTaxRate * 100;
+  return Number.isInteger(percent) ? String(percent) : percent.toFixed(2);
 }
