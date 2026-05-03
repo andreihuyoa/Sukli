@@ -17,10 +17,6 @@ declare module "expo-router" {
           }
         | { pathname: `/onboarding`; params?: Router.UnknownInputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
-        | {
-            pathname: `/../lib/hooks/api/store/useStoreTaxRate`;
-            params?: Router.UnknownInputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
         | {
@@ -54,10 +50,6 @@ declare module "expo-router" {
           }
         | { pathname: `/onboarding`; params?: Router.UnknownOutputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownOutputParams }
-        | {
-            pathname: `/../lib/hooks/api/store/useStoreTaxRate`;
-            params?: Router.UnknownOutputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownOutputParams }
         | {
             pathname: `${"/(tabs)"}` | `/`;
@@ -88,7 +80,6 @@ declare module "expo-router" {
         | Router.ExternalPathString
         | `/onboarding${`?${string}` | `#${string}` | ""}`
         | `/smart-restock${`?${string}` | `#${string}` | ""}`
-        | `/../lib/hooks/api/store/useStoreTaxRate${`?${string}` | `#${string}` | ""}`
         | `/_sitemap${`?${string}` | `#${string}` | ""}`
         | `${"/(tabs)"}${`?${string}` | `#${string}` | ""}`
         | `/${`?${string}` | `#${string}` | ""}`
@@ -112,10 +103,6 @@ declare module "expo-router" {
           }
         | { pathname: `/onboarding`; params?: Router.UnknownInputParams }
         | { pathname: `/smart-restock`; params?: Router.UnknownInputParams }
-        | {
-            pathname: `/../lib/hooks/api/store/useStoreTaxRate`;
-            params?: Router.UnknownInputParams;
-          }
         | { pathname: `/_sitemap`; params?: Router.UnknownInputParams }
         | { pathname: `${"/(tabs)"}` | `/`; params?: Router.UnknownInputParams }
         | {

@@ -31,17 +31,18 @@ const TABS: readonly {
     sf: { default: "house", selected: "house.fill" },
   },
   {
-    key: "sales",
-    label: "Sales",
-    icon: "point_of_sale",
-    sf: { default: "cart", selected: "cart.fill" },
-  },
-  {
     key: "inventory",
     label: "Stock",
     icon: "inventory_2",
     sf: { default: "shippingbox", selected: "shippingbox.fill" },
   },
+  {
+    key: "sales",
+    label: "Sales",
+    icon: "point_of_sale",
+    sf: { default: "cart", selected: "cart.fill" },
+  },
+
   {
     key: "vendors",
     label: "Vendors",
