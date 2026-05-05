@@ -33,10 +33,10 @@ interface InventoryFormState {
   name: string;
   category: string;
   unit: string;
-  price: string;
-  costPrice: string;
+  storePrice: string;
+  buyPrice: string;
   quantityOnHand: string;
-  reorderPoint: string;
+  lowStockThreshold: string;
   imageUrl: string;
 }
 
@@ -44,10 +44,10 @@ const EMPTY_FORM: InventoryFormState = {
   name: "",
   category: "",
   unit: "pc",
-  price: "",
-  costPrice: "0",
+  storePrice: "",
+  buyPrice: "0",
   quantityOnHand: "0",
-  reorderPoint: "0",
+  lowStockThreshold: "0",
   imageUrl: "",
 };
 
@@ -454,7 +454,7 @@ function InventoryRow(props: {
 
             <View className="flex-row items-center gap-2">
               <Text className="font-headline font-bold text-[#1b4332] text-[15px]">
-                {item.priceDisplay}
+                {item.storePriceDisplay}
               </Text>
               <Text
                 className={`text-xs font-semibold ${isLow ? "text-[#6a3342]" : "text-[#8e8e93]"}`}
@@ -591,17 +591,17 @@ function InventoryEditorModal(props: {
               </View>
               <View className="flex-row gap-3">
                 <InventoryField
-                  label="Price"
-                  value={form.price}
-                  onChangeText={(value) => onChange("price", value)}
+                  label="Store price"
+                  value={form.storePrice}
+                  onChangeText={(value) => onChange("storePrice", value)}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
                   containerClassName="flex-1"
                 />
                 <InventoryField
-                  label="Cost"
-                  value={form.costPrice}
-                  onChangeText={(value) => onChange("costPrice", value)}
+                  label="Buy price"
+                  value={form.buyPrice}
+                  onChangeText={(value) => onChange("buyPrice", value)}
                   placeholder="0.00"
                   keyboardType="decimal-pad"
                   containerClassName="flex-1"
@@ -618,8 +618,8 @@ function InventoryEditorModal(props: {
                 />
                 <InventoryField
                   label="Low alert"
-                  value={form.reorderPoint}
-                  onChangeText={(value) => onChange("reorderPoint", value)}
+                  value={form.lowStockThreshold}
+                  onChangeText={(value) => onChange("lowStockThreshold", value)}
                   placeholder="0"
                   keyboardType="decimal-pad"
                   containerClassName="flex-1"
@@ -818,10 +818,10 @@ function formFromItem(item: InventoryItem): InventoryFormState {
     name: item.name,
     category: item.category,
     unit: item.unit,
-    price: String(item.price),
-    costPrice: String(item.costPrice),
+    storePrice: String(item.storePrice),
+    buyPrice: String(item.buyPrice),
     quantityOnHand: String(item.available),
-    reorderPoint: String(item.reorderPoint),
+    lowStockThreshold: String(item.lowStockThreshold),
     imageUrl: item.imageUrl,
   };
 }
@@ -833,10 +833,13 @@ function formToMutationInput(
     name: form.name,
     categoryName: form.category,
     unit: form.unit,
-    price: parseDecimalField(form.price, "Price"),
-    costPrice: parseDecimalField(form.costPrice || "0", "Cost price"),
+    storePrice: parseDecimalField(form.storePrice, "Store price"),
+    buyPrice: parseDecimalField(form.buyPrice || "0", "Buy price"),
     quantityOnHand: parseDecimalField(form.quantityOnHand || "0", "Stock"),
-    reorderPoint: parseDecimalField(form.reorderPoint || "0", "Low alert"),
+    lowStockThreshold: parseDecimalField(
+      form.lowStockThreshold || "0",
+      "Low alert"
+    ),
     imageUrl: form.imageUrl,
   };
 }

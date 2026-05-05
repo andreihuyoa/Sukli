@@ -51,7 +51,7 @@ function useCart(taxRate: number) {
   const qty = (id: string) =>
     items.find((item) => item.product.id === id)?.qty ?? 0;
   const total = items.reduce(
-    (sum, item) => sum + item.product.unitPricePhp * item.qty,
+    (sum, item) => sum + item.product.storePricePhp * item.qty,
     0
   );
   const count = items.reduce((sum, item) => sum + item.qty, 0);
@@ -324,7 +324,7 @@ export default function SalesPOSScreen() {
                         {line.product.name}
                       </Text>
                       <Text className="text-xs font-body-medium text-label-muted">
-                        ₱{line.product.unitPricePhp.toLocaleString("en-PH")} /
+                        ₱{line.product.storePricePhp.toLocaleString("en-PH")} /
                         unit
                       </Text>
                     </View>
@@ -525,7 +525,7 @@ function ProductCard(props: {
 
           <View className="mt-3 w-full flex-row items-center justify-between">
             <Text className="text-[15px] font-label font-bold text-forest">
-              ₱{product.unitPricePhp.toLocaleString("en-PH")}
+              ₱{product.storePricePhp.toLocaleString("en-PH")}
             </Text>
 
             {inCart > 0 ? (
