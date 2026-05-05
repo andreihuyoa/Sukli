@@ -13,7 +13,14 @@ import type {
 } from "@/lib/types/api/inventory";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { Db } from "../client";
-import { categories, products, stockLevels, stockMovements } from "../schema";
+import { createLocalId } from "../id";
+import {
+  categories,
+  products,
+  stockLevels,
+  stockMovements,
+  syncOutbox,
+} from "../schema";
 
 /**
  * Returns active products with their base stock level for the inventory list.
@@ -25,12 +32,12 @@ export function buildInventoryQuery(db: Db) {
       id: products.id,
       name: products.name,
       unit: products.unit,
-      price: products.price,
-      costPrice: products.costPrice,
+      storePrice: products.storePrice,
+      buyPrice: products.buyPrice,
       imageUrls: products.imageUrls,
       categoryName: categories.name,
       quantityOnHand: stockLevels.quantityOnHand,
-      reorderPoint: stockLevels.reorderPoint,
+      lowStockThreshold: stockLevels.lowStockThreshold,
     })
     .from(products)
     .leftJoin(
@@ -49,12 +56,13 @@ export function mapToInventoryItem(row: InventoryRow): InventoryItem {
     row.quantityOnHand,
     "stock_levels.quantity_on_hand"
   );
-  const reorderPoint = requireNumber(
-    row.reorderPoint,
-    "stock_levels.reorder_point"
+  const lowStockThreshold = requireNumber(
+    row.lowStockThreshold,
+    "stock_levels.low_stock_threshold"
   );
 
-  const status: InventoryStockStatus = qty > reorderPoint ? "optimal" : "low";
+  const status: InventoryStockStatus =
+    qty > lowStockThreshold ? "optimal" : "low";
 
   const imageUrls = parseJsonArray(row.imageUrls, "products.image_urls");
   const imageUrl = getOptionalImageUri(imageUrls, "products.image_urls");
@@ -63,10 +71,10 @@ export function mapToInventoryItem(row: InventoryRow): InventoryItem {
     id: row.id,
     name: row.name,
     category: row.categoryName ?? "",
-    price: row.price,
-    costPrice: row.costPrice,
-    reorderPoint,
-    priceDisplay: formatPeso(row.price),
+    storePrice: row.storePrice,
+    buyPrice: row.buyPrice,
+    lowStockThreshold,
+    storePriceDisplay: formatPeso(row.storePrice),
     available: qty,
     unit: row.unit,
     status,
@@ -76,7 +84,7 @@ export function mapToInventoryItem(row: InventoryRow): InventoryItem {
 export interface UpsertBaseStockLevelInput {
   productId: string;
   quantityOnHand: number;
-  reorderPoint: number;
+  lowStockThreshold: number;
   movementNoteWhenChanged: string;
 }
 
@@ -86,10 +94,11 @@ export function upsertBaseStockLevel(
 ): void {
   const now = new Date();
   const quantityOnHand = roundQuantity(input.quantityOnHand);
-  const reorderPoint = roundQuantity(input.reorderPoint);
+  const lowStockThreshold = roundQuantity(input.lowStockThreshold);
+  const operationId = createLocalId();
 
   assertFiniteNonNegative(quantityOnHand, "Stock quantity");
-  assertFiniteNonNegative(reorderPoint, "Low stock threshold");
+  assertFiniteNonNegative(lowStockThreshold, "Low stock threshold");
 
   db.transaction((tx) => {
     const existingStock = tx
@@ -113,9 +122,7 @@ export function upsertBaseStockLevel(
           productId: input.productId,
           variantId: null,
           quantityOnHand,
-          reorderPoint,
-          reorderQuantity: 0,
-          location: null,
+          lowStockThreshold,
           syncStatus: "pending",
           lastSyncedAt: null,
           updatedAt: now,
@@ -131,13 +138,26 @@ export function upsertBaseStockLevel(
             movementType: "adjustment",
             quantityDelta: quantityOnHand,
             referenceId: null,
+            operationId,
             note: input.movementNoteWhenChanged,
-            performedBy: null,
             syncStatus: "pending",
             lastSyncedAt: null,
             createdAt: now,
           })
           .run();
+
+        insertOutboxOperation(tx, {
+          id: operationId,
+          aggregateType: "stock_movement",
+          aggregateId: input.productId,
+          operation: "adjust",
+          payload: {
+            productId: input.productId,
+            quantityDelta: quantityOnHand,
+            note: input.movementNoteWhenChanged,
+          },
+          now,
+        });
       }
       return;
     }
@@ -145,7 +165,7 @@ export function upsertBaseStockLevel(
     tx.update(stockLevels)
       .set({
         quantityOnHand,
-        reorderPoint,
+        lowStockThreshold,
         syncStatus: "pending",
         lastSyncedAt: null,
         updatedAt: now,
@@ -155,21 +175,35 @@ export function upsertBaseStockLevel(
 
     const delta = quantityOnHand - existingStock.quantityOnHand;
     if (delta !== 0) {
+      const movementId = createLocalId();
       tx.insert(stockMovements)
         .values({
-          id: createLocalId(),
+          id: movementId,
           productId: input.productId,
           variantId: null,
           movementType: "adjustment",
           quantityDelta: delta,
           referenceId: null,
+          operationId,
           note: input.movementNoteWhenChanged,
-          performedBy: null,
           syncStatus: "pending",
           lastSyncedAt: null,
           createdAt: now,
         })
         .run();
+
+      insertOutboxOperation(tx, {
+        id: operationId,
+        aggregateType: "stock_movement",
+        aggregateId: movementId,
+        operation: "adjust",
+        payload: {
+          productId: input.productId,
+          quantityDelta: delta,
+          note: input.movementNoteWhenChanged,
+        },
+        now,
+      });
     }
   });
 }
@@ -225,20 +259,29 @@ function roundQuantity(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
-const ULID_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-
-function createLocalId(): string {
-  let timestamp = Date.now();
-  let id = "";
-
-  for (let index = 0; index < 10; index += 1) {
-    id = ULID_ALPHABET[timestamp % 32] + id;
-    timestamp = Math.floor(timestamp / 32);
+function insertOutboxOperation(
+  tx: Parameters<Parameters<Db["transaction"]>[0]>[0],
+  input: {
+    id: string;
+    aggregateType: string;
+    aggregateId: string;
+    operation: string;
+    payload: unknown;
+    now: Date;
   }
-
-  for (let index = 0; index < 16; index += 1) {
-    id += ULID_ALPHABET[Math.floor(Math.random() * ULID_ALPHABET.length)];
-  }
-
-  return id;
+): void {
+  tx.insert(syncOutbox)
+    .values({
+      id: input.id,
+      aggregateType: input.aggregateType,
+      aggregateId: input.aggregateId,
+      operation: input.operation,
+      payload: JSON.stringify(input.payload),
+      status: "pending",
+      attemptCount: 0,
+      createdAt: input.now,
+      syncedAt: null,
+      error: null,
+    })
+    .run();
 }

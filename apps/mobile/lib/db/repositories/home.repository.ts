@@ -15,12 +15,12 @@ export function buildHomeStockQuery(db: Db) {
       id: products.id,
       name: products.name,
       unit: products.unit,
-      price: products.price,
-      costPrice: products.costPrice,
+      storePrice: products.storePrice,
+      buyPrice: products.buyPrice,
       imageUrls: products.imageUrls,
       categoryName: categories.name,
       quantityOnHand: stockLevels.quantityOnHand,
-      reorderPoint: stockLevels.reorderPoint,
+      lowStockThreshold: stockLevels.lowStockThreshold,
     })
     .from(products)
     .leftJoin(
@@ -44,11 +44,10 @@ export function buildHomeSalesQuery(db: Db, from: Date, to: Date) {
       itemId: saleOrderItems.id,
       itemQuantity: saleOrderItems.quantity,
       itemTotal: saleOrderItems.total,
-      productCostPrice: products.costPrice,
+      itemBuyPriceAtSale: saleOrderItems.buyPriceAtSale,
     })
     .from(saleOrders)
     .leftJoin(saleOrderItems, eq(saleOrderItems.orderId, saleOrders.id))
-    .leftJoin(products, eq(products.id, saleOrderItems.productId))
     .where(
       and(
         ne(saleOrders.status, "voided"),

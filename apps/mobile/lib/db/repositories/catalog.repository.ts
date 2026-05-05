@@ -14,7 +14,8 @@
 import type { PosProduct, PosProductStockLevel } from "@/lib/types/api/catalog";
 import { and, desc, eq, isNull } from "drizzle-orm";
 import type { Db } from "../client";
-import { categories, products, stockLevels } from "../schema";
+import { createLocalId } from "../id";
+import { categories, products, stockLevels, syncOutbox } from "../schema";
 
 /**
  * Returns a live query that fetches active products with their base-variant
@@ -32,11 +33,11 @@ export function buildPosCatalogQuery(db: Db) {
       id: products.id,
       name: products.name,
       unit: products.unit,
-      price: products.price,
+      storePrice: products.storePrice,
       imageUrls: products.imageUrls,
       categoryName: categories.name,
       quantityOnHand: stockLevels.quantityOnHand,
-      reorderPoint: stockLevels.reorderPoint,
+      lowStockThreshold: stockLevels.lowStockThreshold,
     })
     .from(products)
     .leftJoin(
@@ -58,13 +59,13 @@ export function mapToPosProduct(row: PosCatalogRow): PosProduct {
     row.quantityOnHand,
     "stock_levels.quantity_on_hand"
   );
-  const reorderPoint = requireNumber(
-    row.reorderPoint,
-    "stock_levels.reorder_point"
+  const lowStockThreshold = requireNumber(
+    row.lowStockThreshold,
+    "stock_levels.low_stock_threshold"
   );
 
   const stockLevel: PosProductStockLevel =
-    qty > reorderPoint ? "in-stock" : "low";
+    qty > lowStockThreshold ? "in-stock" : "low";
 
   const imageUrls = parseJsonArray(row.imageUrls, "products.image_urls");
   const imageUrl = getOptionalImageUri(imageUrls, "products.image_urls");
@@ -73,7 +74,7 @@ export function mapToPosProduct(row: PosCatalogRow): PosProduct {
     id: row.id,
     name: row.name,
     variant: "", // base product — no variant label
-    unitPricePhp: row.price,
+    storePricePhp: row.storePrice,
     stockLevel,
     category: row.categoryName ?? "",
     imageUrl,
@@ -84,8 +85,8 @@ export interface CatalogProductInput {
   name: string;
   categoryName: string;
   unit: string;
-  price: number;
-  costPrice: number;
+  storePrice: number;
+  buyPrice: number;
   imageUrl: string | null;
 }
 
@@ -110,6 +111,7 @@ export function createCatalogProduct(
   const value = normalizeCatalogInput(input);
   const now = new Date();
   const productId = createLocalId();
+  const operationId = createLocalId();
 
   db.transaction((tx) => {
     const categoryId = value.categoryName
@@ -125,8 +127,8 @@ export function createCatalogProduct(
         sku: null,
         barcode: null,
         unit: value.unit,
-        price: value.price,
-        costPrice: value.costPrice,
+        storePrice: value.storePrice,
+        buyPrice: value.buyPrice,
         imageUrls: serializeImageUrls(value.imageUrl),
         isActive: true,
         syncStatus: "pending",
@@ -135,6 +137,15 @@ export function createCatalogProduct(
         updatedAt: now,
       })
       .run();
+
+    insertOutboxOperation(tx, {
+      id: operationId,
+      aggregateType: "product",
+      aggregateId: productId,
+      operation: "create",
+      payload: value,
+      now,
+    });
   });
 
   return { id: productId };
@@ -146,6 +157,7 @@ export function updateCatalogProduct(
 ): CatalogMutationResult {
   const value = normalizeCatalogInput(input);
   const now = new Date();
+  const operationId = createLocalId();
 
   db.transaction((tx) => {
     const existing = tx
@@ -167,8 +179,8 @@ export function updateCatalogProduct(
         categoryId,
         name: value.name,
         unit: value.unit,
-        price: value.price,
-        costPrice: value.costPrice,
+        storePrice: value.storePrice,
+        buyPrice: value.buyPrice,
         imageUrls: serializeImageUrls(value.imageUrl),
         syncStatus: "pending",
         lastSyncedAt: null,
@@ -176,6 +188,15 @@ export function updateCatalogProduct(
       })
       .where(eq(products.id, input.id))
       .run();
+
+    insertOutboxOperation(tx, {
+      id: operationId,
+      aggregateType: "product",
+      aggregateId: input.id,
+      operation: "update",
+      payload: value,
+      now,
+    });
   });
 
   return { id: input.id };
@@ -186,6 +207,7 @@ export function archiveCatalogProduct(
   input: ArchiveCatalogProductInput
 ): CatalogMutationResult {
   const now = new Date();
+  const operationId = createLocalId();
 
   db.transaction((tx) => {
     const existing = tx
@@ -207,6 +229,15 @@ export function archiveCatalogProduct(
       })
       .where(eq(products.id, input.id))
       .run();
+
+    insertOutboxOperation(tx, {
+      id: operationId,
+      aggregateType: "product",
+      aggregateId: input.id,
+      operation: "archive",
+      payload: { id: input.id },
+      now,
+    });
   });
 
   return { id: input.id };
@@ -282,8 +313,8 @@ function normalizeCatalogInput(input: CatalogProductInput) {
   const unit = input.unit.trim();
   const imageUrl = input.imageUrl ? input.imageUrl.trim() : null;
 
-  assertFinitePositive(input.price, "Price");
-  assertFiniteNonNegative(input.costPrice, "Cost price");
+  assertFinitePositive(input.storePrice, "Store price");
+  assertFiniteNonNegative(input.buyPrice, "Buy price");
 
   if (!name) {
     throw new Error("Product name is required.");
@@ -297,8 +328,8 @@ function normalizeCatalogInput(input: CatalogProductInput) {
     name,
     categoryName,
     unit,
-    price: roundMoney(input.price),
-    costPrice: roundMoney(input.costPrice),
+    storePrice: roundMoney(input.storePrice),
+    buyPrice: roundMoney(input.buyPrice),
     imageUrl,
   };
 }
@@ -323,20 +354,29 @@ function roundMoney(value: number): number {
   return Math.round(value * 100) / 100;
 }
 
-const ULID_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-
-function createLocalId(): string {
-  let timestamp = Date.now();
-  let id = "";
-
-  for (let index = 0; index < 10; index += 1) {
-    id = ULID_ALPHABET[timestamp % 32] + id;
-    timestamp = Math.floor(timestamp / 32);
+function insertOutboxOperation(
+  tx: RepositoryTx,
+  input: {
+    id: string;
+    aggregateType: string;
+    aggregateId: string;
+    operation: string;
+    payload: unknown;
+    now: Date;
   }
-
-  for (let index = 0; index < 16; index += 1) {
-    id += ULID_ALPHABET[Math.floor(Math.random() * ULID_ALPHABET.length)];
-  }
-
-  return id;
+): void {
+  tx.insert(syncOutbox)
+    .values({
+      id: input.id,
+      aggregateType: input.aggregateType,
+      aggregateId: input.aggregateId,
+      operation: input.operation,
+      payload: JSON.stringify(input.payload),
+      status: "pending",
+      attemptCount: 0,
+      createdAt: input.now,
+      syncedAt: null,
+      error: null,
+    })
+    .run();
 }

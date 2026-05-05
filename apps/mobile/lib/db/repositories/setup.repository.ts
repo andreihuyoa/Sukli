@@ -1,12 +1,11 @@
 import Constants from "expo-constants";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { Db } from "../client";
-import { appSetupFlags, userSetupProfiles } from "../schema";
-import type { UserSetupProfile } from "../types";
+import { storeProfiles } from "../schema";
+import type { StoreProfile } from "../types";
 
-const SETUP_COMPLETE_KEY = "setup_complete";
-const STORE_TAX_RATE = { key: "store_tax_rate", defaultValue: "0.12" } as const;
+const DEFAULT_CURRENCY = "PHP";
 const LOCAL_USER_ID = "local-device-user";
 
 export type SetupProfile = {
@@ -14,6 +13,7 @@ export type SetupProfile = {
   storeName: string;
   iconUri: string | null;
   displayName: string;
+  currency: string;
   taxRate: number;
   setupCompleted: boolean;
   updatedAt: Date;
@@ -24,7 +24,10 @@ export type SetupProfileInput = {
   iconUri: string | null;
   displayName: string;
   taxRate: number;
+  currency?: string;
 };
+
+type NormalizedSetupProfileInput = Required<SetupProfileInput>;
 
 export function getCurrentUserId(): string {
   const constants = Constants as typeof Constants & {
@@ -39,8 +42,8 @@ export function getCurrentUserId(): string {
 export function getSetupProfile(db: Db, userId: string): SetupProfile | null {
   const row = db
     .select()
-    .from(userSetupProfiles)
-    .where(eq(userSetupProfiles.userId, userId))
+    .from(storeProfiles)
+    .where(eq(storeProfiles.userId, userId))
     .get();
 
   return row ? mapSetupProfile(db, row) : null;
@@ -61,56 +64,27 @@ export function saveSetupProfile(
   const now = new Date();
 
   db.transaction((tx) => {
-    tx.insert(userSetupProfiles)
+    tx.insert(storeProfiles)
       .values({
         userId,
         storeName: value.storeName,
         iconUri: value.iconUri,
         displayName: value.displayName,
+        currency: value.currency,
+        taxRate: value.taxRate,
         setupCompleted: true,
         createdAt: now,
         updatedAt: now,
       })
       .onConflictDoUpdate({
-        target: userSetupProfiles.userId,
+        target: storeProfiles.userId,
         set: {
           storeName: value.storeName,
           iconUri: value.iconUri,
           displayName: value.displayName,
+          currency: value.currency,
+          taxRate: value.taxRate,
           setupCompleted: true,
-          updatedAt: now,
-        },
-      })
-      .run();
-
-    tx.insert(appSetupFlags)
-      .values({
-        userId,
-        key: SETUP_COMPLETE_KEY,
-        value: "true",
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [appSetupFlags.userId, appSetupFlags.key],
-        set: {
-          value: "true",
-          updatedAt: now,
-        },
-      })
-      .run();
-
-    // Persist VAT config from setup form.
-    tx.insert(appSetupFlags)
-      .values({
-        userId,
-        key: STORE_TAX_RATE.key,
-        value: String(value.taxRate),
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [appSetupFlags.userId, appSetupFlags.key],
-        set: {
-          value: String(value.taxRate),
           updatedAt: now,
         },
       })
@@ -128,17 +102,17 @@ export function saveSetupProfile(
 
 export function clearUserSetup(db: Db, userId: string): void {
   db.transaction((tx) => {
-    tx.delete(appSetupFlags).where(eq(appSetupFlags.userId, userId)).run();
-    tx.delete(userSetupProfiles)
-      .where(eq(userSetupProfiles.userId, userId))
-      .run();
+    tx.delete(storeProfiles).where(eq(storeProfiles.userId, userId)).run();
   });
 }
 
-function normalizeSetupProfile(input: SetupProfileInput): SetupProfileInput {
+function normalizeSetupProfile(
+  input: SetupProfileInput
+): NormalizedSetupProfileInput {
   const storeName = input.storeName.trim();
   const displayName = input.displayName.trim();
   const iconUri = input.iconUri?.trim() || null;
+  const currency = input.currency?.trim() || DEFAULT_CURRENCY;
   const taxRate = input.taxRate;
 
   if (!storeName) {
@@ -158,32 +132,18 @@ function normalizeSetupProfile(input: SetupProfileInput): SetupProfileInput {
     iconUri,
     displayName,
     taxRate,
+    currency,
   };
 }
 
-function mapSetupProfile(db: Db, row: UserSetupProfile): SetupProfile {
-  const taxRateFlag = db
-    .select({ value: appSetupFlags.value })
-    .from(appSetupFlags)
-    .where(
-      and(
-        eq(appSetupFlags.userId, row.userId),
-        eq(appSetupFlags.key, STORE_TAX_RATE.key)
-      )
-    )
-    .get();
-
-  const parsedTaxRate = taxRateFlag ? Number(taxRateFlag.value) : Number.NaN;
-
+function mapSetupProfile(_db: Db, row: StoreProfile): SetupProfile {
   return {
     userId: row.userId,
     storeName: row.storeName,
     iconUri: row.iconUri,
     displayName: row.displayName,
-    taxRate:
-      Number.isFinite(parsedTaxRate) && parsedTaxRate >= 0
-        ? parsedTaxRate
-        : Number(STORE_TAX_RATE.defaultValue),
+    currency: row.currency,
+    taxRate: row.taxRate,
     setupCompleted: row.setupCompleted,
     updatedAt: row.updatedAt,
   };

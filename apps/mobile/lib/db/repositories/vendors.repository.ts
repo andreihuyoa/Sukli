@@ -11,7 +11,7 @@
  */
 
 import type { Supplier, VendorPriceListRow } from "@/lib/types/api/procurement";
-import { purchaseOrderItems, purchaseOrders, vendors } from "../schema";
+import { vendorCatalogItems, vendors } from "../schema";
 import { desc, eq } from "drizzle-orm";
 import type { Db } from "../client";
 
@@ -31,23 +31,20 @@ export function buildVendorsQuery(db: Db) {
 type VendorRow = Awaited<ReturnType<typeof buildVendorsQuery>>[number];
 
 /**
- * Last-unit-cost per product from the most recent PO items.
+ * Vendor buy-price catalog rows.
  * Used to build the price list view.
  */
 export function buildPriceListQuery(db: Db) {
   return db
     .select({
-      productName: purchaseOrderItems.productName,
+      productName: vendorCatalogItems.productName,
       vendorName: vendors.name,
-      unitCost: purchaseOrderItems.unitCost,
+      buyPrice: vendorCatalogItems.buyPrice,
+      minOrderQuantity: vendorCatalogItems.minOrderQuantity,
     })
-    .from(purchaseOrderItems)
-    .innerJoin(
-      purchaseOrders,
-      eq(purchaseOrders.id, purchaseOrderItems.purchaseOrderId)
-    )
-    .innerJoin(vendors, eq(vendors.id, purchaseOrders.vendorId))
-    .orderBy(desc(purchaseOrders.createdAt));
+    .from(vendorCatalogItems)
+    .innerJoin(vendors, eq(vendors.id, vendorCatalogItems.vendorId))
+    .orderBy(desc(vendorCatalogItems.updatedAt));
 }
 
 type PriceListRow = Awaited<ReturnType<typeof buildPriceListQuery>>[number];
@@ -69,8 +66,10 @@ export function mapToVendorPriceListRow(row: PriceListRow): VendorPriceListRow {
   return {
     productName: row.productName,
     vendorName: requireString(row.vendorName, "vendors.name"),
-    priceDisplay: `₱${row.unitCost.toFixed(2)}`,
-    minOrderDisplay: "—",
+    priceDisplay: `₱${row.buyPrice.toFixed(2)}`,
+    minOrderDisplay: row.minOrderQuantity
+      ? row.minOrderQuantity.toLocaleString("en-PH")
+      : "—",
   };
 }
 
