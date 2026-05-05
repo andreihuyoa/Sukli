@@ -132,25 +132,25 @@ function buildDashboard(
   const yesterdayOrders = orders.filter((order) =>
     isWithin(order.createdAt, range.yesterdayStart, range.todayStart)
   );
-  const confirmedToday = todayOrders.filter(
-    (order) => order.status === "confirmed"
+  const completedToday = todayOrders.filter(
+    (order) => order.status === "completed"
   );
-  const confirmedYesterday = yesterdayOrders.filter(
-    (order) => order.status === "confirmed"
+  const completedYesterday = yesterdayOrders.filter(
+    (order) => order.status === "completed"
   );
 
-  const revenueToday = sumBy(confirmedToday, (order) => order.totalAmount);
+  const revenueToday = sumBy(completedToday, (order) => order.totalAmount);
   const revenueYesterday = sumBy(
-    confirmedYesterday,
+    completedYesterday,
     (order) => order.totalAmount
   );
-  const grossProfitToday = sumBy(confirmedToday, (order) => order.grossProfit);
+  const grossProfitToday = sumBy(completedToday, (order) => order.grossProfit);
   const cashSalesToday = sumBy(
-    confirmedToday.filter((order) => order.paymentMethod === "cash"),
+    completedToday.filter((order) => order.paymentMethod === "cash"),
     (order) => order.totalAmount
   );
   const gcashSalesToday = sumBy(
-    confirmedToday.filter((order) => order.paymentMethod === "gcash"),
+    completedToday.filter((order) => order.paymentMethod === "gcash"),
     (order) => order.totalAmount
   );
   const totalUnits = sumBy(stockRows, (row) => row.quantityOnHand ?? 0);
@@ -161,7 +161,7 @@ function buildDashboard(
       value: sumBy(
         orders.filter(
           (order) =>
-            order.status === "confirmed" &&
+            order.status === "completed" &&
             isWithin(order.createdAt, day, nextDay)
         ),
         (order) => order.totalAmount
@@ -186,11 +186,11 @@ function buildDashboard(
         ? `${formatQuantity(totalUnits)} units on hand`
         : "Add products to your catalog",
     profitEstDisplay:
-      confirmedToday.length > 0
+      completedToday.length > 0
         ? formatCurrency(grossProfitToday)
         : EMPTY_VALUE,
     profitEstSubtitle:
-      confirmedToday.length > 0
+      completedToday.length > 0
         ? `${getMarginPercent(grossProfitToday, revenueToday)}% gross margin`
         : EMPTY_VALUE,
     gcashAmountDisplay:
@@ -226,7 +226,7 @@ function buildDashboard(
 
 interface OrderAggregate {
   id: string;
-  status: "draft" | "confirmed";
+  status: "draft" | "completed";
   paymentMethod: string | null;
   totalAmount: number;
   createdAt: Date;
@@ -241,7 +241,7 @@ function aggregateOrders(rows: HomeSalesRow[]): OrderAggregate[] {
     const existing = orders.get(row.orderId);
     const order = existing ?? {
       id: row.orderId,
-      status: row.status === "confirmed" ? "confirmed" : "draft",
+      status: row.status === "completed" ? "completed" : "draft",
       paymentMethod: row.paymentMethod,
       totalAmount: row.totalAmount,
       createdAt: row.createdAt,
@@ -253,7 +253,7 @@ function aggregateOrders(rows: HomeSalesRow[]): OrderAggregate[] {
       const quantity = row.itemQuantity ?? 0;
       order.itemCount += quantity;
       order.grossProfit +=
-        (row.itemTotal ?? 0) - (row.productCostPrice ?? 0) * quantity;
+        (row.itemTotal ?? 0) - (row.itemBuyPriceAtSale ?? 0) * quantity;
     }
 
     orders.set(row.orderId, order);
@@ -268,18 +268,19 @@ function buildRestockAlerts(rows: HomeStockRow[]): HomeRestockAlert[] {
   return rows
     .map((row) => {
       const quantity = row.quantityOnHand ?? 0;
-      const reorderPoint = row.reorderPoint ?? 0;
-      return { row, quantity, reorderPoint };
+      const lowStockThreshold = row.lowStockThreshold ?? 0;
+      return { row, quantity, lowStockThreshold };
     })
-    .filter(({ quantity, reorderPoint }) => quantity <= reorderPoint)
+    .filter(({ quantity, lowStockThreshold }) => quantity <= lowStockThreshold)
     .sort((a, b) => a.quantity - b.quantity)
     .slice(0, 4)
-    .map(({ row, quantity, reorderPoint }) => ({
+    .map(({ row, quantity, lowStockThreshold }) => ({
       id: row.id,
       name: row.name,
       variant: row.categoryName ?? row.unit,
       unitsLeft: quantity,
-      urgency: quantity <= Math.max(0, reorderPoint / 2) ? "critical" : "high",
+      urgency:
+        quantity <= Math.max(0, lowStockThreshold / 2) ? "critical" : "high",
       imageUrl: safeParseJsonArray(row.imageUrls)[0] ?? "",
     }));
 }
@@ -334,7 +335,7 @@ function getMarginPercent(grossProfit: number, revenue: number): number {
 function mapTransactionStatus(
   status: OrderAggregate["status"]
 ): HomeTransactionStatus {
-  return status === "confirmed" ? "completed" : "pending";
+  return status === "completed" ? "completed" : "pending";
 }
 
 function formatCurrency(value: number): string {

@@ -4,8 +4,8 @@ export interface PosProduct {
   id: string;
   name: string;
   variant: string;
-  /** Unit price in PHP (whole pesos); APIs may send minor units — map in the data layer */
-  unitPricePhp: number;
+  /** Store selling price in PHP (whole pesos); APIs may send minor units — map in the data layer */
+  storePricePhp: number;
   stockLevel: PosProductStockLevel;
   category: string;
   imageUrl: string;

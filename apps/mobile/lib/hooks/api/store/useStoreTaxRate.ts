@@ -1,11 +1,9 @@
 import { getDb } from "@/lib/db/client";
 import { getCurrentUserId } from "@/lib/db/repositories/setup.repository";
-import { appSetupFlags } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { storeProfiles } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { useLiveQuery } from "drizzle-orm/expo-sqlite";
 import { useMemo } from "react";
-
-const STORE_TAX_RATE_KEY = "store_tax_rate";
 
 export interface UseStoreTaxRateResult {
   taxRate: number | null;
@@ -14,7 +12,7 @@ export interface UseStoreTaxRateResult {
 }
 
 /**
- * Reads store VAT rate from app_setup_flags.
+ * Reads VAT rate from the user's store profile.
  * Fails fast by returning an explicit error when config is missing/invalid.
  */
 export function useStoreTaxRate(): UseStoreTaxRateResult {
@@ -24,14 +22,9 @@ export function useStoreTaxRate(): UseStoreTaxRateResult {
   const query = useMemo(
     () =>
       db
-        .select({ value: appSetupFlags.value })
-        .from(appSetupFlags)
-        .where(
-          and(
-            eq(appSetupFlags.userId, userId),
-            eq(appSetupFlags.key, STORE_TAX_RATE_KEY)
-          )
-        )
+        .select({ taxRate: storeProfiles.taxRate })
+        .from(storeProfiles)
+        .where(eq(storeProfiles.userId, userId))
         .limit(1),
     [db, userId]
   );
@@ -54,8 +47,8 @@ export function useStoreTaxRate(): UseStoreTaxRateResult {
     };
   }
 
-  const raw = data?.[0]?.value;
-  if (raw === undefined) {
+  const taxRate = data?.[0]?.taxRate;
+  if (taxRate === undefined) {
     return {
       taxRate: null,
       isLoading: false,
@@ -63,17 +56,16 @@ export function useStoreTaxRate(): UseStoreTaxRateResult {
     };
   }
 
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed < 0) {
+  if (!Number.isFinite(taxRate) || taxRate < 0) {
     return {
       taxRate: null,
       isLoading: false,
-      error: `Invalid tax configuration value: "${raw}". Please update setup.`,
+      error: `Invalid tax configuration value: "${taxRate}". Please update setup.`,
     };
   }
 
   return {
-    taxRate: parsed,
+    taxRate,
     isLoading: false,
     error: null,
   };

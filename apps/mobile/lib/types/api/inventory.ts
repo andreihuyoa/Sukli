@@ -4,10 +4,10 @@ export interface InventoryItem {
   id: string;
   name: string;
   category: string;
-  price: number;
-  costPrice: number;
-  reorderPoint: number;
-  priceDisplay: string;
+  storePrice: number;
+  buyPrice: number;
+  lowStockThreshold: number;
+  storePriceDisplay: string;
   available: number;
   unit: string;
   status: InventoryStockStatus;

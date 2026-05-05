@@ -16,7 +16,7 @@ import { useCallback, useMemo } from "react";
 
 export type InventoryProductFormInput = CatalogProductInput & {
   quantityOnHand: number;
-  reorderPoint: number;
+  lowStockThreshold: number;
 };
 
 export interface UseInventoryResult {
@@ -47,12 +47,12 @@ export function useInventory(): UseInventoryResult {
 
   const createItem = useCallback(
     (input: InventoryProductFormInput) => {
-      const { quantityOnHand, reorderPoint, ...catalogInput } = input;
+      const { quantityOnHand, lowStockThreshold, ...catalogInput } = input;
       const { id } = createCatalogProduct(db, catalogInput);
       upsertBaseStockLevel(db, {
         productId: id,
         quantityOnHand,
-        reorderPoint,
+        lowStockThreshold,
         movementNoteWhenChanged: "Initial stock count",
       });
     },
@@ -61,12 +61,12 @@ export function useInventory(): UseInventoryResult {
 
   const updateItem = useCallback(
     (id: string, input: InventoryProductFormInput) => {
-      const { quantityOnHand, reorderPoint, ...catalogInput } = input;
+      const { quantityOnHand, lowStockThreshold, ...catalogInput } = input;
       updateCatalogProduct(db, { ...catalogInput, id });
       upsertBaseStockLevel(db, {
         productId: id,
         quantityOnHand,
-        reorderPoint,
+        lowStockThreshold,
         movementNoteWhenChanged: "Inventory count updated",
       });
     },
