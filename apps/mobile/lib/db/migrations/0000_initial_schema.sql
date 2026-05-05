@@ -1,8 +1,5 @@
 -- Migration: 0000_initial_schema
 -- Generated for: expo-sqlite (Drizzle Kit SQLite dialect)
--- Apply via: useMigrations() hook in _layout.tsx
-
--- ─── IAM ────────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id`            TEXT PRIMARY KEY NOT NULL,
@@ -12,29 +9,19 @@ CREATE TABLE IF NOT EXISTS `users` (
   `created_at`    INTEGER NOT NULL,
   `updated_at`    INTEGER NOT NULL
 );
-
 CREATE UNIQUE INDEX IF NOT EXISTS `users_email_idx` ON `users` (`email`);
 
-CREATE TABLE IF NOT EXISTS `user_setup_profiles` (
+CREATE TABLE IF NOT EXISTS `store_profiles` (
   `user_id`         TEXT PRIMARY KEY NOT NULL,
   `store_name`      TEXT NOT NULL,
   `icon_uri`        TEXT,
   `display_name`    TEXT NOT NULL,
+  `currency`        TEXT NOT NULL,
+  `tax_rate`        REAL NOT NULL,
   `setup_completed` INTEGER NOT NULL,
   `created_at`      INTEGER NOT NULL,
   `updated_at`      INTEGER NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS `app_setup_flags` (
-  `user_id`    TEXT NOT NULL,
-  `key`        TEXT NOT NULL,
-  `value`      TEXT NOT NULL,
-  `updated_at` INTEGER NOT NULL
-);
-CREATE UNIQUE INDEX IF NOT EXISTS `app_setup_flags_user_key_idx`
-  ON `app_setup_flags` (`user_id`, `key`);
-
--- ─── Catalog ────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS `categories` (
   `id`         TEXT PRIMARY KEY NOT NULL,
@@ -53,8 +40,8 @@ CREATE TABLE IF NOT EXISTS `products` (
   `sku`            TEXT,
   `barcode`        TEXT,
   `unit`           TEXT NOT NULL,
-  `price`          REAL NOT NULL,
-  `cost_price`     REAL NOT NULL,
+  `store_price`    REAL NOT NULL,
+  `buy_price`      REAL NOT NULL,
   `image_urls`     TEXT NOT NULL,
   `is_active`      INTEGER NOT NULL,
   `sync_status`    TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
@@ -62,7 +49,6 @@ CREATE TABLE IF NOT EXISTS `products` (
   `created_at`     INTEGER NOT NULL,
   `updated_at`     INTEGER NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS `products_category_idx` ON `products` (`category_id`);
 CREATE INDEX IF NOT EXISTS `products_sku_idx` ON `products` (`sku`);
 CREATE INDEX IF NOT EXISTS `products_barcode_idx` ON `products` (`barcode`);
@@ -78,24 +64,18 @@ CREATE TABLE IF NOT EXISTS `product_variants` (
   `created_at`     INTEGER NOT NULL,
   `updated_at`     INTEGER NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS `product_variants_product_idx` ON `product_variants` (`product_id`);
 
--- ─── Inventory ───────────────────────────────────────────────────────────────
-
 CREATE TABLE IF NOT EXISTS `stock_levels` (
-  `id`               TEXT PRIMARY KEY NOT NULL,
-  `product_id`       TEXT NOT NULL REFERENCES `products`(`id`),
-  `variant_id`       TEXT REFERENCES `product_variants`(`id`),
-  `quantity_on_hand` REAL NOT NULL,
-  `reorder_point`    REAL NOT NULL,
-  `reorder_quantity` REAL NOT NULL,
-  `location`         TEXT,
-  `sync_status`      TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
-  `last_synced_at`   INTEGER,
-  `updated_at`       INTEGER NOT NULL
+  `id`                  TEXT PRIMARY KEY NOT NULL,
+  `product_id`          TEXT NOT NULL REFERENCES `products`(`id`),
+  `variant_id`          TEXT REFERENCES `product_variants`(`id`),
+  `quantity_on_hand`    REAL NOT NULL,
+  `low_stock_threshold` REAL NOT NULL,
+  `sync_status`         TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
+  `last_synced_at`      INTEGER,
+  `updated_at`          INTEGER NOT NULL
 );
-
 CREATE UNIQUE INDEX IF NOT EXISTS `stock_levels_product_variant_idx`
   ON `stock_levels` (`product_id`, `variant_id`);
 CREATE INDEX IF NOT EXISTS `stock_levels_product_idx` ON `stock_levels` (`product_id`);
@@ -104,58 +84,54 @@ CREATE TABLE IF NOT EXISTS `stock_movements` (
   `id`             TEXT PRIMARY KEY NOT NULL,
   `product_id`     TEXT NOT NULL REFERENCES `products`(`id`),
   `variant_id`     TEXT REFERENCES `product_variants`(`id`),
-  `movement_type`  TEXT NOT NULL CHECK (`movement_type` IN ('purchase','sale','adjustment','transfer','waste')),
+  `movement_type`  TEXT NOT NULL CHECK (`movement_type` IN ('sale','restock','adjustment','void')),
   `quantity_delta` REAL NOT NULL,
   `reference_id`   TEXT,
+  `operation_id`   TEXT NOT NULL UNIQUE,
   `note`           TEXT,
-  `performed_by`   TEXT REFERENCES `users`(`id`),
   `sync_status`    TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
   `last_synced_at` INTEGER,
   `created_at`     INTEGER NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS `stock_movements_product_idx` ON `stock_movements` (`product_id`);
 CREATE INDEX IF NOT EXISTS `stock_movements_created_idx` ON `stock_movements` (`created_at`);
-
--- ─── Sales ───────────────────────────────────────────────────────────────────
+CREATE UNIQUE INDEX IF NOT EXISTS `stock_movements_operation_idx` ON `stock_movements` (`operation_id`);
 
 CREATE TABLE IF NOT EXISTS `sale_orders` (
   `id`              TEXT PRIMARY KEY NOT NULL,
   `order_number`    TEXT NOT NULL,
-  `status`          TEXT NOT NULL CHECK (`status` IN ('draft','confirmed','voided')),
+  `status`          TEXT NOT NULL CHECK (`status` IN ('draft','completed','voided')),
   `total_amount`    REAL NOT NULL,
   `discount_amount` REAL NOT NULL,
   `tax_amount`      REAL NOT NULL,
   `payment_method`  TEXT CHECK (`payment_method` IN ('cash','card','gcash','maya','credit','other')),
   `cashier_id`      TEXT REFERENCES `users`(`id`),
+  `operation_id`    TEXT NOT NULL UNIQUE,
   `note`            TEXT,
   `sync_status`     TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
   `last_synced_at`  INTEGER,
   `created_at`      INTEGER NOT NULL,
   `updated_at`      INTEGER NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS `sale_orders_created_idx` ON `sale_orders` (`created_at`);
-CREATE INDEX IF NOT EXISTS `sale_orders_number_idx`
-  ON `sale_orders` (`order_number`);
+CREATE INDEX IF NOT EXISTS `sale_orders_number_idx` ON `sale_orders` (`order_number`);
+CREATE UNIQUE INDEX IF NOT EXISTS `sale_orders_operation_idx` ON `sale_orders` (`operation_id`);
 
 CREATE TABLE IF NOT EXISTS `sale_order_items` (
-  `id`           TEXT PRIMARY KEY NOT NULL,
-  `order_id`     TEXT NOT NULL REFERENCES `sale_orders`(`id`),
-  `product_id`   TEXT NOT NULL REFERENCES `products`(`id`),
-  `variant_id`   TEXT REFERENCES `product_variants`(`id`),
-  `product_name` TEXT NOT NULL,
-  `sku`          TEXT,
-  `quantity`     REAL NOT NULL,
-  `unit_price`   REAL NOT NULL,
-  `discount`     REAL NOT NULL,
-  `total`        REAL NOT NULL
+  `id`                TEXT PRIMARY KEY NOT NULL,
+  `order_id`          TEXT NOT NULL REFERENCES `sale_orders`(`id`),
+  `product_id`        TEXT NOT NULL REFERENCES `products`(`id`),
+  `variant_id`        TEXT REFERENCES `product_variants`(`id`),
+  `product_name`      TEXT NOT NULL,
+  `sku`               TEXT,
+  `quantity`          REAL NOT NULL,
+  `store_price`       REAL NOT NULL,
+  `buy_price_at_sale` REAL NOT NULL,
+  `discount`          REAL NOT NULL,
+  `total`             REAL NOT NULL
 );
-
 CREATE INDEX IF NOT EXISTS `sale_order_items_order_idx` ON `sale_order_items` (`order_id`);
 CREATE INDEX IF NOT EXISTS `sale_order_items_product_idx` ON `sale_order_items` (`product_id`);
-
--- ─── Procurement ─────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS `vendors` (
   `id`             TEXT PRIMARY KEY NOT NULL,
@@ -172,50 +148,49 @@ CREATE TABLE IF NOT EXISTS `vendors` (
   `updated_at`     INTEGER NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS `purchase_orders` (
+CREATE TABLE IF NOT EXISTS `vendor_catalog_items` (
+  `id`                 TEXT PRIMARY KEY NOT NULL,
+  `vendor_id`          TEXT REFERENCES `vendors`(`id`),
+  `product_name`       TEXT NOT NULL,
+  `unit_description`   TEXT NOT NULL,
+  `buy_price`          REAL NOT NULL,
+  `min_order_quantity` INTEGER,
+  `sync_status`        TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
+  `last_synced_at`     INTEGER,
+  `created_at`         INTEGER NOT NULL,
+  `updated_at`         INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS `vendor_catalog_items_vendor_idx` ON `vendor_catalog_items` (`vendor_id`);
+CREATE INDEX IF NOT EXISTS `vendor_catalog_items_product_name_idx` ON `vendor_catalog_items` (`product_name`);
+
+CREATE TABLE IF NOT EXISTS `expenses` (
   `id`             TEXT PRIMARY KEY NOT NULL,
   `vendor_id`      TEXT REFERENCES `vendors`(`id`),
-  `po_number`      TEXT NOT NULL,
-  `status`         TEXT NOT NULL CHECK (`status` IN ('draft','sent','received','cancelled')),
-  `total_amount`   REAL NOT NULL,
-  `expected_date`  INTEGER,
-  `received_date`  INTEGER,
+  `title`          TEXT NOT NULL,
+  `category`       TEXT NOT NULL,
+  `amount`         REAL NOT NULL,
+  `expense_date`   INTEGER NOT NULL,
   `note`           TEXT,
   `sync_status`    TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
   `last_synced_at` INTEGER,
   `created_at`     INTEGER NOT NULL,
-  `updated_at`     INTEGER NOT NULL
+  `updated_at`     INTEGER NOT NULL,
+  `deleted_at`     INTEGER
 );
+CREATE INDEX IF NOT EXISTS `expenses_vendor_idx` ON `expenses` (`vendor_id`);
+CREATE INDEX IF NOT EXISTS `expenses_date_idx` ON `expenses` (`expense_date`);
 
-CREATE INDEX IF NOT EXISTS `purchase_orders_vendor_idx` ON `purchase_orders` (`vendor_id`);
-CREATE INDEX IF NOT EXISTS `purchase_orders_number_idx`
-  ON `purchase_orders` (`po_number`);
-
-CREATE TABLE IF NOT EXISTS `purchase_order_items` (
-  `id`                TEXT PRIMARY KEY NOT NULL,
-  `purchase_order_id` TEXT NOT NULL REFERENCES `purchase_orders`(`id`),
-  `product_id`        TEXT NOT NULL REFERENCES `products`(`id`),
-  `variant_id`        TEXT REFERENCES `product_variants`(`id`),
-  `product_name`      TEXT NOT NULL,
-  `quantity`          REAL NOT NULL,
-  `unit_cost`         REAL NOT NULL,
-  `total`             REAL NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS `po_items_po_idx` ON `purchase_order_items` (`purchase_order_id`);
-CREATE INDEX IF NOT EXISTS `po_items_product_idx` ON `purchase_order_items` (`product_id`);
-
--- ─── Expenses ────────────────────────────────────────────────────────────────
-
-CREATE TABLE IF NOT EXISTS `expenses` (
+CREATE TABLE IF NOT EXISTS `sync_outbox` (
   `id`             TEXT PRIMARY KEY NOT NULL,
-  `category`       TEXT NOT NULL,
-  `amount`         REAL NOT NULL,
-  `description`    TEXT,
-  `performed_by`   TEXT REFERENCES `users`(`id`),
-  `sync_status`    TEXT NOT NULL CHECK (`sync_status` IN ('synced','pending','conflict')),
-  `last_synced_at` INTEGER,
-  `created_at`     INTEGER NOT NULL
+  `aggregate_type` TEXT NOT NULL,
+  `aggregate_id`   TEXT NOT NULL,
+  `operation`      TEXT NOT NULL,
+  `payload`        TEXT NOT NULL,
+  `status`         TEXT NOT NULL CHECK (`status` IN ('pending','synced','failed')),
+  `attempt_count`  INTEGER NOT NULL,
+  `created_at`     INTEGER NOT NULL,
+  `synced_at`      INTEGER,
+  `error`          TEXT
 );
-
-CREATE INDEX IF NOT EXISTS `expenses_created_idx` ON `expenses` (`created_at`);
+CREATE INDEX IF NOT EXISTS `sync_outbox_status_created_idx` ON `sync_outbox` (`status`, `created_at`);
+CREATE INDEX IF NOT EXISTS `sync_outbox_aggregate_idx` ON `sync_outbox` (`aggregate_type`, `aggregate_id`);
