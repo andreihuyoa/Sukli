@@ -10,24 +10,22 @@ import type {
   expenses,
   productVariants,
   products,
-  purchaseOrderItems,
-  purchaseOrders,
   saleOrderItems,
   saleOrders,
+  storeProfiles,
   stockLevels,
   stockMovements,
-  appSetupFlags,
+  syncOutbox,
   users,
-  userSetupProfiles,
+  vendorCatalogItems,
   vendors,
 } from "./schema";
 
 // IAM
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
-export type UserSetupProfile = InferSelectModel<typeof userSetupProfiles>;
-export type NewUserSetupProfile = InferInsertModel<typeof userSetupProfiles>;
-export type AppSetupFlag = InferSelectModel<typeof appSetupFlags>;
+export type StoreProfile = InferSelectModel<typeof storeProfiles>;
+export type NewStoreProfile = InferInsertModel<typeof storeProfiles>;
 
 // Catalog
 export type Category = InferSelectModel<typeof categories>;
@@ -49,8 +47,8 @@ export type SaleOrderItem = InferSelectModel<typeof saleOrderItems>;
 // Procurement
 export type Vendor = InferSelectModel<typeof vendors>;
 export type NewVendor = InferInsertModel<typeof vendors>;
-export type PurchaseOrder = InferSelectModel<typeof purchaseOrders>;
-export type PurchaseOrderItem = InferSelectModel<typeof purchaseOrderItems>;
+export type VendorCatalogItem = InferSelectModel<typeof vendorCatalogItems>;
+export type NewVendorCatalogItem = InferInsertModel<typeof vendorCatalogItems>;
 
 // Finance
 export type Expense = InferSelectModel<typeof expenses>;
@@ -58,3 +56,5 @@ export type NewExpense = InferInsertModel<typeof expenses>;
 
 // Sync metadata helpers
 export type SyncStatus = "synced" | "pending" | "conflict";
+export type SyncOutboxOperation = InferSelectModel<typeof syncOutbox>;
+export type NewSyncOutboxOperation = InferInsertModel<typeof syncOutbox>;

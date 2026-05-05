@@ -8,22 +8,34 @@ import {
   expenses,
   productVariants,
   products,
-  purchaseOrderItems,
-  purchaseOrders,
   saleOrderItems,
   saleOrders,
+  storeProfiles,
   stockLevels,
   stockMovements,
+  syncOutbox,
   users,
+  vendorCatalogItems,
   vendors,
 } from "./schema";
 
 // IAM
-export const usersRelations = relations(users, ({ many }) => ({
-  stockMovements: many(stockMovements),
+export const usersRelations = relations(users, ({ one, many }) => ({
+  storeProfile: one(storeProfiles, {
+    fields: [users.id],
+    references: [storeProfiles.userId],
+  }),
   saleOrdersCashier: many(saleOrders),
-  expenses: many(expenses),
 }));
+
+export const storeProfilesRelations = relations(storeProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [storeProfiles.userId],
+    references: [users.id],
+  }),
+}));
+
+export const syncOutboxRelations = relations(syncOutbox, () => ({}));
 
 // Catalog
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -39,7 +51,6 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   stockLevels: many(stockLevels),
   stockMovements: many(stockMovements),
   saleOrderItems: many(saleOrderItems),
-  poItems: many(purchaseOrderItems),
 }));
 
 export const productVariantsRelations = relations(
@@ -75,10 +86,6 @@ export const stockMovementsRelations = relations(stockMovements, ({ one }) => ({
     fields: [stockMovements.variantId],
     references: [productVariants.id],
   }),
-  performer: one(users, {
-    fields: [stockMovements.performedBy],
-    references: [users.id],
-  }),
 }));
 
 // Sales
@@ -107,42 +114,24 @@ export const saleOrderItemsRelations = relations(saleOrderItems, ({ one }) => ({
 
 // Procurement
 export const vendorsRelations = relations(vendors, ({ many }) => ({
-  purchaseOrders: many(purchaseOrders),
+  catalogItems: many(vendorCatalogItems),
+  expenses: many(expenses),
 }));
 
-export const purchaseOrdersRelations = relations(
-  purchaseOrders,
-  ({ one, many }) => ({
-    vendor: one(vendors, {
-      fields: [purchaseOrders.vendorId],
-      references: [vendors.id],
-    }),
-    items: many(purchaseOrderItems),
-  })
-);
-
-export const purchaseOrderItemsRelations = relations(
-  purchaseOrderItems,
+export const vendorCatalogItemsRelations = relations(
+  vendorCatalogItems,
   ({ one }) => ({
-    purchaseOrder: one(purchaseOrders, {
-      fields: [purchaseOrderItems.purchaseOrderId],
-      references: [purchaseOrders.id],
-    }),
-    product: one(products, {
-      fields: [purchaseOrderItems.productId],
-      references: [products.id],
-    }),
-    variant: one(productVariants, {
-      fields: [purchaseOrderItems.variantId],
-      references: [productVariants.id],
+    vendor: one(vendors, {
+      fields: [vendorCatalogItems.vendorId],
+      references: [vendors.id],
     }),
   })
 );
 
 // Expenses
 export const expensesRelations = relations(expenses, ({ one }) => ({
-  performer: one(users, {
-    fields: [expenses.performedBy],
-    references: [users.id],
+  vendor: one(vendors, {
+    fields: [expenses.vendorId],
+    references: [vendors.id],
   }),
 }));
