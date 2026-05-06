@@ -221,6 +221,10 @@ export function NavigationBar({ state, navigation }: BottomTabBarProps) {
   ); // tighter space between tabs
   const chipRadius = Math.round(chipSize * 0.45); // rounded pill
   const iconSize = Math.round(Math.max(22, Math.min(34, chipSize * 0.5))); // icon size
+  const activeRoute = state.routes[state.index];
+  const shouldShowActiveIndicator = Boolean(
+    activeRoute && TABS.some((tab) => tab.key === activeRoute.name)
+  );
 
   const getIndicatorTargetX = useCallback(
     (index: number) => {
@@ -269,10 +273,12 @@ export function NavigationBar({ state, navigation }: BottomTabBarProps) {
 
   const androidNavigationBar = (
     <View style={styles.tabsContainer}>
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.activeIndicator, indicatorStyle]}
-      />
+      {shouldShowActiveIndicator ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.activeIndicator, indicatorStyle]}
+        />
+      ) : null}
       {state.routes.map((route, index) => {
         const meta = TABS.find((t) => t.key === route.name);
         if (!meta) return null;
