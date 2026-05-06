@@ -93,7 +93,7 @@ export default function SettingsScreen() {
         horizontalPadding={0}
       >
         <View className="px-5 pt-1 pb-3">
-          <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+          <Text className="text-xs font-label uppercase tracking-widest text-label-muted">
             App controls
           </Text>
           <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
@@ -104,7 +104,7 @@ export default function SettingsScreen() {
         <Entrance delayMs={40}>
           <View className="mx-4 mb-4 rounded-3xl border border-outline bg-glass-surface p-5">
             <View className="mb-3 self-start rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1.5">
-              <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-accent-focus">
+              <Text className="text-[10px] font-label uppercase tracking-[0.18em] text-accent-focus">
                 Workspace
               </Text>
             </View>
@@ -132,7 +132,7 @@ export default function SettingsScreen() {
 
             <View className="mt-4 flex-row gap-3">
               <View className="flex-1 rounded-2xl border border-outline bg-surface-container px-4 py-3">
-                <Text className="text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted">
+                <Text className="text-[10px] font-label uppercase tracking-[0.16em] text-label-muted">
                   Theme
                 </Text>
                 <Text className="mt-1 text-sm font-body-semibold text-label-primary">
@@ -140,7 +140,7 @@ export default function SettingsScreen() {
                 </Text>
               </View>
               <View className="flex-1 rounded-2xl border border-outline bg-surface-container px-4 py-3">
-                <Text className="text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted">
+                <Text className="text-[10px] font-label uppercase tracking-[0.16em] text-label-muted">
                   Sync state
                 </Text>
                 <Text className="mt-1 text-sm font-body-semibold text-label-primary">

@@ -29,7 +29,7 @@ export default function ReportsScreen() {
       >
         <View>
           <View className="px-5 pt-1 pb-3">
-            <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+            <Text className="text-xs font-label uppercase tracking-widest text-label-muted">
               Analytics Console
             </Text>
             <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
@@ -63,8 +63,8 @@ export default function ReportsScreen() {
                     <Text
                       className={`text-xs ${
                         active
-                          ? "font-label font-bold text-forest"
-                          : "font-body font-bold text-label-muted"
+                          ? "font-label text-forest"
+                          : "font-body-semibold text-label-muted"
                       }`}
                     >
                       {value}
@@ -80,11 +80,11 @@ export default function ReportsScreen() {
               <View className="mb-4 flex-row items-start justify-between">
                 <View className="flex-1">
                   <View className="mb-3 self-start rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1.5">
-                    <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-accent-focus">
+                    <Text className="text-[10px] font-label uppercase tracking-[0.18em] text-accent-focus">
                       Focus score
                     </Text>
                   </View>
-                  <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
+                  <Text className="text-xs font-label uppercase tracking-[0.2em] text-label-muted">
                     Total net profit
                   </Text>
                   <Text className="text-4xl font-black leading-9 tracking-[-0.2px] text-label-primary">
@@ -98,7 +98,7 @@ export default function ReportsScreen() {
                     className="text-status-completed-text"
                     strokeWidth={2.5}
                   />
-                  <Text className="text-[13px] font-label font-bold text-status-completed-text">
+                  <Text className="text-[13px] font-label text-status-completed-text">
                     {data.profitChangeDisplay}
                   </Text>
                 </View>
@@ -109,7 +109,7 @@ export default function ReportsScreen() {
                   <Text className="text-[13px] font-body-semibold text-label-muted">
                     Sales Velocity vs Forecast
                   </Text>
-                  <Text className="text-[13px] font-label font-bold text-label-primary">
+                  <Text className="text-[13px] font-label text-label-primary">
                     {data.targetProgressPercent}% Target reached
                   </Text>
                 </View>
@@ -130,7 +130,7 @@ export default function ReportsScreen() {
           <View className="mx-4 mb-4 flex-row gap-3">
             <Entrance delayMs={120}>
               <View className="w-[120px] rounded-2xl border border-outline bg-glass-surface p-3">
-                <Text className="mb-2 text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
+                <Text className="mb-2 text-xs font-label uppercase tracking-[0.1em] text-label-muted">
                   Avg. Order
                 </Text>
                 <Text className="mb-1.5 text-lg font-black leading-[22px] text-forest">
@@ -144,7 +144,7 @@ export default function ReportsScreen() {
 
             <Entrance delayMs={150}>
               <View className="flex-1 rounded-2xl border border-outline bg-glass-surface p-3">
-                <Text className="mb-[10px] text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
+                <Text className="mb-[10px] text-xs font-label uppercase tracking-[0.1em] text-label-muted">
                   Sales Trends
                 </Text>
                 {chartData.length > 0 ? (
@@ -166,7 +166,7 @@ export default function ReportsScreen() {
           <Entrance delayMs={200}>
             <View className="mx-4 mb-4 rounded-2xl border border-outline bg-glass-surface p-4">
               <View className="mb-4 flex-row items-center justify-between">
-                <Text className="text-base font-body font-bold tracking-[-0.2px] text-label-primary">
+                <Text className="text-base font-body-semibold tracking-[-0.2px] text-label-primary">
                   High Velocity Items
                 </Text>
                 <AppIcon
@@ -185,10 +185,10 @@ export default function ReportsScreen() {
                   {data.velocityItems.map((item, index) => (
                     <View key={`${item.name}-${index}`}>
                       <View className="mb-2 flex-row items-center justify-between">
-                        <Text className="text-sm font-body font-bold text-label-primary">
+                        <Text className="text-sm font-body-semibold text-label-primary">
                           {item.name}
                         </Text>
-                        <Text className="text-xs font-body font-bold text-label-muted">
+                        <Text className="text-xs font-body-semibold text-label-muted">
                           {item.progressPercent}% Sold
                         </Text>
                       </View>
@@ -212,7 +212,7 @@ export default function ReportsScreen() {
           <Entrance delayMs={260}>
             <View className="mx-4 overflow-hidden rounded-2xl border border-outline bg-glass-surface">
               <View className="flex-row items-center justify-between border-b border-separator-subtle px-4 pb-3 pt-4">
-                <Text className="text-base font-body font-bold tracking-[-0.2px] text-label-primary">
+                <Text className="text-base font-body-semibold tracking-[-0.2px] text-label-primary">
                   Expense Ledger
                 </Text>
                 <Pressable
@@ -221,7 +221,7 @@ export default function ReportsScreen() {
                   onPress={() => {}}
                   className="flex-row items-center gap-2"
                 >
-                  <Text className="text-xs font-label font-bold text-forest">
+                  <Text className="text-xs font-label text-forest">
                     Export PDF
                   </Text>
                   <AppIcon
@@ -256,7 +256,7 @@ export default function ReportsScreen() {
                         <View className="min-w-0 flex-1">
                           <Text
                             numberOfLines={1}
-                            className="text-sm font-body font-bold text-label-primary"
+                            className="text-sm font-body-semibold text-label-primary"
                           >
                             {expense.title}
                           </Text>
@@ -268,10 +268,10 @@ export default function ReportsScreen() {
                           </Text>
                         </View>
                         <View className="w-[120px] items-end">
-                          <Text className="text-[13px] font-label font-bold text-destructive">
+                          <Text className="text-[13px] font-label text-destructive">
                             {expense.amountDisplay}
                           </Text>
-                          <Text className="mt-1 text-[10px] font-label font-bold uppercase tracking-[0.1em] text-label-muted">
+                          <Text className="mt-1 text-[10px] font-label uppercase tracking-[0.1em] text-label-muted">
                             {expense.tag}
                           </Text>
                         </View>
@@ -282,7 +282,7 @@ export default function ReportsScreen() {
               </View>
 
               <View className="flex-row items-center justify-between bg-table-header-bg px-4 py-3">
-                <Text className="text-xs font-body font-bold text-label-muted">
+                <Text className="text-xs font-body-semibold text-label-muted">
                   {expenseTotal > 0
                     ? `Showing ${expenseShowing} of ${expenseTotal} expenses`
                     : "No expense totals from API yet"}

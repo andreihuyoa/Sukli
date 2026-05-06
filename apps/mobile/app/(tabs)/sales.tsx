@@ -136,7 +136,7 @@ export default function SalesPOSScreen() {
             }
             className="mt-4 rounded-xl bg-revenue-hero px-4 py-3 items-center"
           >
-            <Text className="text-sm font-label font-bold text-on-primary">
+            <Text className="text-sm font-label text-on-primary">
               Open Setup
             </Text>
           </Pressable>
@@ -165,7 +165,7 @@ export default function SalesPOSScreen() {
           ListHeaderComponent={
             <View>
               <View className="px-1 pt-1 pb-3">
-                <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+                <Text className="text-xs font-label uppercase tracking-widest text-label-muted">
                   Point of Sale
                 </Text>
                 <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
@@ -225,7 +225,7 @@ export default function SalesPOSScreen() {
           >
             <View className="flex-row items-center gap-2">
               <View className="h-7 w-7 items-center justify-center rounded-full bg-hero-cta-ghost">
-                <Text className="text-xs font-label font-bold text-on-primary">
+                <Text className="text-xs font-label text-on-primary">
                   {cart.count}
                 </Text>
               </View>
@@ -233,7 +233,7 @@ export default function SalesPOSScreen() {
                 <Text className="text-[10px] font-body-semibold text-on-hero-muted">
                   {cart.count} item{cart.count !== 1 ? "s" : ""}
                 </Text>
-                <Text className="text-sm font-label font-bold text-on-primary">
+                <Text className="text-sm font-label text-on-primary">
                   ₱{cart.total.toLocaleString("en-PH")}
                 </Text>
               </View>
@@ -251,7 +251,7 @@ export default function SalesPOSScreen() {
                 className="text-on-primary"
                 strokeWidth={2.5}
               />
-              <Text className="text-[13px] font-label font-bold text-on-primary">
+              <Text className="text-[13px] font-label text-on-primary">
                 View Cart
               </Text>
             </Pressable>
@@ -324,7 +324,7 @@ export default function SalesPOSScreen() {
                       <View className="min-w-0 flex-1">
                         <Text
                           numberOfLines={1}
-                          className="text-sm font-body font-bold text-label-primary"
+                          className="text-sm font-body-semibold text-label-primary"
                         >
                           {line.product.name}
                         </Text>
@@ -348,7 +348,7 @@ export default function SalesPOSScreen() {
                             strokeWidth={3}
                           />
                         </Pressable>
-                        <Text className="min-w-[18px] text-center text-sm font-label font-bold text-forest">
+                        <Text className="min-w-[18px] text-center text-sm font-label text-forest">
                           {line.qty}
                         </Text>
                         <Pressable
@@ -374,7 +374,7 @@ export default function SalesPOSScreen() {
                     <Text className="text-[13px] font-body-medium text-label-muted">
                       Subtotal
                     </Text>
-                    <Text className="text-[13px] font-body font-bold text-label-primary">
+                    <Text className="text-[13px] font-body-semibold text-label-primary">
                       ₱{cart.total.toLocaleString("en-PH")}
                     </Text>
                   </View>
@@ -382,12 +382,12 @@ export default function SalesPOSScreen() {
                     <Text className="text-[13px] font-body-medium text-label-muted">
                       Tax ({Math.round(taxRate * 100)}%)
                     </Text>
-                    <Text className="text-[13px] font-body font-bold text-label-primary">
+                    <Text className="text-[13px] font-body-semibold text-label-primary">
                       ₱{cart.tax.toFixed(2)}
                     </Text>
                   </View>
                   <View className="flex-row items-center justify-between border-t border-separator pt-2">
-                    <Text className="text-base font-label font-bold text-forest">
+                    <Text className="text-base font-label text-forest">
                       Total Amount
                     </Text>
                     <Text className="text-[22px] font-black text-forest">
@@ -419,7 +419,7 @@ export default function SalesPOSScreen() {
                       className="text-on-primary"
                       strokeWidth={2}
                     />
-                    <Text className="text-[15px] font-label font-bold text-on-primary">
+                    <Text className="text-[15px] font-label text-on-primary">
                       {checkoutDone ? "Sale Complete!" : "Complete Sale"}
                     </Text>
                   </View>
@@ -434,7 +434,7 @@ export default function SalesPOSScreen() {
                   }}
                   className="w-full items-center rounded-2xl py-3"
                 >
-                  <Text className="text-sm font-body font-bold text-critical">
+                  <Text className="text-sm font-body-semibold text-critical">
                     Cancel & Clear Cart
                   </Text>
                 </Pressable>
@@ -474,7 +474,7 @@ function ScrollCategories(props: {
             }`}
           >
             <Text
-              className={`text-[13px] font-label font-bold ${
+              className={`text-[13px] font-label ${
                 active === category ? "text-on-primary" : "text-label-primary"
               }`}
             >
@@ -517,7 +517,7 @@ function ProductCard(props: {
           </View>
 
           <Text
-            className="mt-3 text-sm font-body font-bold text-label-primary"
+            className="mt-3 text-sm font-body-semibold text-label-primary"
             numberOfLines={1}
           >
             {product.name}
@@ -530,7 +530,7 @@ function ProductCard(props: {
           </Text>
 
           <View className="mt-3 w-full flex-row items-center justify-between">
-            <Text className="text-[15px] font-label font-bold text-forest">
+            <Text className="text-[15px] font-label text-forest">
               ₱{product.storePricePhp.toLocaleString("en-PH")}
             </Text>
 
@@ -549,7 +549,7 @@ function ProductCard(props: {
                     strokeWidth={3}
                   />
                 </Pressable>
-                <Text className="min-w-[18px] text-center text-sm font-label font-bold text-forest">
+                <Text className="min-w-[18px] text-center text-sm font-label text-forest">
                   {inCart}
                 </Text>
                 <Pressable

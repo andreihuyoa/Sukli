@@ -396,8 +396,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: 12,
-    fontWeight: "800",
     textAlign: "center",
-    fontFamily: "body",
+    fontFamily: "NotoSans_700Bold",
   },
 });

@@ -188,7 +188,6 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Vollkorn_700Bold",
     fontSize: 30,
-    fontWeight: "700",
     letterSpacing: -0.2,
     color: colors.title,
     flexShrink: 1,

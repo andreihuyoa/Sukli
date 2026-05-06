@@ -107,10 +107,12 @@ module.exports = {
       },
       fontFamily: {
         headline: ["Vollkorn_800ExtraBold", "Vollkorn_700Bold", "System"],
+        "headline-bold": ["Vollkorn_700Bold", "System"],
         "headline-regular": ["Vollkorn_400Regular", "System"],
         body: ["NotoSans_400Regular", "System"],
         "body-medium": ["NotoSans_500Medium", "System"],
         "body-semibold": ["NotoSans_600SemiBold", "System"],
+        "body-bold": ["NotoSans_700Bold", "System"],
         label: ["NotoSans_600SemiBold", "System"],
       },
       borderRadius: {

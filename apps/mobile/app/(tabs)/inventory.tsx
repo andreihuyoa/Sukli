@@ -233,7 +233,7 @@ export default function InventoryScreen() {
           ListHeaderComponent={
             <View>
               <View className="px-1 pt-1 pb-3">
-                <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+                <Text className="text-xs font-label uppercase tracking-widest text-label-muted">
                   Manage
                 </Text>
                 <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
@@ -253,10 +253,10 @@ export default function InventoryScreen() {
                       />
                     </View>
                     <View>
-                      <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
+                      <Text className="text-[10px] font-label uppercase tracking-[0.2em] text-[#8e8e93]">
                         Total SKUs
                       </Text>
-                      <Text className="font-headline text-[30px] font-extrabold text-[#1b4332] leading-[34px]">
+                      <Text className="font-headline text-[30px] text-[#1b4332] leading-[34px]">
                         {totalSkus.toLocaleString("en-PH")}
                       </Text>
                     </View>
@@ -274,10 +274,10 @@ export default function InventoryScreen() {
                       />
                     </View>
                     <View>
-                      <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
+                      <Text className="text-[10px] font-label uppercase tracking-[0.2em] text-[#8e8e93]">
                         Low Stock
                       </Text>
-                      <Text className="font-headline text-[30px] font-extrabold text-[#6a3342] leading-[34px]">
+                      <Text className="font-headline text-[30px] text-[#6a3342] leading-[34px]">
                         {lowStockCount}
                       </Text>
                     </View>
@@ -299,7 +299,7 @@ export default function InventoryScreen() {
                       onChangeText={setQuery}
                       placeholder="Search inventory..."
                       placeholderTextColor="#8e8e93"
-                      className="flex-1 bg-transparent text-sm font-body text-[#1c1c1e] font-medium"
+                      className="flex-1 bg-transparent text-sm font-body-medium text-[#1c1c1e]"
                       accessibilityLabel="Search inventory"
                     />
                   </View>
@@ -344,7 +344,7 @@ export default function InventoryScreen() {
 
               <Entrance delayMs={250}>
                 <View className="mb-3 px-1">
-                  <Text className="font-body-medium text-[17px] font-bold text-[#1b4332] tracking-[-0.1px]">
+                  <Text className="font-body-medium text-[17px] text-[#1b4332] tracking-[-0.1px]">
                     {query ? `Results for \"${query}\"` : "All Items"}
                   </Text>
                 </View>
@@ -380,7 +380,7 @@ export default function InventoryScreen() {
                   color="#1b4332"
                   strokeWidth={2.5}
                 />
-                <Text className="font-body-medium font-bold text-[#1b4332] text-sm">
+                <Text className="font-body-medium text-[#1b4332] text-sm">
                   Add New Product
                 </Text>
               </Pressable>
@@ -441,7 +441,7 @@ function InventoryRow(props: {
 
           <View className="flex-1 min-w-0">
             <Text
-              className="font-body-medium mb-1 text-[#1c1c1e] font-bold text-sm"
+              className="font-body-medium mb-1 text-[#1c1c1e] text-sm"
               numberOfLines={1}
             >
               {item.name}
@@ -454,7 +454,7 @@ function InventoryRow(props: {
             </Text>
 
             <View className="flex-row items-center gap-2">
-              <Text className="font-headline font-bold text-[#1b4332] text-[15px]">
+              <Text className="font-headline text-[#1b4332] text-[15px]">
                 {item.storePriceDisplay}
               </Text>
               <Text
@@ -470,7 +470,7 @@ function InventoryRow(props: {
               className={`px-2.5 py-1 rounded-full ${isLow ? "bg-[rgba(106,51,66,0.1)]" : "bg-[rgba(27,67,50,0.1)]"}`}
             >
               <Text
-                className={`text-[10px] font-label font-extrabold uppercase ${isLow ? "text-[#6a3342]" : "text-[#1b4332]"}`}
+                className={`text-[10px] font-label uppercase ${isLow ? "text-[#6a3342]" : "text-[#1b4332]"}`}
               >
                 {isLow ? "Low Stock" : "Optimal"}
               </Text>
@@ -542,10 +542,10 @@ function InventoryEditorModal(props: {
         <View className="bg-background px-5 pt-4 rounded-t-[22px] max-h-[88%]">
           <View className="mb-4 flex-row items-center justify-between">
             <View className="min-w-0 flex-1">
-              <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
+              <Text className="text-[10px] font-label uppercase tracking-[0.2em] text-[#8e8e93]">
                 {mode === "create" ? "New product" : "Edit product"}
               </Text>
-              <Text className="font-headline text-2xl font-extrabold text-[#1b4332] leading-[30px]">
+              <Text className="font-headline text-2xl text-[#1b4332] leading-[30px]">
                 {mode === "create" ? "Add Inventory" : "Update Inventory"}
               </Text>
             </View>
@@ -636,7 +636,7 @@ function InventoryEditorModal(props: {
 
             {error ? (
               <View className="mt-4 rounded-2xl px-4 py-3 bg-[rgba(106,51,66,0.1)]">
-                <Text className="text-sm font-body font-bold text-[#6a3342]">
+                <Text className="text-sm font-body-semibold text-[#6a3342]">
                   {error}
                 </Text>
               </View>
@@ -662,7 +662,7 @@ function InventoryEditorModal(props: {
                     strokeWidth={2.5}
                   />
                 )}
-                <Text className="font-body-medium font-bold text-white text-sm">
+                <Text className="font-body-medium text-white text-sm">
                   {mode === "create" ? "Save Product" : "Save Changes"}
                 </Text>
               </Pressable>
@@ -675,7 +675,7 @@ function InventoryEditorModal(props: {
                   className="h-12 items-center justify-center rounded-2xl bg-[rgba(106,51,66,0.1)]"
                   onPress={onDelete}
                 >
-                  <Text className="font-body-medium font-bold text-[#6a3342] text-sm">
+                  <Text className="font-body-medium text-[#6a3342] text-sm">
                     Delete Product
                   </Text>
                 </Pressable>
@@ -709,7 +709,7 @@ function InventoryField(props: {
 
   return (
     <View className={containerClassName}>
-      <Text className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em] text-[#8e8e93]">
+      <Text className="mb-1.5 text-[10px] font-label uppercase tracking-[0.16em] text-[#8e8e93]">
         {label}
       </Text>
       <TextInput
@@ -719,7 +719,7 @@ function InventoryField(props: {
         placeholderTextColor="#8e8e93"
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
-        className="h-12 rounded-2xl px-4 text-sm font-body bg-[rgba(255,255,255,0.82)] text-[#1c1c1e] font-semibold"
+        className="h-12 rounded-2xl px-4 text-sm font-body-semibold bg-[rgba(255,255,255,0.82)] text-[#1c1c1e]"
       />
     </View>
   );
@@ -735,7 +735,7 @@ function InventoryImagePicker(props: {
 
   return (
     <View>
-      <Text className="mb-1.5 text-[10px] font-label font-bold uppercase tracking-[0.16em] text-[#8e8e93]">
+      <Text className="mb-1.5 text-[10px] font-label uppercase tracking-[0.16em] text-[#8e8e93]">
         Product image
       </Text>
       <View className="rounded-2xl p-3 bg-[rgba(255,255,255,0.82)]">
@@ -773,7 +773,7 @@ function InventoryImagePicker(props: {
                   color="#1b4332"
                   strokeWidth={2.4}
                 />
-                <Text className="font-body-medium font-bold text-[#1b4332] text-xs">
+                <Text className="font-body-medium text-[#1b4332] text-xs">
                   Gallery
                 </Text>
               </Pressable>
@@ -789,7 +789,7 @@ function InventoryImagePicker(props: {
                   color="#1b4332"
                   strokeWidth={2.4}
                 />
-                <Text className="font-body-medium font-bold text-[#1b4332] text-xs">
+                <Text className="font-body-medium text-[#1b4332] text-xs">
                   Camera
                 </Text>
               </Pressable>
@@ -802,7 +802,7 @@ function InventoryImagePicker(props: {
                 className="h-9 items-center justify-center rounded-xl bg-[rgba(106,51,66,0.1)]"
                 onPress={onRemoveImage}
               >
-                <Text className="font-body-medium font-bold text-[#6a3342] text-xs">
+                <Text className="font-body-medium text-[#6a3342] text-xs">
                   Remove Image
                 </Text>
               </Pressable>
