@@ -1,6 +1,4 @@
 import type { LucideIcon } from "lucide-react-native";
-import { cssInterop } from "nativewind";
-import { StyleSheet, type StyleProp, type TextStyle } from "react-native";
 import {
   AlertTriangle,
   ArrowUpDown,
@@ -50,6 +48,8 @@ import {
   X,
   Zap,
 } from "lucide-react-native";
+import { cssInterop } from "nativewind";
+import { StyleSheet, type StyleProp, type TextStyle } from "react-native";
 
 const ICONS = {
   storefront: Store,
