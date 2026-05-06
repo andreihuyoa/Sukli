@@ -14,18 +14,15 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
 import { AppIcon } from "@/components/ui/AppIcon";
+import { ScreenShell } from "@/components/ui/ScreenShell";
 import {
   useInventory,
   type InventoryProductFormInput,
 } from "@/lib/hooks/api/inventory/useInventory";
 import type { InventoryItem } from "@/lib/types/api/inventory";
-
-const TOP_CONTENT_INSET = 16;
-const TAB_BAR = 88;
 
 type InventoryEditorMode = "create" | "edit";
 
@@ -62,7 +59,6 @@ export default function InventoryScreen() {
   const [form, setForm] = useState<InventoryFormState>(EMPTY_FORM);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const insets = useSafeAreaInsets();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -221,187 +217,192 @@ export default function InventoryScreen() {
 
   return (
     <View className="flex-1 bg-screen-grouped">
-      {/* <AppHeader /> */}
-      <FlashList
-        data={filtered}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: insets.top + TOP_CONTENT_INSET,
-          paddingBottom: TAB_BAR + insets.bottom + 24,
-          paddingHorizontal: 16,
-        }}
-        ListHeaderComponent={
-          <View>
-            <View className="px-1 pt-1 pb-3">
-              <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
-                Manage
-              </Text>
-              <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
-                Inventory
-              </Text>
-            </View>
-
-            <View className="mb-5 flex-row gap-3">
-              <Entrance delayMs={50}>
-                <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)]">
-                  <View className="h-10 w-10 rounded-xl items-center justify-center bg-[#2d6a4f]">
-                    <AppIcon
-                      name="category"
-                      size={18}
-                      color="#ffffff"
-                      strokeWidth={2.5}
-                    />
-                  </View>
-                  <View>
-                    <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
-                      Total SKUs
-                    </Text>
-                    <Text className="font-headline text-[30px] font-extrabold text-[#1b4332] leading-[34px]">
-                      {totalSkus.toLocaleString("en-PH")}
-                    </Text>
-                  </View>
-                </View>
-              </Entrance>
-
-              <Entrance delayMs={100}>
-                <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)] border border-[rgba(106,51,66,0.15)]">
-                  <View className="h-10 w-10 rounded-xl items-center justify-center bg-[rgba(106,51,66,0.12)]">
-                    <AppIcon
-                      name="warning"
-                      size={18}
-                      color="#6a3342"
-                      strokeWidth={2.5}
-                    />
-                  </View>
-                  <View>
-                    <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
-                      Low Stock
-                    </Text>
-                    <Text className="font-headline text-[30px] font-extrabold text-[#6a3342] leading-[34px]">
-                      {lowStockCount}
-                    </Text>
-                  </View>
-                </View>
-              </Entrance>
-            </View>
-
-            <View className="mb-3">
-              <Entrance delayMs={150}>
-                <View className="flex-row items-center gap-3 px-4 py-3 rounded-2xl bg-[rgba(255,255,255,0.82)]">
-                  <AppIcon
-                    name="search"
-                    size={16}
-                    color="#8e8e93"
-                    strokeWidth={2}
-                  />
-                  <TextInput
-                    value={query}
-                    onChangeText={setQuery}
-                    placeholder="Search inventory..."
-                    placeholderTextColor="#8e8e93"
-                    className="flex-1 bg-transparent text-sm font-body text-[#1c1c1e] font-medium"
-                    accessibilityLabel="Search inventory"
-                  />
-                </View>
-              </Entrance>
-            </View>
-
-            <View className="mb-5 flex-row gap-2">
-              <Entrance delayMs={180}>
-                <Pressable
-                  accessibilityRole="button"
-                  className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
-                >
-                  <AppIcon
-                    name="filter_list"
-                    size={14}
-                    color="#1b4332"
-                    strokeWidth={2.5}
-                  />
-                  <Text className="text-[13px] font-bold text-[#1c1c1e]">
-                    Filters
-                  </Text>
-                </Pressable>
-              </Entrance>
-
-              <Entrance delayMs={220}>
-                <Pressable
-                  accessibilityRole="button"
-                  className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
-                >
-                  <AppIcon
-                    name="sort"
-                    size={14}
-                    color="#1b4332"
-                    strokeWidth={2.5}
-                  />
-                  <Text className="text-[13px] font-bold text-[#1c1c1e]">
-                    Sort
-                  </Text>
-                </Pressable>
-              </Entrance>
-            </View>
-
-            <Entrance delayMs={250}>
-              <View className="mb-3 px-1">
-                <Text className="font-body-medium text-[17px] font-bold text-[#1b4332] tracking-[-0.1px]">
-                  {query ? `Results for \"${query}\"` : "All Items"}
+      <ScreenShell
+        bottomExtra={2}
+        scrollable={false}
+        withHeaderOffset={false}
+        horizontalPadding={0}
+      >
+        <FlashList
+          data={filtered}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: 24,
+            paddingHorizontal: 16,
+          }}
+          ListHeaderComponent={
+            <View>
+              <View className="px-1 pt-1 pb-3">
+                <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+                  Manage
+                </Text>
+                <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+                  Inventory
                 </Text>
               </View>
-            </Entrance>
-          </View>
-        }
-        keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <InventoryRow item={item} index={index} onEdit={openEditEditor} />
-        )}
-        ListEmptyComponent={
-          <View className="items-center px-2 py-8">
-            <Text className="text-sm font-body text-center text-[#8e8e93]">
-              {isLoading
-                ? "Loading inventory from this device..."
-                : error
-                  ? "Inventory unavailable right now."
-                  : "No inventory yet. Add your first product to start tracking stock."}
-            </Text>
-          </View>
-        }
-        ListFooterComponent={
-          <Entrance delayMs={500}>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Add new product"
-              className="mt-5 flex-row items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-[rgba(27,67,50,0.25)] bg-[rgba(255,255,255,0.82)] py-4"
-              onPress={openCreateEditor}
-            >
-              <AppIcon
-                name="add_box"
-                size={16}
-                color="#1b4332"
-                strokeWidth={2.5}
-              />
-              <Text className="font-body-medium font-bold text-[#1b4332] text-sm">
-                Add New Product
+
+              <View className="mb-5 flex-row gap-3">
+                <Entrance delayMs={50}>
+                  <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)]">
+                    <View className="h-10 w-10 rounded-xl items-center justify-center bg-[#2d6a4f]">
+                      <AppIcon
+                        name="category"
+                        size={18}
+                        color="#ffffff"
+                        strokeWidth={2.5}
+                      />
+                    </View>
+                    <View>
+                      <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
+                        Total SKUs
+                      </Text>
+                      <Text className="font-headline text-[30px] font-extrabold text-[#1b4332] leading-[34px]">
+                        {totalSkus.toLocaleString("en-PH")}
+                      </Text>
+                    </View>
+                  </View>
+                </Entrance>
+
+                <Entrance delayMs={100}>
+                  <View className="flex-1 rounded-2xl p-4 flex-row items-center gap-3 bg-[rgba(255,255,255,0.82)] border border-[rgba(106,51,66,0.15)]">
+                    <View className="h-10 w-10 rounded-xl items-center justify-center bg-[rgba(106,51,66,0.12)]">
+                      <AppIcon
+                        name="warning"
+                        size={18}
+                        color="#6a3342"
+                        strokeWidth={2.5}
+                      />
+                    </View>
+                    <View>
+                      <Text className="text-[10px] font-label font-bold uppercase tracking-[0.2em] text-[#8e8e93]">
+                        Low Stock
+                      </Text>
+                      <Text className="font-headline text-[30px] font-extrabold text-[#6a3342] leading-[34px]">
+                        {lowStockCount}
+                      </Text>
+                    </View>
+                  </View>
+                </Entrance>
+              </View>
+
+              <View className="mb-3">
+                <Entrance delayMs={150}>
+                  <View className="flex-row items-center gap-3 px-4 py-3 rounded-2xl bg-[rgba(255,255,255,0.82)]">
+                    <AppIcon
+                      name="search"
+                      size={16}
+                      color="#8e8e93"
+                      strokeWidth={2}
+                    />
+                    <TextInput
+                      value={query}
+                      onChangeText={setQuery}
+                      placeholder="Search inventory..."
+                      placeholderTextColor="#8e8e93"
+                      className="flex-1 bg-transparent text-sm font-body text-[#1c1c1e] font-medium"
+                      accessibilityLabel="Search inventory"
+                    />
+                  </View>
+                </Entrance>
+              </View>
+
+              <View className="mb-5 flex-row gap-2">
+                <Entrance delayMs={180}>
+                  <Pressable
+                    accessibilityRole="button"
+                    className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
+                  >
+                    <AppIcon
+                      name="filter_list"
+                      size={14}
+                      color="#1b4332"
+                      strokeWidth={2.5}
+                    />
+                    <Text className="text-[13px] font-bold text-[#1c1c1e]">
+                      Filters
+                    </Text>
+                  </Pressable>
+                </Entrance>
+
+                <Entrance delayMs={220}>
+                  <Pressable
+                    accessibilityRole="button"
+                    className="flex-1 rounded-xl p-2.5 flex-row items-center justify-center bg-[rgba(255,255,255,0.82)]"
+                  >
+                    <AppIcon
+                      name="sort"
+                      size={14}
+                      color="#1b4332"
+                      strokeWidth={2.5}
+                    />
+                    <Text className="text-[13px] font-bold text-[#1c1c1e]">
+                      Sort
+                    </Text>
+                  </Pressable>
+                </Entrance>
+              </View>
+
+              <Entrance delayMs={250}>
+                <View className="mb-3 px-1">
+                  <Text className="font-body-medium text-[17px] font-bold text-[#1b4332] tracking-[-0.1px]">
+                    {query ? `Results for \"${query}\"` : "All Items"}
+                  </Text>
+                </View>
+              </Entrance>
+            </View>
+          }
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <InventoryRow item={item} index={index} onEdit={openEditEditor} />
+          )}
+          ListEmptyComponent={
+            <View className="items-center px-2 py-8">
+              <Text className="text-sm font-body text-center text-[#8e8e93]">
+                {isLoading
+                  ? "Loading inventory from this device..."
+                  : error
+                    ? "Inventory unavailable right now."
+                    : "No inventory yet. Add your first product to start tracking stock."}
               </Text>
-            </Pressable>
-          </Entrance>
-        }
-      />
-      <InventoryEditorModal
-        visible={isEditorVisible}
-        mode={editorMode ?? "create"}
-        form={form}
-        error={formError}
-        isSaving={isSaving}
-        canDelete={editorMode === "edit"}
-        onChange={setFormField}
-        onPickImage={pickImageFromGallery}
-        onTakePhoto={takePhoto}
-        onRemoveImage={removeImage}
-        onClose={closeEditor}
-        onSubmit={handleSubmit}
-        onDelete={handleDelete}
-      />
+            </View>
+          }
+          ListFooterComponent={
+            <Entrance delayMs={500}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Add new product"
+                className="mt-5 flex-row items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-[rgba(27,67,50,0.25)] bg-[rgba(255,255,255,0.82)] py-4"
+                onPress={openCreateEditor}
+              >
+                <AppIcon
+                  name="add_box"
+                  size={16}
+                  color="#1b4332"
+                  strokeWidth={2.5}
+                />
+                <Text className="font-body-medium font-bold text-[#1b4332] text-sm">
+                  Add New Product
+                </Text>
+              </Pressable>
+            </Entrance>
+          }
+        />
+        <InventoryEditorModal
+          visible={isEditorVisible}
+          mode={editorMode ?? "create"}
+          form={form}
+          error={formError}
+          isSaving={isSaving}
+          canDelete={editorMode === "edit"}
+          onChange={setFormField}
+          onPickImage={pickImageFromGallery}
+          onTakePhoto={takePhoto}
+          onRemoveImage={removeImage}
+          onClose={closeEditor}
+          onSubmit={handleSubmit}
+          onDelete={handleDelete}
+        />
+      </ScreenShell>
     </View>
   );
 }

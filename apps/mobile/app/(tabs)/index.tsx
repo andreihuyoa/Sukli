@@ -15,8 +15,8 @@ export default function DashboardScreen() {
   return (
     <View className="flex-1 bg-screen-grouped">
       <Header onRefresh={handleRefresh} />
-      <ScreenShell bottomExtra={60}>
-        <View className="gap-4 pb-6">
+      <ScreenShell bottomExtra={2}>
+        <View className="gap-4">
           {isLoading ? (
             <Card className="p-4">
               <SectionEmptyState

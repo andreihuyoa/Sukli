@@ -9,12 +9,42 @@ type Props = {
   children: ReactNode;
   /** Extra bottom space beyond tab bar */
   bottomExtra?: number;
+  /** When false, renders a plain container instead of ScrollView */
+  scrollable?: boolean;
+  /** Adds space for top app header area */
+  withHeaderOffset?: boolean;
+  /** Horizontal padding for shell content */
+  horizontalPadding?: number;
 };
 
-export function ScreenShell({ children, bottomExtra = 0 }: Props) {
+export function ScreenShell({
+  children,
+  bottomExtra = 0,
+  scrollable = true,
+  withHeaderOffset = true,
+  horizontalPadding = 24,
+}: Props) {
   const insets = useSafeAreaInsets();
-  const paddingTop = insets.top + HEADER_BODY + 8;
+  // Non-header screens still need safe-area breathing room to avoid status bar overlap.
+  const paddingTop = withHeaderOffset
+    ? insets.top + HEADER_BODY + 8
+    : insets.top + 4;
   const paddingBottom = TAB_BAR + insets.bottom + bottomExtra;
+
+  if (!scrollable) {
+    return (
+      <View
+        className="flex-1 bg-background"
+        style={{
+          paddingTop,
+          paddingBottom,
+          paddingHorizontal: horizontalPadding,
+        }}
+      >
+        {children}
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background">
@@ -23,7 +53,7 @@ export function ScreenShell({ children, bottomExtra = 0 }: Props) {
         contentContainerStyle={{ paddingTop, paddingBottom }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="px-6">{children}</View>
+        <View style={{ paddingHorizontal: horizontalPadding }}>{children}</View>
       </ScrollView>
     </View>
   );

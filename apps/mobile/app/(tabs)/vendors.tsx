@@ -1,11 +1,11 @@
 import { FlashList } from "@shopify/flash-list";
 import { useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Entrance } from "@/components/animation/Entrance";
 import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
+import { ScreenShell } from "@/components/ui/ScreenShell";
 import { useVendors } from "@/lib/hooks/api/procurement/useVendors";
 import type {
   Supplier,
@@ -13,11 +13,7 @@ import type {
   VendorPriceListRow,
 } from "@/lib/types/api/procurement";
 
-const TAB_BAR = 88;
-const TOP_CONTENT_INSET = 16;
-
 export default function VendorsScreen() {
-  const insets = useSafeAreaInsets();
   const { suppliers, priceList } = useVendors();
   const [catalogQuery, setCatalogQuery] = useState("");
   const [expandedSupplierId, setExpandedSupplierId] = useState<string | null>(
@@ -36,94 +32,100 @@ export default function VendorsScreen() {
 
   return (
     <View className="flex-1 bg-screen-grouped">
-      <FlashList
-        data={suppliers}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingTop: insets.top + TOP_CONTENT_INSET,
-          paddingBottom: TAB_BAR + insets.bottom + 80,
-          paddingHorizontal: 16,
-        }}
-        keyExtractor={(supplier) => supplier.id}
-        ListHeaderComponent={
-          <View>
-            <Entrance delayMs={40}>
-              <View className="mb-[10px] px-1 pb-3 pt-1">
-                <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
-                  Supply Chain
-                </Text>
-                <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
-                  Vendors & Partners
-                </Text>
-                <Text className="mt-1 text-[13px] font-body-semibold text-label-muted">
-                  Manage your trusted local and regional distributors.
-                </Text>
-              </View>
-            </Entrance>
-
-            <Entrance delayMs={70}>
-              <View className="flex-row items-center rounded-2xl border border-outline bg-glass-surface px-4 py-3">
-                <AppIcon
-                  name="search"
-                  size={16}
-                  className="text-label-muted"
-                  strokeWidth={2}
-                />
-                <TextInput
-                  value={catalogQuery}
-                  onChangeText={setCatalogQuery}
-                  placeholder="Search catalog or vendor..."
-                  placeholderTextColor="#5f675f"
-                  className="ml-2 flex-1 bg-transparent text-sm font-body-medium text-label-primary"
-                />
-              </View>
-            </Entrance>
-
-            <Entrance delayMs={110}>
-              <View className="mb-[14px] mt-3">
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel="Add supplier"
-                  onPress={() => {}}
-                  className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3.5"
-                >
-                  <AppIcon
-                    name="person_add"
-                    size={18}
-                    className="text-on-primary"
-                    strokeWidth={2.5}
-                  />
-                  <Text className="text-sm font-label font-bold text-on-primary">
-                    Add Supplier
+      <ScreenShell
+        bottomExtra={2}
+        scrollable={false}
+        withHeaderOffset={false}
+        horizontalPadding={0}
+      >
+        <FlashList
+          data={suppliers}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: 80,
+            paddingHorizontal: 16,
+          }}
+          keyExtractor={(supplier) => supplier.id}
+          ListHeaderComponent={
+            <View>
+              <Entrance delayMs={40}>
+                <View className="mb-[10px] px-1 pb-3 pt-1">
+                  <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+                    Supply Chain
                   </Text>
-                </Pressable>
-              </View>
+                  <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+                    Vendors & Partners
+                  </Text>
+                  <Text className="mt-1 text-[13px] font-body-semibold text-label-muted">
+                    Manage your trusted local and regional distributors.
+                  </Text>
+                </View>
+              </Entrance>
+
+              <Entrance delayMs={70}>
+                <View className="flex-row items-center rounded-2xl border border-outline bg-glass-surface px-4 py-3">
+                  <AppIcon
+                    name="search"
+                    size={16}
+                    className="text-label-muted"
+                    strokeWidth={2}
+                  />
+                  <TextInput
+                    value={catalogQuery}
+                    onChangeText={setCatalogQuery}
+                    placeholder="Search catalog or vendor..."
+                    placeholderTextColor="#5f675f"
+                    className="ml-2 flex-1 bg-transparent text-sm font-body-medium text-label-primary"
+                  />
+                </View>
+              </Entrance>
+
+              <Entrance delayMs={110}>
+                <View className="mb-[14px] mt-3">
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Add supplier"
+                    onPress={() => {}}
+                    className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3.5"
+                  >
+                    <AppIcon
+                      name="person_add"
+                      size={18}
+                      className="text-on-primary"
+                      strokeWidth={2.5}
+                    />
+                    <Text className="text-sm font-label font-bold text-on-primary">
+                      Add Supplier
+                    </Text>
+                  </Pressable>
+                </View>
+              </Entrance>
+            </View>
+          }
+          renderItem={({ item: supplier, index }) => (
+            <Entrance delayMs={150 + index * 70}>
+              <SupplierCard
+                supplier={supplier}
+                expanded={expandedSupplierId === supplier.id}
+                onToggle={() =>
+                  setExpandedSupplierId((prev) =>
+                    prev === supplier.id ? null : supplier.id
+                  )
+                }
+                filteredList={filteredList}
+              />
             </Entrance>
-          </View>
-        }
-        renderItem={({ item: supplier, index }) => (
-          <Entrance delayMs={150 + index * 70}>
-            <SupplierCard
-              supplier={supplier}
-              expanded={expandedSupplierId === supplier.id}
-              onToggle={() =>
-                setExpandedSupplierId((prev) =>
-                  prev === supplier.id ? null : supplier.id
-                )
-              }
-              filteredList={filteredList}
-            />
-          </Entrance>
-        )}
-        ListEmptyComponent={
-          <View className="items-center px-2 py-10">
-            <Text className="text-center text-sm text-label-muted">
-              No vendors yet. Sync suppliers from your back office when
-              available.
-            </Text>
-          </View>
-        }
-      />
+          )}
+          ListEmptyComponent={
+            <View className="items-center px-2 py-10">
+              <Text className="text-center text-sm text-label-muted">
+                No vendors yet. Sync suppliers from your back office when
+                available.
+              </Text>
+            </View>
+          }
+        />
+      </ScreenShell>
     </View>
   );
 }
