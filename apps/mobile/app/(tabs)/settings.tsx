@@ -117,6 +117,19 @@ export default function SettingsScreen() {
               actions for everyday inventory and sales.
             </Text>
 
+            {/* <View className="mt-3 self-start flex-row items-center gap-2 rounded-full border border-outline bg-accent-focus-soft px-3 py-1.5">
+              <View className="h-2 w-2 rounded-full bg-accent-focus" />
+              <Text className="text-[10px] font-label font-bold uppercase tracking-[0.12em] text-accent-focus">
+                Cloud Synced
+              </Text>
+              <AppIcon
+                name="cloud_sync"
+                size={14}
+                className="text-accent-focus"
+                strokeWidth={2}
+              />
+            </View> */}
+
             <View className="mt-4 flex-row gap-3">
               <View className="flex-1 rounded-2xl border border-outline bg-surface-container px-4 py-3">
                 <Text className="text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted">

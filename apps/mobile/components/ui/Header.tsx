@@ -6,28 +6,29 @@ import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppIcon } from "./AppIcon";
 
-const COL = {
-  barFill: "rgba(255, 248, 239, 0.9)",
-  barBorder: "rgba(184, 179, 170, 1)",
+const colors = {
+  accent: "#5f7d67",
+  fill: "rgba(255, 248, 239, 0.92)",
+  border: "rgba(184, 179, 170, 0.75)",
+  native: "rgba(255, 248, 239, 1)",
+  active: "#31463a",
+  inactive: "#7f847d",
+  indicator: "rgba(95, 125, 103, 0.22)",
+  shadow: "#9a8f7a",
   title: "#2f332f",
-  accent: "#31463a",
   muted: "#747870",
   iconOnLight: "#31463a",
   subtleFill: "rgba(95, 125, 103, 0.1)",
   softOutline: "rgba(215, 210, 200, 0.1)",
 };
 
-const HEADER_BOTTOM_RADIUS = 20;
-const TOOLBAR_MIN_HEIGHT = 56;
-
 type Props = {
   onBackPress?: () => void;
   right?: ReactNode;
   onRefresh?: () => void;
-  syncPill?: boolean;
 };
 
-export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
+export function Header({ onBackPress, right, onRefresh }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const useNativeGlass = Platform.OS === "ios" && isGlassEffectAPIAvailable();
@@ -38,7 +39,7 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
         styles.toolbar,
         {
           paddingTop: insets.top,
-          minHeight: TOOLBAR_MIN_HEIGHT + insets.top,
+          minHeight: 56 + insets.top,
         },
       ]}
     >
@@ -54,7 +55,7 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
             <AppIcon
               name="arrow_back"
               size={24}
-              color={COL.iconOnLight}
+              color={colors.iconOnLight}
               strokeWidth={2.25}
             />
           </Pressable>
@@ -64,7 +65,7 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
             // replace this with product icon later on
             name="inventory_2"
             size={18}
-            color={COL.accent}
+            color={colors.accent}
             strokeWidth={2.5}
           />
         </View>
@@ -75,19 +76,6 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
 
       {right ? (
         right
-      ) : syncPill ? (
-        <View style={styles.syncPill}>
-          <View style={styles.syncDotOuter}>
-            <View style={styles.syncDotInner} />
-          </View>
-          <Text style={styles.syncLabel}>Cloud Synced</Text>
-          <AppIcon
-            name="cloud_sync"
-            size={16}
-            color={COL.accent}
-            strokeWidth={2}
-          />
-        </View>
       ) : (
         <View style={styles.rightActions}>
           <Pressable
@@ -103,7 +91,7 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
             <AppIcon
               name="sync"
               size={18}
-              color={COL.iconOnLight}
+              color={colors.iconOnLight}
               strokeWidth={2.25}
             />
           </Pressable>
@@ -134,9 +122,12 @@ export function Header({ onBackPress, right, onRefresh, syncPill }: Props) {
           </GlassView>
         ) : (
           <BlurView
-            intensity={Platform.OS === "android" ? 40 : 72}
+            intensity={72}
             tint="light"
             style={styles.barInner}
+            experimentalBlurMethod={
+              Platform.OS === "android" ? "dimezisBlurView" : undefined
+            }
           >
             {toolbar}
           </BlurView>
@@ -157,14 +148,14 @@ const styles = StyleSheet.create({
   bar: {
     borderWidth: StyleSheet.hairlineWidth,
     borderTopWidth: 0,
-    borderColor: COL.barBorder,
-    borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
-    borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+    borderColor: colors.border,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   barInner: {
     overflow: "hidden",
-    borderBottomLeftRadius: HEADER_BOTTOM_RADIUS,
-    borderBottomRightRadius: HEADER_BOTTOM_RADIUS,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
   },
   toolbar: {
     flexDirection: "row",
@@ -192,46 +183,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    backgroundColor: COL.subtleFill,
+    backgroundColor: colors.subtleFill,
   },
   title: {
     fontFamily: "Vollkorn_700Bold",
     fontSize: 30,
     fontWeight: "700",
     letterSpacing: -0.2,
-    color: COL.title,
+    color: colors.title,
     flexShrink: 1,
-  },
-  syncPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COL.barBorder,
-    backgroundColor: "rgba(255, 250, 242, 0.78)",
-  },
-  syncDotOuter: {
-    position: "relative",
-    height: 8,
-    width: 8,
-  },
-  syncDotInner: {
-    position: "absolute",
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COL.accent,
-    opacity: 0.85,
-  },
-  syncLabel: {
-    fontSize: 10,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-    color: COL.accent,
   },
   rightActions: {
     flexDirection: "row",
@@ -246,7 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: "rgba(95, 125, 103, 0.08)",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COL.softOutline,
+    borderColor: colors.softOutline,
   },
   refreshPressed: {
     opacity: 0.75,
@@ -258,12 +218,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: COL.softOutline,
-    backgroundColor: COL.subtleFill,
+    borderColor: colors.softOutline,
+    backgroundColor: colors.subtleFill,
   },
   avatarText: {
     fontSize: 12,
     fontWeight: "700",
-    color: COL.title,
+    color: colors.title,
   },
 });
