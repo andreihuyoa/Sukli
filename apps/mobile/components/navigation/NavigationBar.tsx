@@ -4,14 +4,19 @@ import { BlurView } from "expo-blur";
 import { isGlassEffectAPIAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
 import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { useCallback, useEffect, useState } from "react";
 import {
+  LayoutChangeEvent,
   Platform,
   Pressable,
   StyleSheet,
-  Text,
   View,
-  useWindowDimensions,
 } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const colors = {
@@ -24,6 +29,8 @@ const colors = {
   indicator: "rgba(95, 125, 103, 0.22)",
   shadow: "#9a8f7a",
 };
+
+const TABS_CONTAINER_PADDING = 5;
 
 const TABS: readonly {
   key: string;
@@ -126,6 +133,70 @@ function NativeLiquidGlassTabs() {
   );
 }
 
+type NavigationTabItemProps = {
+  meta: (typeof TABS)[number];
+  focused: boolean;
+  chipSize: number;
+  chipRadius: number;
+  iconSize: number;
+  onPress: () => void;
+  onLayout: (event: LayoutChangeEvent) => void;
+};
+
+const NavigationTabItem: React.FC<NavigationTabItemProps> = ({
+  meta,
+  focused,
+  chipSize,
+  chipRadius,
+  iconSize,
+  onPress,
+  onLayout,
+}) => {
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected: focused }}
+      accessibilityLabel={meta.label}
+      onPress={onPress}
+      onLayout={onLayout}
+      style={({ pressed }) => [
+        styles.tab,
+        pressed && !focused && styles.tabPressed,
+      ]}
+    >
+      <View
+        style={[
+          styles.iconContainer,
+          {
+            width: chipSize,
+            height: chipSize,
+            borderRadius: chipRadius,
+            overflow: "hidden",
+          },
+        ]}
+      >
+        <View style={styles.iconContent}>
+          <AppIcon
+            name={meta.icon}
+            size={iconSize}
+            color={focused ? colors.active : colors.inactive}
+            strokeWidth={focused ? 2.5 : 1.8}
+          />
+          <Animated.Text
+            style={[
+              styles.tabLabel,
+              { color: focused ? colors.active : colors.inactive },
+            ]}
+            numberOfLines={1}
+          >
+            {meta.label}
+          </Animated.Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
+
 /**
  * The navigation bar is the bottom bar that appears at the bottom of the screen.
  * It contains the tabs for the app.
@@ -137,64 +208,86 @@ export function NavigationBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const bottomInset = Math.max(insets.bottom);
   const blurViewFallback = Platform.OS === "android";
+  const [tabLayouts, setTabLayouts] = useState<
+    ({ x: number; width: number } | null)[]
+  >(Array(TABS.length).fill(null));
 
-  const { width: screenWidth } = useWindowDimensions();
+  const allTabsMeasured = tabLayouts.every((layout) => layout !== null);
+  const shellHorizontalPadding = 25;
+  const measuredTabWidth = tabLayouts[state.index]?.width ?? 0;
 
-  const tabCount = TABS.length;
-  const tabWidth = (screenWidth - 60) / tabCount;
+  const chipSize = Math.round(
+    Math.max(68, Math.min(72, measuredTabWidth * 0.94))
+  ); // tighter space between tabs
+  const chipRadius = Math.round(chipSize * 0.45); // rounded pill
+  const iconSize = Math.round(Math.max(22, Math.min(34, chipSize * 0.5))); // icon size
 
-  const chipSize = Math.round(Math.max(52, Math.min(72, tabWidth * 0.88)));
-  const chipRadius = Math.round(chipSize * 0.45);
-  const iconSize = Math.round(Math.max(20, Math.min(30, chipSize * 0.42)));
+  const getIndicatorTargetX = useCallback(
+    (index: number) => {
+      const layout = tabLayouts[index];
+      if (!layout) return 0;
+      return layout.x + (layout.width - chipSize) / 2;
+    },
+    [chipSize, tabLayouts]
+  );
+  const indicatorX = useSharedValue(getIndicatorTargetX(state.index));
+
+  useEffect(() => {
+    indicatorX.value = withSpring(getIndicatorTargetX(state.index), {
+      damping: 16,
+      stiffness: 160,
+      mass: 0.9,
+    });
+  }, [getIndicatorTargetX, indicatorX, state.index]);
+
+  const handleTabLayout = useCallback(
+    (index: number) => (event: LayoutChangeEvent) => {
+      const { x, width } = event.nativeEvent.layout;
+      setTabLayouts((prev) => {
+        const current = prev[index];
+        if (current && current.x === x && current.width === width) {
+          return prev;
+        }
+        const next = [...prev];
+        next[index] = { x, width };
+        return next;
+      });
+    },
+    []
+  );
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: indicatorX.value },
+      { translateY: -chipSize / 2 + 2 },
+    ],
+    opacity: allTabsMeasured ? 1 : 0,
+    width: chipSize,
+    height: chipSize,
+    borderRadius: chipRadius,
+  }));
 
   const androidNavigationBar = (
     <View style={styles.tabsContainer}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.activeIndicator, indicatorStyle]}
+      />
       {state.routes.map((route, index) => {
         const meta = TABS.find((t) => t.key === route.name);
         if (!meta) return null;
         const focused = state.index === index;
         return (
-          <Pressable
+          <NavigationTabItem
             key={route.key}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: focused }}
-            accessibilityLabel={meta.label}
+            meta={meta}
+            focused={focused}
+            chipSize={chipSize}
+            chipRadius={chipRadius}
+            iconSize={iconSize}
             onPress={() => navigation.navigate(route.name)}
-            style={({ pressed }) => [
-              styles.tab,
-              pressed && !focused && styles.tabPressed,
-            ]}
-          >
-            <View
-              style={[
-                styles.iconContainer,
-                {
-                  width: chipSize,
-                  height: chipSize,
-                  borderRadius: chipRadius,
-                  overflow: "hidden",
-                },
-                // Background applied after geometry so the radius is never lost.
-                focused ? styles.iconContainerActive : null,
-              ]}
-            >
-              <AppIcon
-                name={meta.icon}
-                size={iconSize}
-                color={focused ? colors.active : colors.inactive}
-                strokeWidth={focused ? 2.5 : 1.8}
-              />
-              <Text
-                style={[
-                  styles.tabLabel,
-                  { color: focused ? colors.active : colors.inactive },
-                ]}
-                numberOfLines={1}
-              >
-                {meta.label}
-              </Text>
-            </View>
-          </Pressable>
+            onLayout={handleTabLayout(index)}
+          />
         );
       })}
     </View>
@@ -202,7 +295,13 @@ export function NavigationBar({ state, navigation }: BottomTabBarProps) {
 
   return (
     <View
-      style={[styles.shell, { paddingBottom: bottomInset }]}
+      style={[
+        styles.shell,
+        {
+          paddingBottom: bottomInset,
+          paddingHorizontal: shellHorizontalPadding,
+        },
+      ]}
       pointerEvents="box-none"
     >
       <View style={styles.pillShadow}>
@@ -257,7 +356,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.fill,
   },
   tabsContainer: {
-    padding: 5,
+    position: "relative",
+    padding: TABS_CONTAINER_PADDING,
     flexDirection: "row",
     alignItems: "stretch",
     height: "100%",
@@ -276,9 +376,17 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1,
   },
-  iconContainerActive: {
+  iconContent: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activeIndicator: {
+    position: "absolute",
+    top: "55%",
     backgroundColor: colors.indicator,
+    zIndex: 0,
   },
   tabLabel: {
     fontSize: 12,
