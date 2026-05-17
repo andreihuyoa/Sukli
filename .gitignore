@@ -6,6 +6,7 @@ node_modules/
 .idea/
 .cursor/
 .codex
+AGENTS.md
 
 apps/mobile/assets/stitch-reference/
 apps/mobile/docs/
