@@ -88,6 +88,14 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="onboarding" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen
+            name="settings"
+            options={{
+              gestureEnabled: true,
+              fullScreenGestureEnabled: true,
+              animation: "slide_from_right",
+            }}
+          />
           <Stack.Screen name="smart-restock" />
         </Stack>
       </SafeAreaProvider>

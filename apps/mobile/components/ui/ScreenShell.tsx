@@ -13,6 +13,8 @@ type Props = {
   scrollable?: boolean;
   /** Adds space for top app header area */
   withHeaderOffset?: boolean;
+  /** Reserve bottom space for the floating tab bar (default true). */
+  withTabBarInset?: boolean;
   /** Horizontal padding for shell content */
   horizontalPadding?: number;
 };
@@ -22,6 +24,7 @@ export function ScreenShell({
   bottomExtra = 0,
   scrollable = true,
   withHeaderOffset = true,
+  withTabBarInset = true,
   horizontalPadding = 24,
 }: Props) {
   const insets = useSafeAreaInsets();
@@ -29,7 +32,8 @@ export function ScreenShell({
   const paddingTop = withHeaderOffset
     ? insets.top + HEADER_BODY + 8
     : insets.top + 4;
-  const paddingBottom = TAB_BAR + insets.bottom + bottomExtra;
+  const tabBarReserve = withTabBarInset ? TAB_BAR : 0;
+  const paddingBottom = tabBarReserve + insets.bottom + bottomExtra;
 
   if (!scrollable) {
     return (

@@ -1,7 +1,6 @@
 import { BlurView } from "expo-blur";
 import { GlassView, isGlassEffectAPIAvailable } from "expo-glass-effect";
 import { useRouter } from "expo-router";
-import type { ReactNode } from "react";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppIcon } from "./AppIcon";
@@ -24,11 +23,9 @@ const colors = {
 
 type Props = {
   onBackPress?: () => void;
-  right?: ReactNode;
-  onRefresh?: () => void;
 };
 
-export function Header({ onBackPress, right, onRefresh }: Props) {
+export function Header({ onBackPress }: Props) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const useNativeGlass = Platform.OS === "ios" && isGlassEffectAPIAvailable();
@@ -74,49 +71,32 @@ export function Header({ onBackPress, right, onRefresh }: Props) {
         </Text>
       </View>
 
-      {right ? (
-        right
-      ) : (
-        <View style={styles.rightActions}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Refresh"
-            hitSlop={12}
-            onPress={() => onRefresh?.()}
-            style={({ pressed }) => [
-              styles.refreshButton,
-              pressed && styles.refreshPressed,
-            ]}
-          >
-            <AppIcon
-              name="sync"
-              size={18}
-              color={colors.iconOnLight}
-              strokeWidth={2.25}
-            />
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Open settings"
-            hitSlop={12}
-            onPress={() => router.push("/(tabs)/settings")}
-            style={styles.avatar}
-          >
-            <Text style={styles.avatarText}>JD</Text>
-          </Pressable>
-        </View>
-      )}
+      {!onBackPress ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Open settings"
+          hitSlop={12}
+          onPress={() => router.push("/settings")}
+          style={({ pressed }) => [
+            styles.avatar,
+            pressed && styles.avatarPressed,
+          ]}
+        >
+          <Text style={styles.avatarText}>JD</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 
   return (
-    <View style={styles.shell} pointerEvents="box-none">
+    <View style={styles.shell}>
       <View style={styles.bar}>
         {useNativeGlass ? (
           <GlassView
             style={styles.barInner}
             glassEffectStyle="clear"
             colorScheme="light"
+            isInteractive
           >
             {toolbar}
           </GlassView>
@@ -192,24 +172,6 @@ const styles = StyleSheet.create({
     color: colors.title,
     flexShrink: 1,
   },
-  rightActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  refreshButton: {
-    minHeight: 44,
-    minWidth: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 22,
-    backgroundColor: "rgba(95, 125, 103, 0.08)",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.softOutline,
-  },
-  refreshPressed: {
-    opacity: 0.75,
-  },
   avatar: {
     height: 40,
     width: 40,
@@ -219,6 +181,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.softOutline,
     backgroundColor: colors.subtleFill,
+  },
+  avatarPressed: {
+    opacity: 0.85,
   },
   avatarText: {
     fontSize: 12,

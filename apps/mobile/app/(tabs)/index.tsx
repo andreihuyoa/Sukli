@@ -10,11 +10,10 @@ import { View } from "react-native";
 
 export default function DashboardScreen() {
   const { dashboard, error, isEmpty, isLoading } = useHomeDashboard();
-  const handleRefresh = () => {};
 
   return (
     <View className="flex-1 bg-screen-grouped">
-      <Header onRefresh={handleRefresh} />
+      <Header />
       <ScreenShell bottomExtra={2}>
         <View className="gap-4">
           {isLoading ? (

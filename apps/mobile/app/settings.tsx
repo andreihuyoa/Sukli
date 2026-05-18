@@ -90,6 +90,7 @@ export default function SettingsScreen() {
       <ScreenShell
         bottomExtra={2}
         withHeaderOffset={false}
+        withTabBarInset={false}
         horizontalPadding={0}
       >
         <View className="px-5 pt-1 pb-3">
