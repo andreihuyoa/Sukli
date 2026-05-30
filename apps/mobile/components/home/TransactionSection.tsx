@@ -11,6 +11,7 @@ import type {
   HomeRestockAlert,
   HomeTransaction,
 } from "@/lib/types/api/reporting";
+import { router } from "expo-router";
 
 const statusConfig = {
   completed: {
@@ -35,6 +36,9 @@ type Props = {
   transactions: HomeTransaction[];
   totalToday: number;
   isEmpty: boolean;
+  showWeeklyTrend?: boolean;
+  showRestockAlerts?: boolean;
+  showRecentTransactions?: boolean;
 };
 
 function WeeklyTrendCard(props: {
@@ -276,12 +280,13 @@ function RecentTransactionsCard(props: {
             className="min-w-0 flex-1 text-label-primary"
             style={{ fontSize: 16, fontWeight: "700" }}
           >
-            Recent Transactions
+            Latest Sales
           </Text>
           <Pressable
             accessibilityRole="button"
             className="ml-3 flex-shrink-0 flex-row items-center gap-1"
             style={{ gap: 4 }}
+            onPress={() => router.push({ pathname: "/sales" })}
           >
             <Text className="text-sm font-body font-bold text-revenue-hero">
               View All
@@ -297,13 +302,13 @@ function RecentTransactionsCard(props: {
 
         <View className="flex-row items-center bg-table-header-bg px-4 py-2">
           <Text className="flex-1 text-[10px] font-label font-bold uppercase text-label-muted">
-            Customer
+            Sale
           </Text>
           <Text className="w-16 text-center text-[10px] font-label font-bold uppercase text-label-muted">
             Items
           </Text>
           <Text className="w-24 text-right text-[10px] font-label font-bold uppercase text-label-muted">
-            Status
+            Amount
           </Text>
         </View>
 
@@ -311,14 +316,12 @@ function RecentTransactionsCard(props: {
           <SectionEmptyState
             iconKey="receipt_long"
             title={
-              isEmpty
-                ? "No transactions connected yet"
-                : "No transactions for this period"
+              isEmpty ? "No sales recorded yet" : "No sales for this period"
             }
             body={
               isEmpty
-                ? "Connect POS activity to populate the live transaction feed without changing card height."
-                : "There were no transactions recorded in the selected time window."
+                ? "Complete a transaction from the register to see it here."
+                : "There were no sales recorded in the selected time window."
             }
             tone="info"
             compact
@@ -350,15 +353,18 @@ function RecentTransactionsCard(props: {
                         {tx.itemCount} {tx.itemCount === 1 ? "item" : "items"}
                       </Text>
                     </View>
-                    <View className="w-24 flex-row justify-end">
+                    <View className="w-24 items-end">
+                      <Text className="text-xs font-body font-bold text-label-primary">
+                        {tx.amountDisplay}
+                      </Text>
                       <View
-                        className={`flex-row items-center gap-1 rounded-full px-2.5 py-1 ${status.badgeClassName}`}
+                        className={`mt-1 flex-row items-center gap-1 rounded-full px-2 py-0.5 ${status.badgeClassName}`}
                       >
                         <View
-                          className={`h-2 w-2 rounded-full ${status.dotClassName}`}
+                          className={`h-1.5 w-1.5 rounded-full ${status.dotClassName}`}
                         />
                         <Text
-                          className={`text-xs font-body font-bold ${status.textClassName}`}
+                          className={`text-[10px] font-body font-bold ${status.textClassName}`}
                         >
                           {status.label}
                         </Text>
@@ -374,10 +380,10 @@ function RecentTransactionsCard(props: {
         <View className="flex-row items-center justify-between gap-3 border-t border-separator px-4 py-3">
           <Text className="min-w-0 flex-1 text-xs font-body font-medium text-label-muted">
             {totalToday > 0
-              ? `Showing ${transactions.length} of ${totalToday} transactions today`
+              ? `Showing ${transactions.length} of ${totalToday} sales today`
               : isEmpty
-                ? "Connect POS to show live transactions here"
-                : "No transactions recorded today"}
+                ? "Complete a sale to show live transactions here"
+                : "No sales recorded today"}
           </Text>
           <View className="flex-shrink-0 items-center rounded-lg border border-outline bg-surface-container px-2 py-1">
             <Text className="text-xs font-body font-bold text-label-primary">
@@ -398,21 +404,30 @@ export function TransactionSection({
   transactions,
   totalToday,
   isEmpty,
+  showWeeklyTrend = true,
+  showRestockAlerts = true,
+  showRecentTransactions = true,
 }: Props) {
   return (
     <View className="gap-4">
-      <WeeklyTrendCard
-        bars={bars}
-        weeklyTotalDisplay={weeklyTotalDisplay}
-        dailyAvgDisplay={dailyAvgDisplay}
-        isEmpty={isEmpty}
-      />
-      <RestockAlertsCard alerts={alerts} isEmpty={isEmpty} />
-      <RecentTransactionsCard
-        transactions={transactions}
-        totalToday={totalToday}
-        isEmpty={isEmpty}
-      />
+      {showWeeklyTrend ? (
+        <WeeklyTrendCard
+          bars={bars}
+          weeklyTotalDisplay={weeklyTotalDisplay}
+          dailyAvgDisplay={dailyAvgDisplay}
+          isEmpty={isEmpty}
+        />
+      ) : null}
+      {showRestockAlerts ? (
+        <RestockAlertsCard alerts={alerts} isEmpty={isEmpty} />
+      ) : null}
+      {showRecentTransactions ? (
+        <RecentTransactionsCard
+          transactions={transactions}
+          totalToday={totalToday}
+          isEmpty={isEmpty}
+        />
+      ) : null}
     </View>
   );
 }

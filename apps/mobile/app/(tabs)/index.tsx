@@ -1,7 +1,6 @@
 import { Card } from "@/components/home/Card";
 import { GreetingSection } from "@/components/home/GreetingSection";
 import { SectionEmptyState } from "@/components/home/SectionEmptyState";
-import { StatsContainer } from "@/components/home/StatsContainer";
 import { TransactionSection } from "@/components/home/TransactionSection";
 import { Header } from "@/components/ui/Header";
 import { ScreenShell } from "@/components/ui/ScreenShell";
@@ -44,17 +43,7 @@ export default function DashboardScreen() {
                 percentChange={dashboard.revenueChangePercent}
                 isEmpty={isEmpty}
               />
-              <StatsContainer
-                activeStockDisplay={dashboard.activeStockDisplay}
-                activeStockSubtitle={dashboard.activeStockSubtitle}
-                profitEstDisplay={dashboard.profitEstDisplay}
-                profitEstSubtitle={dashboard.profitEstSubtitle}
-                gcashAmountDisplay={dashboard.gcashAmountDisplay}
-                gcashChangeLabel={dashboard.gcashChangeLabel}
-                cashSalesAmountDisplay={dashboard.cashSalesAmountDisplay}
-                cashSalesShareLabel={dashboard.cashSalesShareLabel}
-                isEmpty={isEmpty}
-              />
+
               <TransactionSection
                 bars={dashboard.weeklyChartBars}
                 weeklyTotalDisplay={dashboard.weeklyTotalDisplay}
@@ -63,6 +52,8 @@ export default function DashboardScreen() {
                 transactions={dashboard.transactions}
                 totalToday={dashboard.transactionTotalToday}
                 isEmpty={isEmpty}
+                showWeeklyTrend={false}
+                showRestockAlerts={false}
               />
             </>
           )}

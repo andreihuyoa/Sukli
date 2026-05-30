@@ -36,29 +36,23 @@ export function GreetingSection({
           className="mt-1 text-label-primary"
           style={{ fontSize: 20, fontWeight: "800", letterSpacing: -0.3 }}
         >
-          {greetingLine} {displayName}
+          {greetingLine}, {displayName}!
         </Text>
+        {/* Add a mascot here  */}
       </View>
 
       <Entrance>
         <Card className="rounded-3xl px-6 pb-5 pt-6">
-          <View className="mb-3 self-start rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1.5">
-            <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-accent-focus">
-              Focus panel
-            </Text>
-          </View>
-          <Text className="mb-3 text-[10px] font-label font-bold uppercase tracking-[0.18em] text-label-muted">
+          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-label-muted">
             Today&apos;s revenue
           </Text>
-
           {isEmpty ? (
             <View className="min-h-[84px] justify-end">
               <Text className="text-[22px] font-black tracking-[-0.3px] text-label-primary">
                 No sales recorded yet
               </Text>
               <Text className="mt-2 max-w-[260px] text-[12px] font-body-medium leading-5 text-label-muted">
-                Start your day by recording a sale or adding products to your
-                catalog.
+                Start your day by recording your first sale!
               </Text>
             </View>
           ) : (
@@ -108,23 +102,6 @@ export function GreetingSection({
               />
               <Text className="text-[13px] font-body font-bold text-on-primary">
                 Add Sale
-              </Text>
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              onPress={onAddProduct}
-              className="flex-1 flex-row items-center justify-center gap-2 rounded-2xl border border-outline bg-surface-container py-3"
-              style={{ minWidth: 132 }}
-            >
-              <AppIcon
-                name="add_box"
-                size={16}
-                className="text-forest"
-                strokeWidth={2}
-              />
-              <Text className="text-[13px] font-body font-bold text-label-primary">
-                Add Product
               </Text>
             </Pressable>
           </View>

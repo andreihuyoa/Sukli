@@ -8,6 +8,7 @@ node_modules/
 .claude/
 .codex
 AGENTS.md
+CLAUDE.md
 
 apps/mobile/assets/stitch-reference/
 apps/mobile/docs/
