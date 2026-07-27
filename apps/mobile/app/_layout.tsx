@@ -16,7 +16,7 @@ import {
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -40,19 +40,17 @@ export default function RootLayout() {
   const db = getDb();
   const { success: dbReady, error: dbError } = useMigrations(db, migrations);
 
-  const [setupReady, setSetupReady] = useState(false);
-  const [setupError, setSetupError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    if (!dbReady || setupReady || setupError) return;
+  const setupError = useMemo(() => {
+    if (!dbReady) return null;
 
     try {
       ensureDatabaseCompatibility(db);
-      setSetupReady(true);
+      return null;
     } catch (error) {
-      setSetupError(error instanceof Error ? error : new Error(String(error)));
+      return error instanceof Error ? error : new Error(String(error));
     }
-  }, [db, dbReady, setupError, setupReady]);
+  }, [db, dbReady]);
+  const setupReady = dbReady && !setupError;
 
   useEffect(() => {
     if (

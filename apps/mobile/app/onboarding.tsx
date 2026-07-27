@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -27,30 +27,31 @@ export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ mode?: string }>();
   const isEditMode = params.mode === "edit";
-  const [isLoading, setIsLoading] = useState(true);
-  const [setupComplete, setSetupComplete] = useState(false);
-  const [step, setStep] = useState(1);
-  const [storeName, setStoreName] = useState("");
-  const [iconUri, setIconUri] = useState<string | null>(null);
-  const [displayName, setDisplayName] = useState("");
-  const [taxRatePercent, setTaxRatePercent] = useState("12");
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
+  const initialSetupState = useMemo(() => {
     const db = getDb();
     const userId = getCurrentUserId();
     const profile = getSetupProfile(db, userId);
 
-    if (profile) {
-      setStoreName(profile.storeName);
-      setIconUri(profile.iconUri);
-      setDisplayName(profile.displayName);
-      setTaxRatePercent(formatTaxRatePercent(profile.taxRate));
-    }
-
-    setSetupComplete(isSetupComplete(db, userId));
-    setIsLoading(false);
+    return {
+      setupComplete: isSetupComplete(db, userId),
+      storeName: profile?.storeName ?? "",
+      iconUri: profile?.iconUri ?? null,
+      displayName: profile?.displayName ?? "",
+      taxRatePercent: profile ? formatTaxRatePercent(profile.taxRate) : "12",
+    };
   }, []);
+  const isLoading = false;
+  const [setupComplete] = useState(initialSetupState.setupComplete);
+  const [step, setStep] = useState(1);
+  const [storeName, setStoreName] = useState(initialSetupState.storeName);
+  const [iconUri, setIconUri] = useState<string | null>(
+    initialSetupState.iconUri
+  );
+  const [displayName, setDisplayName] = useState(initialSetupState.displayName);
+  const [taxRatePercent, setTaxRatePercent] = useState(
+    initialSetupState.taxRatePercent
+  );
+  const [isSaving, setIsSaving] = useState(false);
 
   const lastStep = isEditMode ? 3 : 4;
   const isWelcomeStep = !isEditMode && step === 1;
