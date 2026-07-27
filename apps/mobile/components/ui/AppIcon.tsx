@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react-native";
+import type React from "react";
 import {
   AlertTriangle,
   ArrowUpDown,
@@ -130,7 +131,15 @@ function AppIconBase({
       ? resolvedStyle.color
       : undefined);
 
-  return <Icon size={size} color={resolvedColor} strokeWidth={strokeWidth} />;
+  return (
+    <Icon
+      {...({
+        size,
+        color: resolvedColor,
+        strokeWidth,
+      } as React.ComponentProps<typeof Icon>)}
+    />
+  );
 }
 
 cssInterop(AppIconBase, {

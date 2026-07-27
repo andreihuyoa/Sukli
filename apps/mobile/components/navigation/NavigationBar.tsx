@@ -1,9 +1,9 @@
 import { AppIcon, type AppIconName } from "@/components/ui/AppIcon";
-import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "expo-router/build/react-navigation/bottom-tabs";
 import { BlurView } from "expo-blur";
 import { isGlassEffectAPIAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
-import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { useCallback, useEffect, useState } from "react";
 import {
   LayoutChangeEvent,
@@ -125,8 +125,8 @@ function NativeLiquidGlassTabs() {
     >
       {TABS.map((tab) => (
         <NativeTabs.Trigger key={tab.key} name={tab.key}>
-          <Icon sf={tab.sf} />
-          <Label>{tab.label}</Label>
+          <NativeTabs.Trigger.Icon sf={tab.sf} />
+          <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       ))}
     </NativeTabs>
