@@ -1,5 +1,7 @@
-import { ulid } from "ulid";
+import { factory } from "ulid";
+
+const createUlid = factory(Math.random);
 
 export function createLocalId(): string {
-  return ulid();
+  return createUlid();
 }

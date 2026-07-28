@@ -14,7 +14,7 @@
     "@expo-google-fonts/noto-sans": "^0.4.2",
     "@expo-google-fonts/vollkorn": "^0.4.1",
     "@shopify/flash-list": "2.0.2",
-    "drizzle-orm": "^0.40.0",
+    "drizzle-orm": "^0.45.2",
     "expo": "^57.0.8",
     "expo-blur": "~57.0.2",
     "expo-constants": "~57.0.7",
