@@ -3,7 +3,7 @@ import type { BottomTabBarProps } from "expo-router/build/react-navigation/botto
 import { BlurView } from "expo-blur";
 import { isGlassEffectAPIAvailable } from "expo-glass-effect";
 import { Tabs } from "expo-router";
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { NativeTabs, NativeTabTrigger } from "expo-router/unstable-native-tabs";
 import { useCallback, useEffect, useState } from "react";
 import {
   LayoutChangeEvent,
@@ -124,10 +124,10 @@ function NativeLiquidGlassTabs() {
       labelStyle={{ color: colors.accent }}
     >
       {TABS.map((tab) => (
-        <NativeTabs.Trigger key={tab.key} name={tab.key}>
-          <NativeTabs.Trigger.Icon sf={tab.sf} />
-          <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
+        <NativeTabTrigger key={tab.key} name={tab.key}>
+          <NativeTabTrigger.Icon sf={tab.sf} />
+          <NativeTabTrigger.Label>{tab.label}</NativeTabTrigger.Label>
+        </NativeTabTrigger>
       ))}
     </NativeTabs>
   );
