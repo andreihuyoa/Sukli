@@ -31,7 +31,7 @@ export default function VendorsScreen() {
   }, [catalogQuery, priceList]);
 
   return (
-    <View className="flex-1 bg-screen-grouped">
+    <View className="flex-1 bg-background">
       <ScreenShell
         bottomExtra={2}
         scrollable={false}
@@ -50,24 +50,24 @@ export default function VendorsScreen() {
             <View>
               <Entrance delayMs={40}>
                 <View className="mb-[10px] px-1 pb-3 pt-1">
-                  <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+                  <Text className="text-xs font-label font-bold uppercase tracking-widest text-muted-foreground">
                     Supply Chain
                   </Text>
-                  <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+                  <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-primary">
                     Vendors & Partners
                   </Text>
-                  <Text className="mt-1 text-[13px] font-body-semibold text-label-muted">
+                  <Text className="mt-1 text-[13px] font-body-semibold text-muted-foreground">
                     Manage your trusted local and regional distributors.
                   </Text>
                 </View>
               </Entrance>
 
               <Entrance delayMs={70}>
-                <View className="flex-row items-center rounded-2xl border border-outline bg-glass-surface px-4 py-3">
+                <View className="flex-row items-center rounded-2xl border border-border bg-surface px-4 py-3">
                   <AppIcon
                     name="search"
                     size={16}
-                    className="text-label-muted"
+                    className="text-muted-foreground"
                     strokeWidth={2}
                   />
                   <TextInput
@@ -75,7 +75,7 @@ export default function VendorsScreen() {
                     onChangeText={setCatalogQuery}
                     placeholder="Search catalog or vendor..."
                     placeholderTextColor="#5f675f"
-                    className="ml-2 flex-1 bg-transparent text-sm font-body-medium text-label-primary"
+                    className="ml-2 flex-1 bg-transparent text-sm font-body-medium text-foreground"
                   />
                 </View>
               </Entrance>
@@ -86,15 +86,15 @@ export default function VendorsScreen() {
                     accessibilityRole="button"
                     accessibilityLabel="Add supplier"
                     onPress={() => {}}
-                    className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3.5"
+                    className="w-full flex-row items-center justify-center gap-2 rounded-2xl bg-primary-strong py-3.5"
                   >
                     <AppIcon
                       name="person_add"
                       size={18}
-                      className="text-on-primary"
+                      className="text-primary-foreground"
                       strokeWidth={2.5}
                     />
-                    <Text className="text-sm font-label font-bold text-on-primary">
+                    <Text className="text-sm font-label font-bold text-primary-foreground">
                       Add Supplier
                     </Text>
                   </Pressable>
@@ -118,7 +118,7 @@ export default function VendorsScreen() {
           )}
           ListEmptyComponent={
             <View className="items-center px-2 py-10">
-              <Text className="text-center text-sm text-label-muted">
+              <Text className="text-center text-sm text-muted-foreground">
                 No vendors yet. Sync suppliers from your back office when
                 available.
               </Text>
@@ -145,7 +145,7 @@ function SupplierCard(props: {
 
   return (
     <View
-      className="mb-3 overflow-hidden rounded-2xl border border-outline bg-glass-surface"
+      className="mb-3 overflow-hidden rounded-2xl border border-border bg-surface"
       style={{
         borderBottomWidth: supplier.accent ? 3 : 0,
         borderBottomColor: supplier.accent ? "#6a3342" : "transparent",
@@ -154,7 +154,7 @@ function SupplierCard(props: {
       <View className="p-4">
         <View className="mb-4 flex-row items-start justify-between">
           <View className="flex-row items-center gap-3">
-            <View className="h-12 w-12 overflow-hidden rounded-xl bg-overlay-soft">
+            <View className="h-12 w-12 overflow-hidden rounded-xl bg-foreground/4">
               <ImageWithFallback
                 src={supplier.imageUrl}
                 alt={supplier.name}
@@ -164,7 +164,7 @@ function SupplierCard(props: {
             <View>
               <Text
                 numberOfLines={1}
-                className="text-base font-body font-bold tracking-[-0.1px] text-label-primary"
+                className="text-base font-body font-bold tracking-[-0.1px] text-foreground"
               >
                 {supplier.name}
               </Text>
@@ -182,24 +182,24 @@ function SupplierCard(props: {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Call supplier"
-              className="h-10 w-10 items-center justify-center rounded-full bg-forest-alpha-10"
+              className="h-10 w-10 items-center justify-center rounded-full bg-primary/10"
             >
               <AppIcon
                 name="call"
                 size={16}
-                className="text-forest"
+                className="text-primary"
                 strokeWidth={2.5}
               />
             </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Message supplier"
-              className="h-10 w-10 items-center justify-center rounded-full bg-forest-alpha-10"
+              className="h-10 w-10 items-center justify-center rounded-full bg-primary/10"
             >
               <AppIcon
                 name="chat"
                 size={16}
-                className="text-forest"
+                className="text-primary"
                 strokeWidth={2.5}
               />
             </Pressable>
@@ -226,8 +226,8 @@ function SupplierCard(props: {
           ))}
         </View>
 
-        <View className="rounded-xl border border-outline bg-table-header-bg p-3">
-          <Text className="mb-[10px] text-xs font-label font-bold uppercase tracking-[0.1em] text-label-muted">
+        <View className="rounded-xl border border-border bg-surface-muted p-3">
+          <Text className="mb-[10px] text-xs font-label font-bold uppercase tracking-[0.1em] text-muted-foreground">
             Price Catalog
           </Text>
           {expanded ? (
@@ -237,7 +237,7 @@ function SupplierCard(props: {
                 .map((entry, idx) => (
                   <CatalogRowView key={rowKey(entry, idx)} row={entry} />
                 ))}
-              <Text className="text-xs font-body-semibold text-label-muted">
+              <Text className="text-xs font-body-semibold text-muted-foreground">
                 {catalogMatches.length
                   ? `${catalogMatches.length} match(es) in your search`
                   : "Showing featured items"}
@@ -252,11 +252,11 @@ function SupplierCard(props: {
                 >
                   <Text
                     numberOfLines={1}
-                    className="text-[13px] font-body-semibold text-label-primary"
+                    className="text-[13px] font-body-semibold text-foreground"
                   >
                     {catalogItem.productName}
                   </Text>
-                  <Text className="text-[13px] font-label font-bold text-forest">
+                  <Text className="text-[13px] font-label font-bold text-primary">
                     {catalogItem.priceDisplay}
                   </Text>
                 </View>
@@ -269,9 +269,9 @@ function SupplierCard(props: {
           accessibilityRole="button"
           accessibilityLabel={expanded ? "Hide catalog" : "View catalog"}
           onPress={onToggle}
-          className="mt-3 w-full items-center justify-center rounded-xl border border-outline bg-surface-container py-3"
+          className="mt-3 w-full items-center justify-center rounded-xl border border-border bg-surface py-3"
         >
-          <Text className="text-[13px] font-label font-bold text-forest">
+          <Text className="text-[13px] font-label font-bold text-primary">
             {expanded ? "Hide Catalog" : "View Catalog"}
           </Text>
         </Pressable>
@@ -290,12 +290,12 @@ function CatalogRowView(props: { row: CatalogRow }) {
   return (
     <View className="flex-row items-center justify-between">
       <Text
-        className="text-[13px] font-body-semibold text-label-primary"
+        className="text-[13px] font-body-semibold text-foreground"
         numberOfLines={1}
       >
         {row.productName}
       </Text>
-      <Text className="text-[13px] font-label font-bold text-forest">
+      <Text className="text-[13px] font-label font-bold text-primary">
         {row.priceDisplay}
       </Text>
     </View>

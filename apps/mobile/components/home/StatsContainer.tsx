@@ -66,7 +66,7 @@ function MetricCard({
             </View>
             <Text
               numberOfLines={2}
-              className="flex-1 text-right text-[10px] font-label font-bold uppercase tracking-[0.16em] text-label-muted"
+              className="flex-1 text-right text-[10px] font-label font-bold uppercase tracking-[0.16em] text-muted-foreground"
             >
               {label}
             </Text>
@@ -74,17 +74,17 @@ function MetricCard({
 
           {isEmpty ? (
             <View className="min-h-[64px] justify-end">
-              <Text className="mb-2 text-[15px] font-body-semibold text-label-primary">
+              <Text className="mb-2 text-[15px] font-body-semibold text-foreground">
                 {emptyLabel}
               </Text>
-              <Text className="text-[11px] font-body-medium leading-4 text-label-muted">
+              <Text className="text-[11px] font-body-medium leading-4 text-muted-foreground">
                 {subtitle}
               </Text>
             </View>
           ) : (
             <>
               <Text
-                className="mb-0.5 text-label-primary"
+                className="mb-0.5 text-foreground"
                 style={{
                   fontSize: 28,
                   fontWeight: "800",
@@ -94,7 +94,7 @@ function MetricCard({
               >
                 {value}
               </Text>
-              <Text className="text-[11px] font-body font-medium leading-4 text-label-muted">
+              <Text className="text-[11px] font-body font-medium leading-4 text-muted-foreground">
                 {subtitle}
               </Text>
             </>
@@ -120,8 +120,8 @@ export function StatsContainer({
         subtitle={activeStockSubtitle}
         emptyLabel="No catalog connected"
         delayMs={50}
-        accentIconClassName="text-forest"
-        accentSurfaceClassName="bg-forest-alpha-14"
+        accentIconClassName="text-primary"
+        accentSurfaceClassName="bg-primary/14"
       />
 
       <MetricCard
@@ -131,8 +131,8 @@ export function StatsContainer({
         subtitle={profitEstSubtitle}
         emptyLabel="Profit needs sales data"
         delayMs={90}
-        accentIconClassName="text-revenue-hero"
-        accentSurfaceClassName="bg-forest-alpha-10"
+        accentIconClassName="text-primary-strong"
+        accentSurfaceClassName="bg-primary/10"
       />
     </View>
   );

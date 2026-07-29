@@ -216,7 +216,7 @@ export default function InventoryScreen() {
   };
 
   return (
-    <View className="flex-1 bg-screen-grouped">
+    <View className="flex-1 bg-background">
       <ScreenShell
         bottomExtra={2}
         scrollable={false}
@@ -233,10 +233,10 @@ export default function InventoryScreen() {
           ListHeaderComponent={
             <View>
               <View className="px-1 pt-1 pb-3">
-                <Text className="text-xs font-label uppercase tracking-widest text-label-muted">
+                <Text className="text-xs font-label uppercase tracking-widest text-muted-foreground">
                   Manage
                 </Text>
-                <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+                <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-primary">
                   Inventory
                 </Text>
               </View>

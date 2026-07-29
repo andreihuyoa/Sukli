@@ -32,19 +32,19 @@ export default function SmartRestockRoute() {
   }, [checked, items]);
 
   return (
-    <View className="flex-1 bg-screen-grouped">
+    <View className="flex-1 bg-background">
       <Header onBackPress={() => router.back()} />
 
       <View className="px-5 pt-2 pb-3">
         <Entrance>
           <View>
-            <Text className="text-xs font-label font-bold uppercase tracking-widest text-label-muted">
+            <Text className="text-xs font-label font-bold uppercase tracking-widest text-muted-foreground">
               Smart Inventory
             </Text>
-            <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-forest">
+            <Text className="text-[30px] font-black leading-[34px] tracking-[-0.2px] text-primary">
               Restock List
             </Text>
-            <Text className="mt-1 text-[13px] font-body-semibold text-label-muted">
+            <Text className="mt-1 text-[13px] font-body-semibold text-muted-foreground">
               Smart suggestions based on sales velocity.
             </Text>
           </View>
@@ -53,32 +53,32 @@ export default function SmartRestockRoute() {
 
       <View className="mx-4 mb-5 flex-row gap-3">
         <Entrance delayMs={60}>
-          <View className="flex-1 rounded-2xl border border-outline bg-glass-surface p-4">
-            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
+          <View className="flex-1 rounded-2xl border border-border bg-surface p-4">
+            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-muted-foreground">
               Items to Buy
             </Text>
-            <Text className="text-[40px] font-black leading-10 tracking-[-0.2px] text-forest">
+            <Text className="text-[40px] font-black leading-10 tracking-[-0.2px] text-primary">
               {items.length}
             </Text>
-            <Text className="text-xs font-body-semibold text-label-muted">
+            <Text className="text-xs font-body-semibold text-muted-foreground">
               {checked.size} selected
             </Text>
           </View>
         </Entrance>
 
         <Entrance delayMs={90}>
-          <View className="flex-1 justify-between rounded-2xl border border-accent-info-border bg-accent-info-soft p-4">
-            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-label-muted">
+          <View className="flex-1 justify-between rounded-2xl border border-accent/30 bg-accent/10 p-4">
+            <Text className="text-xs font-label font-bold uppercase tracking-[0.2em] text-muted-foreground">
               Est. Total
             </Text>
             <View>
-              <Text className="text-[28px] font-black leading-[30px] tracking-[-0.2px] text-label-primary">
+              <Text className="text-[28px] font-black leading-[30px] tracking-[-0.2px] text-foreground">
                 ₱
                 {selectedTotal.toLocaleString("en-PH", {
                   minimumFractionDigits: 2,
                 })}
               </Text>
-              <Text className="mt-0.5 text-xs font-body font-bold text-label-muted">
+              <Text className="mt-0.5 text-xs font-body font-bold text-muted-foreground">
                 for selected
               </Text>
             </View>
@@ -88,12 +88,12 @@ export default function SmartRestockRoute() {
 
       <View className="mb-3 flex-row items-center justify-between px-4">
         <Entrance delayMs={120}>
-          <Text className="text-base font-body font-bold tracking-[-0.1px] text-forest">
+          <Text className="text-base font-body font-bold tracking-[-0.1px] text-primary">
             Suggested items
           </Text>
         </Entrance>
         <Entrance delayMs={140}>
-          <Text className="text-xs font-body font-bold text-label-muted">
+          <Text className="text-xs font-body font-bold text-muted-foreground">
             Selected: {checked.size}
           </Text>
         </Entrance>
@@ -102,7 +102,7 @@ export default function SmartRestockRoute() {
       <View className="px-4 pb-6">
         {items.length === 0 ? (
           <View className="items-center py-10">
-            <Text className="px-4 text-center text-sm text-label-muted">
+            <Text className="px-4 text-center text-sm text-muted-foreground">
               No restock suggestions yet. Connect sales and inventory data to
               populate this list.
             </Text>
@@ -115,7 +115,7 @@ export default function SmartRestockRoute() {
                   accessibilityRole="button"
                   accessibilityLabel={`Toggle ${item.name}`}
                   onPress={() => toggle(item.id)}
-                  className="overflow-hidden rounded-2xl border border-outline bg-glass-surface"
+                  className="overflow-hidden rounded-2xl border border-border bg-surface"
                   style={{
                     borderBottomWidth: item.critical ? 3 : 0,
                     borderBottomColor: item.critical
@@ -130,20 +130,20 @@ export default function SmartRestockRoute() {
                         <AppIcon
                           name="check_circle"
                           size={22}
-                          className="text-forest"
+                          className="text-primary"
                           strokeWidth={2.2}
                         />
                       ) : (
                         <AppIcon
                           name="circle"
                           size={22}
-                          className="text-outline-variant"
+                          className="text-border"
                           strokeWidth={1.8}
                         />
                       )}
                     </View>
 
-                    <View className="h-14 w-14 overflow-hidden rounded-xl bg-overlay-soft">
+                    <View className="h-14 w-14 overflow-hidden rounded-xl bg-foreground/4">
                       <ImageWithFallback
                         src={item.imageUrl}
                         alt={item.name}
@@ -155,20 +155,20 @@ export default function SmartRestockRoute() {
                       <View className="mb-0.5 flex-row items-center gap-2">
                         <Text
                           numberOfLines={1}
-                          className="text-sm font-body font-bold text-label-primary"
+                          className="text-sm font-body font-bold text-foreground"
                         >
                           {item.name}
                         </Text>
                         {item.critical ? (
-                          <View className="items-center justify-center rounded-full bg-critical px-2.5 py-1">
+                          <View className="items-center justify-center rounded-full bg-destructive px-2.5 py-1">
                             <View className="flex-row items-center gap-1">
                               <AppIcon
                                 name="warning"
                                 size={10}
-                                className="text-on-primary"
+                                className="text-primary-foreground"
                                 strokeWidth={3}
                               />
-                              <Text className="text-[10px] font-label font-bold tracking-[0.1em] text-on-primary">
+                              <Text className="text-[10px] font-label font-bold tracking-[0.1em] text-primary-foreground">
                                 CRITICAL
                               </Text>
                             </View>
@@ -176,13 +176,13 @@ export default function SmartRestockRoute() {
                         ) : null}
                       </View>
 
-                      <Text className="text-xs font-body-semibold text-label-muted">
+                      <Text className="text-xs font-body-semibold text-muted-foreground">
                         {item.detailDisplay}
                       </Text>
                     </View>
 
-                    <View className="rounded-full bg-forest-alpha-10 px-2.5 py-2">
-                      <Text className="text-xs font-label font-bold text-forest">
+                    <View className="rounded-full bg-primary/10 px-2.5 py-2">
+                      <Text className="text-xs font-label font-bold text-primary">
                         Qty: {item.suggestedQty}
                       </Text>
                     </View>
@@ -195,20 +195,20 @@ export default function SmartRestockRoute() {
 
         {insight ? (
           <Entrance delayMs={420}>
-            <View className="mt-[18px] flex-row items-center gap-3 rounded-2xl border border-accent-warn-border bg-accent-warn-soft p-4">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-critical-soft-12">
+            <View className="mt-[18px] flex-row items-center gap-3 rounded-2xl border border-warning/30 bg-warning/12 p-4">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-destructive/12">
                 <AppIcon
                   name="trending_down"
                   size={16}
-                  className="text-accent-warn"
+                  className="text-warning"
                   strokeWidth={2.2}
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-body font-bold text-label-primary">
+                <Text className="text-sm font-body font-bold text-foreground">
                   {insight.title}
                 </Text>
-                <Text className="mt-0.5 text-xs font-body-semibold text-label-muted">
+                <Text className="mt-0.5 text-xs font-body-semibold text-muted-foreground">
                   {insight.body}
                 </Text>
               </View>
@@ -230,22 +230,22 @@ export default function SmartRestockRoute() {
             accessibilityRole="button"
             accessibilityLabel="Add selected to list"
             onPress={() => {}}
-            className="w-full items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-4"
+            className="w-full items-center justify-center gap-2 rounded-2xl bg-primary-strong py-4"
           >
             <View className="flex-row items-center gap-2.5">
               <AppIcon
                 name="cart"
                 size={18}
-                className="text-on-primary"
+                className="text-primary-foreground"
                 strokeWidth={2}
               />
-              <Text className="text-sm font-label font-bold uppercase tracking-[0.1em] text-on-primary">
+              <Text className="text-sm font-label font-bold uppercase tracking-[0.1em] text-primary-foreground">
                 Add Selected to List
               </Text>
             </View>
             {checked.size > 0 ? (
-              <View className="h-5 w-5 self-center items-center justify-center rounded-full bg-hero-cta-ghost">
-                <Text className="text-[10px] font-label font-bold text-on-primary">
+              <View className="h-5 w-5 self-center items-center justify-center rounded-full bg-primary-foreground/14">
+                <Text className="text-[10px] font-label font-bold text-primary-foreground">
                   {checked.size}
                 </Text>
               </View>

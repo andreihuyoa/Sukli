@@ -29,11 +29,11 @@ export function GreetingSection({
   return (
     <View className="gap-4">
       <View className="pb-1">
-        <Text className="text-xs font-body font-medium tracking-[0.08em] text-label-muted">
+        <Text className="text-xs font-body font-medium tracking-[0.08em] text-muted-foreground">
           {dateLabel}
         </Text>
         <Text
-          className="mt-1 text-label-primary"
+          className="mt-1 text-foreground"
           style={{ fontSize: 20, fontWeight: "800", letterSpacing: -0.3 }}
         >
           {greetingLine}, {displayName}!
@@ -43,21 +43,21 @@ export function GreetingSection({
 
       <Entrance>
         <Card className="rounded-3xl px-6 pb-5 pt-6">
-          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-label-muted">
+          <Text className="text-[10px] font-label font-bold uppercase tracking-[0.18em] text-muted-foreground">
             Today&apos;s revenue
           </Text>
           {isEmpty ? (
             <View className="min-h-[84px] justify-end">
-              <Text className="text-[22px] font-black tracking-[-0.3px] text-label-primary">
+              <Text className="text-[22px] font-black tracking-[-0.3px] text-foreground">
                 No sales recorded yet
               </Text>
-              <Text className="mt-2 max-w-[260px] text-[12px] font-body-medium leading-5 text-label-muted">
+              <Text className="mt-2 max-w-[260px] text-[12px] font-body-medium leading-5 text-muted-foreground">
                 Start your day by recording your first sale!
               </Text>
             </View>
           ) : (
             <Text
-              className="text-label-primary"
+              className="text-foreground"
               style={{
                 fontSize: 42,
                 fontWeight: "900",
@@ -69,15 +69,15 @@ export function GreetingSection({
             </Text>
           )}
 
-          <View className="mt-4 max-w-full self-start rounded-full border border-outline bg-surface-container px-3 py-1.5">
+          <View className="mt-4 max-w-full self-start rounded-full border border-border bg-surface px-3 py-1.5">
             <View className="flex-row items-center gap-1.5">
               <AppIcon
                 name={isEmpty ? "checklist" : "trending_up"}
                 size={14}
-                className="text-accent-focus"
+                className="text-accent"
                 strokeWidth={2.5}
               />
-              <Text className="flex-shrink text-[11px] font-body font-bold text-label-primary">
+              <Text className="flex-shrink text-[11px] font-body font-bold text-foreground">
                 {isEmpty
                   ? "Waiting for today’s first transaction"
                   : percentChange === 0
@@ -91,16 +91,16 @@ export function GreetingSection({
             <Pressable
               accessibilityRole="button"
               onPress={onAddSale}
-              className="flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-revenue-hero py-3"
+              className="flex-1 flex-row items-center justify-center gap-2 rounded-2xl bg-primary-strong py-3"
               style={{ minWidth: 132 }}
             >
               <AppIcon
                 name="add"
                 size={16}
-                className="text-on-primary"
+                className="text-primary-foreground"
                 strokeWidth={2.5}
               />
-              <Text className="text-[13px] font-body font-bold text-on-primary">
+              <Text className="text-[13px] font-body font-bold text-primary-foreground">
                 Add Sale
               </Text>
             </Pressable>

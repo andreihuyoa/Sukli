@@ -5,22 +5,6 @@ import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppIcon } from "./AppIcon";
 
-const colors = {
-  accent: "#5f7d67",
-  fill: "rgba(255, 248, 239, 0.92)",
-  border: "rgba(184, 179, 170, 0.75)",
-  native: "rgba(255, 248, 239, 1)",
-  active: "#31463a",
-  inactive: "#7f847d",
-  indicator: "rgba(95, 125, 103, 0.22)",
-  shadow: "#9a8f7a",
-  title: "#2f332f",
-  muted: "#747870",
-  iconOnLight: "#31463a",
-  subtleFill: "rgba(95, 125, 103, 0.1)",
-  softOutline: "rgba(215, 210, 200, 0.1)",
-};
-
 type Props = {
   onBackPress?: () => void;
 };
@@ -52,7 +36,7 @@ export function Header({ onBackPress }: Props) {
             <AppIcon
               name="arrow_back"
               size={24}
-              color={colors.iconOnLight}
+              color="#31463a"
               strokeWidth={2.25}
             />
           </Pressable>
@@ -62,7 +46,7 @@ export function Header({ onBackPress }: Props) {
             // replace this with product icon later on
             name="inventory_2"
             size={18}
-            color={colors.accent}
+            color="#5f7d67"
             strokeWidth={2.5}
           />
         </View>
@@ -128,7 +112,7 @@ const styles = StyleSheet.create({
   bar: {
     borderWidth: StyleSheet.hairlineWidth,
     borderTopWidth: 0,
-    borderColor: colors.border,
+    borderColor: "rgba(184, 179, 170, 0.75)",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
@@ -163,13 +147,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    backgroundColor: colors.subtleFill,
+    backgroundColor: "rgba(95, 125, 103, 0.1)",
   },
   title: {
     fontFamily: "Vollkorn_700Bold",
     fontSize: 30,
     letterSpacing: -0.2,
-    color: colors.title,
+    color: "#2f332f",
     flexShrink: 1,
   },
   avatar: {
@@ -179,8 +163,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 20,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.softOutline,
-    backgroundColor: colors.subtleFill,
+    borderColor: "rgba(184, 179, 170, 0.1)",
+    backgroundColor: "rgba(95, 125, 103, 0.1)",
   },
   avatarPressed: {
     opacity: 0.85,
@@ -188,6 +172,6 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 12,
     fontWeight: "700",
-    color: colors.title,
+    color: "#2f332f",
   },
 });

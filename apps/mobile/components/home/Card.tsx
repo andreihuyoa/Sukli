@@ -10,7 +10,7 @@ type Props = {
 export function Card({ children, className, style }: Props) {
   return (
     <View
-      className={`overflow-hidden rounded-2xl border border-outline bg-glass-surface ${
+      className={`overflow-hidden rounded-2xl border border-border bg-surface ${
         className ?? ""
       }`.trim()}
       style={style}

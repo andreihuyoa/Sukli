@@ -19,17 +19,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const colors = {
-  accent: "#5f7d67",
-  fill: "rgba(255, 248, 239, 0.92)",
-  border: "rgba(184, 179, 170, 0.75)",
-  native: "rgba(255, 248, 239, 1)",
-  active: "#31463a",
-  inactive: "#7f847d",
-  indicator: "rgba(95, 125, 103, 0.22)",
-  shadow: "#9a8f7a",
-};
-
 const TABS_CONTAINER_PADDING = 5;
 
 const TABS: readonly {
@@ -118,10 +107,10 @@ export function TabsNavigator() {
 function NativeLiquidGlassTabs() {
   return (
     <NativeTabs
-      tintColor={colors.accent}
-      backgroundColor={colors.native}
+      tintColor="#5f7d67"
+      backgroundColor="#fffaf2"
       // disableTransparentOnScrollEdge
-      labelStyle={{ color: colors.accent }}
+      labelStyle={{ color: "#5f7d67" }}
     >
       {TABS.map((tab) => (
         <NativeTabTrigger key={tab.key} name={tab.key}>
@@ -179,13 +168,13 @@ const NavigationTabItem: React.FC<NavigationTabItemProps> = ({
           <AppIcon
             name={meta.icon}
             size={iconSize}
-            color={focused ? colors.active : colors.inactive}
+            color={focused ? "#31463a" : "#747870"}
             strokeWidth={focused ? 2.5 : 1.8}
           />
           <Animated.Text
             style={[
               styles.tabLabel,
-              { color: focused ? colors.active : colors.inactive },
+              { color: focused ? "#31463a" : "#747870" },
             ]}
             numberOfLines={1}
           >
@@ -341,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: "transparent",
     width: "100%",
-    shadowColor: colors.shadow,
+    shadowColor: "#b8b3aa",
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.16,
     shadowRadius: 24,
@@ -351,7 +340,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: "hidden",
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: colors.border,
+    borderColor: "rgba(184, 179, 170, 0.75)",
     height: "100%", // hugs container height
     width: "100%", // hugs container width
     flexDirection: "row",
@@ -359,7 +348,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   pillAndroid: {
-    backgroundColor: colors.fill,
+    backgroundColor: "rgba(255, 250, 242, 0.92)",
   },
   tabsContainer: {
     position: "relative",
@@ -391,7 +380,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     top: "55%",
-    backgroundColor: colors.indicator,
+    backgroundColor: "rgba(95, 125, 103, 0.22)",
     zIndex: 0,
   },
   tabLabel: {

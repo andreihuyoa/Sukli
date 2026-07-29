@@ -5,105 +5,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        forest: "#5f7d67",
-        "forest-alpha-10": "rgba(95, 125, 103, 0.10)",
-        "forest-alpha-14": "rgba(95, 125, 103, 0.16)",
-        "glass-surface": "#fffaf2",
-        "screen-grouped": "#f3ede2",
-        "label-primary": "#2f332f",
-        "label-muted": "#747870",
-        "label-tertiary": "#4c6553",
-        "time-muted": "#8a8f87",
-        separator: "#ddd7cc",
-        "separator-subtle": "#ece5d9",
-        "restock-icon": "#84b96b",
-        "thumbnail-placeholder": "#efe7db",
-        "table-header-bg": "#f4ede2",
-        destructive: "#ba1a1a",
-        critical: "#6a3342",
-        "critical-soft": "rgba(106, 51, 66, 0.07)",
-        "critical-soft-12": "rgba(106, 51, 66, 0.12)",
-        "critical-border": "rgba(106, 51, 66, 0.15)",
-        "critical-bottom": "rgba(106, 51, 66, 0.35)",
-        "overlay-soft": "rgba(72, 64, 48, 0.04)",
-        "overlay-muted": "rgba(72, 64, 48, 0.08)",
-        "overlay-strong": "rgba(72, 64, 48, 0.14)",
-        "revenue-hero": "#31463a",
-        "on-hero-muted": "rgba(255, 250, 242, 0.72)",
-        "on-hero-strong": "#fffaf2",
-        "on-hero-soft": "rgba(255, 250, 242, 0.84)",
-        "on-hero-label": "rgba(255, 250, 242, 0.78)",
-        "hero-pill-bg": "rgba(255, 250, 242, 0.12)",
-        "hero-pill-border": "rgba(255, 250, 242, 0.16)",
-        "hero-cta-solid": "#dce9cf",
-        "hero-cta-ghost": "rgba(255, 250, 242, 0.08)",
-        "hero-cta-ghost-border": "rgba(255, 250, 242, 0.16)",
-        gcash: "#dcecff",
-        "gcash-icon-tile": "rgba(30, 120, 210, 0.14)",
-        "status-completed-bg": "#e6f4ea",
-        "status-completed-text": "#1f6e3b",
-        "status-completed-dot": "#2f8f4e",
-        "status-pending-bg": "#fff1d9",
-        "status-pending-text": "#8a5b12",
-        "status-pending-dot": "#f08a24",
-        "inverse-primary": "#dce9cf",
-        "surface-container-lowest": "#fffdf9",
-        "on-tertiary-container": "#d17c11",
-        "on-surface-variant": "#5b6058",
-        "outline-variant": "#d7d2c8",
-        "inverse-on-surface": "#f8f1e6",
-        "on-secondary-fixed": "#082100",
-        "on-primary-container": "#edf4e6",
-        "on-background": "#2f332f",
-        "surface-variant": "#ece5d9",
-        "surface-container-high": "#f1ebdf",
-        surface: "#f7f2e9",
-        "error-container": "#ffdad6",
-        "on-primary-fixed": "#00210a",
-        "on-tertiary": "#ffffff",
-        secondary: "#6d8a73",
-        "secondary-fixed-dim": "#dce9cf",
-        tertiary: "#f08a24",
-        "on-primary": "#fffaf2",
-        "secondary-container": "#edf4e6",
-        error: "#ba1a1a",
-        "surface-container-low": "#fbf7f0",
-        "surface-container-highest": "#ece5d9",
-        "on-primary-fixed-variant": "#31463a",
-        outline: "#b8b3aa",
-        "primary-fixed": "#e4efda",
-        "tertiary-fixed-dim": "#ffd7ab",
-        "on-tertiary-fixed": "#151f00",
-        "on-surface": "#2f332f",
-        "on-error": "#ffffff",
-        "tertiary-fixed": "#ffe8cb",
-        "surface-bright": "#fffdf9",
-        "tertiary-container": "#fff1df",
-        background: "#f7f2e9",
-        primary: "#5f7d67",
-        "inverse-surface": "#384038",
-        "primary-fixed-dim": "#dce9cf",
-        "on-secondary": "#ffffff",
-        "on-error-container": "#93000a",
-        "primary-container": "#e4efda",
-        "surface-tint": "#5f7d67",
-        "on-secondary-fixed-variant": "#31463a",
-        "on-secondary-container": "#4c6553",
-        "surface-container": "#f8f2e8",
-        "secondary-fixed": "#e9f3df",
-        "on-tertiary-fixed-variant": "#8a5b12",
-        "surface-dim": "#e6dece",
-        accent: "#8fcf72",
-        "accent-focus": "#7b61ff",
-        "accent-focus-soft": "#f2ecff",
-        "accent-focus-border": "#d8cef8",
-        "accent-info": "#2f9cf5",
-        "accent-info-soft": "#e8f4ff",
-        "accent-info-border": "#b9daf8",
-        "accent-warn": "#ff8a1d",
-        "accent-warn-soft": "#fff1df",
-        "accent-warn-border": "#ffd0a3",
-        "surface-raised": "#fff8ef",
+        // Surfaces
+        background: "#f3ede2", // app background (was screen-grouped)
+        surface: "#fffaf2", // cards, sheets, inputs (was glass-surface / surface-container*)
+        "surface-muted": "#f4ede2", // table headers, subtle fills (was table-header-bg)
+
+        // Text
+        foreground: "#2f332f", // primary text (was label-primary / on-surface / on-background)
+        "muted-foreground": "#747870", // secondary/meta text (was label-muted / time-muted / on-surface-variant)
+
+        // Structure
+        border: "#b8b3aa", // default border (was outline) — use border/40 etc. for subtle dividers, replaces separator*
+
+        // Brand
+        primary: "#5f7d67", // was forest
+        "primary-foreground": "#fffaf2", // text/icons on primary (was on-primary)
+        "primary-strong": "#31463a", // hero/emphasis surface, e.g. revenue card (was revenue-hero)
+
+        // Secondary accent (focus panels, highlights)
+        accent: "#7b61ff", // was accent-focus
+        "accent-foreground": "#fffaf2",
+
+        // Status (reduced to 3)
+        success: "#2f8f4e", // completed, in-stock, optimal (was status-completed-* / restock-icon)
+        warning: "#f08a24", // pending, low stock (was status-pending-* / accent-warn* / tertiary)
+        destructive: "#ba1a1a", // errors, critical, delete actions (was destructive / error / critical*)
       },
       fontFamily: {
         headline: ["Vollkorn_800ExtraBold", "Vollkorn_700Bold", "System"],

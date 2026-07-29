@@ -19,16 +19,16 @@ export function SectionEmptyState({
 }: Props) {
   const toneMap = {
     forest: {
-      iconClassName: "text-forest",
-      iconSurfaceClassName: "bg-forest-alpha-14",
+      iconClassName: "text-primary",
+      iconSurfaceClassName: "bg-primary/14",
     },
     info: {
-      iconClassName: "text-accent-info",
-      iconSurfaceClassName: "bg-accent-info-soft",
+      iconClassName: "text-accent",
+      iconSurfaceClassName: "bg-accent/10",
     },
     warn: {
-      iconClassName: "text-accent-warn",
-      iconSurfaceClassName: "bg-accent-warn-soft",
+      iconClassName: "text-warning",
+      iconSurfaceClassName: "bg-warning/12",
     },
   } as const;
 
@@ -48,10 +48,10 @@ export function SectionEmptyState({
           strokeWidth={2.25}
         />
       </View>
-      <Text className="text-sm font-body-semibold text-label-primary">
+      <Text className="text-sm font-body-semibold text-foreground">
         {title}
       </Text>
-      <Text className="mt-1 max-w-[240px] text-center text-[12px] font-body-medium leading-4 text-label-muted">
+      <Text className="mt-1 max-w-[240px] text-center text-[12px] font-body-medium leading-4 text-muted-foreground">
         {body}
       </Text>
     </View>

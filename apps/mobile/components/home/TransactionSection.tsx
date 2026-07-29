@@ -15,15 +15,15 @@ import { router } from "expo-router";
 
 const statusConfig = {
   completed: {
-    badgeClassName: "bg-status-completed-bg",
-    dotClassName: "bg-status-completed-dot",
-    textClassName: "text-status-completed-text",
+    badgeClassName: "bg-success/12",
+    dotClassName: "bg-success",
+    textClassName: "text-success",
     label: "Completed",
   },
   pending: {
-    badgeClassName: "bg-status-pending-bg",
-    dotClassName: "bg-status-pending-dot",
-    textClassName: "text-status-pending-text",
+    badgeClassName: "bg-warning/12",
+    dotClassName: "bg-warning",
+    textClassName: "text-warning",
     label: "Pending",
   },
 } as const;
@@ -54,23 +54,23 @@ function WeeklyTrendCard(props: {
       <Card className="p-4 pb-2">
         <View className="mb-4 flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1 flex-row items-center gap-2">
-            <View className="h-7 w-7 items-center justify-center rounded-lg bg-forest-alpha-14">
+            <View className="h-7 w-7 items-center justify-center rounded-lg bg-primary/14">
               <AppIcon
                 name="check"
                 size={14}
-                className="text-forest"
+                className="text-primary"
                 strokeWidth={2.5}
               />
             </View>
             <Text
               numberOfLines={1}
-              className="flex-1 text-[10px] font-label font-bold uppercase tracking-widest text-label-muted"
+              className="flex-1 text-[10px] font-label font-bold uppercase tracking-widest text-muted-foreground"
             >
               Weekly Trend
             </Text>
           </View>
-          <View className="flex-shrink-0 rounded-lg border border-outline bg-surface-container px-3 py-1">
-            <Text className="text-[10px] font-label font-bold uppercase tracking-[0.14em] text-label-primary">
+          <View className="flex-shrink-0 rounded-lg border border-border bg-surface px-3 py-1">
+            <Text className="text-[10px] font-label font-bold uppercase tracking-[0.14em] text-foreground">
               This Week
             </Text>
           </View>
@@ -100,25 +100,25 @@ function WeeklyTrendCard(props: {
           />
         )}
 
-        <View className="flex-row items-center justify-between gap-3 border-t border-separator pt-3 pb-1">
+        <View className="flex-row items-center justify-between gap-3 border-t border-border/40 pt-3 pb-1">
           <View className="min-w-0 flex-1">
-            <Text className="text-[11px] font-body font-medium text-label-muted">
+            <Text className="text-[11px] font-body font-medium text-muted-foreground">
               Weekly Total
             </Text>
             <Text
               numberOfLines={1}
-              className="text-sm font-headline font-bold text-label-primary"
+              className="text-sm font-headline font-bold text-foreground"
             >
               {weeklyTotalDisplay}
             </Text>
           </View>
           <View className="min-w-0 flex-1 items-end">
-            <Text className="text-[11px] font-body font-medium text-label-muted">
+            <Text className="text-[11px] font-body font-medium text-muted-foreground">
               Daily Avg
             </Text>
             <Text
               numberOfLines={1}
-              className="text-sm font-headline font-bold text-label-primary"
+              className="text-sm font-headline font-bold text-foreground"
             >
               {dailyAvgDisplay}
             </Text>
@@ -143,18 +143,18 @@ function RestockAlertsCard(props: {
             <AppIcon
               name="warning"
               size={16}
-              className="text-restock-icon"
+              className="text-success"
               strokeWidth={2.5}
             />
             <Text
               numberOfLines={2}
-              className="flex-1 text-base font-body font-bold text-label-primary"
+              className="flex-1 text-base font-body font-bold text-foreground"
             >
               Restock Required
             </Text>
           </View>
-          <View className="flex-shrink-0 rounded-full border border-accent-warn-border bg-status-pending-bg px-3 py-1">
-            <Text className="text-[11px] font-body font-bold text-status-pending-text">
+          <View className="flex-shrink-0 rounded-full border border-warning/30 bg-warning/12 px-3 py-1">
+            <Text className="text-[11px] font-body font-bold text-warning">
               {alerts.length} Alerts
             </Text>
           </View>
@@ -180,10 +180,10 @@ function RestockAlertsCard(props: {
           <View>
             {alerts.map((item, index) => (
               <View key={item.id}>
-                {index > 0 ? <View className="mx-4 h-px bg-separator" /> : null}
+                {index > 0 ? <View className="mx-4 h-px bg-border/40" /> : null}
                 <View className="gap-3 px-4 py-3">
                   <View className="flex-row items-center gap-3">
-                    <View className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl bg-thumbnail-placeholder">
+                    <View className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl bg-surface-muted">
                       <ImageWithFallback
                         src={item.imageUrl}
                         alt={item.name}
@@ -193,7 +193,7 @@ function RestockAlertsCard(props: {
                     <View className="min-w-0 flex-1">
                       <Text
                         numberOfLines={1}
-                        className="text-[15px] font-body-semibold text-label-primary"
+                        className="text-[15px] font-body-semibold text-foreground"
                       >
                         {item.name}
                       </Text>
@@ -202,10 +202,10 @@ function RestockAlertsCard(props: {
                           className={`h-2 w-2 rounded-full ${
                             item.urgency === "critical"
                               ? "bg-destructive"
-                              : "bg-restock-icon"
+                              : "bg-success"
                           }`}
                         />
-                        <Text className="text-[11px] font-body font-medium text-label-muted">
+                        <Text className="text-[11px] font-body font-medium text-muted-foreground">
                           {item.unitsLeft} units left · {item.variant}
                         </Text>
                       </View>
@@ -214,15 +214,15 @@ function RestockAlertsCard(props: {
 
                   <Pressable
                     accessibilityRole="button"
-                    className="self-start flex-row items-center gap-1 rounded-xl border border-accent-warn-border bg-accent-warn-soft px-3 py-2"
+                    className="self-start flex-row items-center gap-1 rounded-xl border border-warning/30 bg-warning/12 px-3 py-2"
                   >
-                    <Text className="text-xs font-body font-bold text-accent-warn">
+                    <Text className="text-xs font-body font-bold text-warning">
                       Quick Reorder
                     </Text>
                     <AppIcon
                       name="chevron_right"
                       size={12}
-                      className="text-accent-warn"
+                      className="text-warning"
                       strokeWidth={2.5}
                     />
                   </Pressable>
@@ -234,15 +234,15 @@ function RestockAlertsCard(props: {
 
         <Pressable
           accessibilityRole="button"
-          className="mt-1 w-full flex-row items-center justify-center gap-2 border-t border-separator py-3"
+          className="mt-1 w-full flex-row items-center justify-center gap-2 border-t border-border/40 py-3"
         >
-          <Text className="text-sm font-body font-bold text-revenue-hero">
+          <Text className="text-sm font-body font-bold text-primary-strong">
             View All Stock Alerts
           </Text>
           <AppIcon
             name="chevron_right"
             size={14}
-            className="text-revenue-hero"
+            className="text-primary-strong"
             strokeWidth={2.5}
           />
         </Pressable>
@@ -257,7 +257,7 @@ function Avatar({ initials, color }: { initials: string; color: string }) {
       className="h-9 w-9 flex-shrink-0 items-center justify-center rounded-full"
       style={{ backgroundColor: color }}
     >
-      <Text className="text-[11px] font-body font-bold text-on-primary">
+      <Text className="text-[11px] font-body font-bold text-primary-foreground">
         {initials}
       </Text>
     </View>
@@ -277,7 +277,7 @@ function RecentTransactionsCard(props: {
         <View className="flex-row items-center justify-between px-4 pt-4 pb-3">
           <Text
             numberOfLines={2}
-            className="min-w-0 flex-1 text-label-primary"
+            className="min-w-0 flex-1 text-foreground"
             style={{ fontSize: 16, fontWeight: "700" }}
           >
             Latest Sales
@@ -288,26 +288,26 @@ function RecentTransactionsCard(props: {
             style={{ gap: 4 }}
             onPress={() => router.push({ pathname: "/sales" })}
           >
-            <Text className="text-sm font-body font-bold text-revenue-hero">
+            <Text className="text-sm font-body font-bold text-primary-strong">
               View All
             </Text>
             <AppIcon
               name="chevron_right"
               size={14}
-              className="text-revenue-hero"
+              className="text-primary-strong"
               strokeWidth={2.5}
             />
           </Pressable>
         </View>
 
-        <View className="flex-row items-center bg-table-header-bg px-4 py-2">
-          <Text className="flex-1 text-[10px] font-label font-bold uppercase text-label-muted">
+        <View className="flex-row items-center bg-surface-muted px-4 py-2">
+          <Text className="flex-1 text-[10px] font-label font-bold uppercase text-muted-foreground">
             Sale
           </Text>
-          <Text className="w-16 text-center text-[10px] font-label font-bold uppercase text-label-muted">
+          <Text className="w-16 text-center text-[10px] font-label font-bold uppercase text-muted-foreground">
             Items
           </Text>
-          <Text className="w-24 text-right text-[10px] font-label font-bold uppercase text-label-muted">
+          <Text className="w-24 text-right text-[10px] font-label font-bold uppercase text-muted-foreground">
             Amount
           </Text>
         </View>
@@ -333,28 +333,28 @@ function RecentTransactionsCard(props: {
               return (
                 <View key={tx.id}>
                   {index > 0 ? (
-                    <View className="mx-4 h-px bg-separator-subtle" />
+                    <View className="mx-4 h-px bg-border/20" />
                   ) : null}
                   <View className="flex-row items-center gap-3 px-4 py-3">
                     <Avatar initials={tx.initials} color={tx.avatarColor} />
                     <View className="min-w-0 flex-1">
                       <Text
                         numberOfLines={1}
-                        className="text-sm font-body-semibold text-label-primary"
+                        className="text-sm font-body-semibold text-foreground"
                       >
                         {tx.customerName}
                       </Text>
-                      <Text className="text-xs font-body font-medium text-time-muted">
+                      <Text className="text-xs font-body font-medium text-muted-foreground">
                         {tx.timeDisplay}
                       </Text>
                     </View>
                     <View className="w-16 items-center">
-                      <Text className="text-xs font-body font-bold text-label-tertiary">
+                      <Text className="text-xs font-body font-bold text-muted-foreground">
                         {tx.itemCount} {tx.itemCount === 1 ? "item" : "items"}
                       </Text>
                     </View>
                     <View className="w-24 items-end">
-                      <Text className="text-xs font-body font-bold text-label-primary">
+                      <Text className="text-xs font-body font-bold text-foreground">
                         {tx.amountDisplay}
                       </Text>
                       <View
@@ -377,16 +377,16 @@ function RecentTransactionsCard(props: {
           </View>
         )}
 
-        <View className="flex-row items-center justify-between gap-3 border-t border-separator px-4 py-3">
-          <Text className="min-w-0 flex-1 text-xs font-body font-medium text-label-muted">
+        <View className="flex-row items-center justify-between gap-3 border-t border-border/40 px-4 py-3">
+          <Text className="min-w-0 flex-1 text-xs font-body font-medium text-muted-foreground">
             {totalToday > 0
               ? `Showing ${transactions.length} of ${totalToday} sales today`
               : isEmpty
                 ? "Complete a sale to show live transactions here"
                 : "No sales recorded today"}
           </Text>
-          <View className="flex-shrink-0 items-center rounded-lg border border-outline bg-surface-container px-2 py-1">
-            <Text className="text-xs font-body font-bold text-label-primary">
+          <View className="flex-shrink-0 items-center rounded-lg border border-border bg-surface px-2 py-1">
+            <Text className="text-xs font-body font-bold text-foreground">
               Today
             </Text>
           </View>

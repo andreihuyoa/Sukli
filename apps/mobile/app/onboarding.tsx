@@ -203,23 +203,23 @@ export default function OnboardingScreen() {
 
   return (
     <View
-      className="flex-1 bg-screen-grouped px-5"
+      className="flex-1 bg-background px-5"
       style={{ paddingTop: insets.top + 32, paddingBottom: insets.bottom + 24 }}
     >
       <View className="mb-6">
-        <Text className="mt-2 font-headline text-[32px] leading-9 text-label-primary">
+        <Text className="mt-2 font-headline text-[32px] leading-9 text-foreground">
           {stepTitle}
         </Text>
         {stepDescription ? (
-          <Text className="mt-2 text-[14px] font-body-medium leading-5 text-label-muted">
+          <Text className="mt-2 text-[14px] font-body-medium leading-5 text-muted-foreground">
             {stepDescription}
           </Text>
         ) : null}
       </View>
 
-      <View className="mb-6 h-2 overflow-hidden rounded-full bg-surface-container">
+      <View className="mb-6 h-2 overflow-hidden rounded-full bg-surface">
         <View
-          className="h-full rounded-full bg-accent-focus"
+          className="h-full rounded-full bg-accent"
           style={{ width: `${(step / lastStep) * 100}%` }}
         />
       </View>
@@ -233,7 +233,7 @@ export default function OnboardingScreen() {
                   S
                 </Text>
               </View>
-              <Text className="font-headline-regular text-[22px] leading-8 text-label-primary">
+              <Text className="font-headline-regular text-[22px] leading-8 text-foreground">
                 <Text className="font-headline text-[28px] text-primary">
                   Sukli
                 </Text>{" "}
@@ -243,38 +243,38 @@ export default function OnboardingScreen() {
               </Text>
               <View className="gap-3">
                 <View className="flex-row items-start gap-3">
-                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-outline bg-surface-container">
+                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-border bg-surface">
                     <AppIcon
                       name="inventory_2"
                       size={18}
-                      className="text-accent-focus"
+                      className="text-accent"
                     />
                   </View>
-                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-label-muted">
+                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-muted-foreground">
                     Track stock levels and know what needs restocking.
                   </Text>
                 </View>
                 <View className="flex-row items-start gap-3">
-                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-outline bg-surface-container">
+                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-border bg-surface">
                     <AppIcon
                       name="receipt_long"
                       size={18}
-                      className="text-accent-focus"
+                      className="text-accent"
                     />
                   </View>
-                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-label-muted">
+                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-muted-foreground">
                     Record sales quickly and review how your day is going.
                   </Text>
                 </View>
                 <View className="flex-row items-start gap-3">
-                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-outline bg-surface-container">
+                  <View className="mt-0.5 h-9 w-9 items-center justify-center rounded-2xl border border-border bg-surface">
                     <AppIcon
                       name="smartphone"
                       size={18}
-                      className="text-accent-focus"
+                      className="text-accent"
                     />
                   </View>
-                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-label-muted">
+                  <Text className="flex-1 text-[16px] font-body-medium leading-6 text-muted-foreground">
                     Keep everything on this device so you can work without a
                     connection.
                   </Text>
@@ -287,7 +287,7 @@ export default function OnboardingScreen() {
             <View className="gap-3">
               <TextInput
                 autoCapitalize="sentences"
-                className="rounded-2xl border border-outline bg-glass-surface px-4 py-4 text-[18px] font-body-semibold text-label-primary"
+                className="rounded-2xl border border-border bg-surface px-4 py-4 text-[18px] font-body-semibold text-foreground"
                 onChangeText={setStoreName}
                 placeholder="Store name"
                 placeholderTextColor="#8a8f87"
@@ -301,7 +301,7 @@ export default function OnboardingScreen() {
               <Pressable
                 accessibilityRole="button"
                 onPress={pickIcon}
-                className="h-44 items-center justify-center overflow-hidden rounded-3xl border border-outline bg-glass-surface"
+                className="h-44 items-center justify-center overflow-hidden rounded-3xl border border-border bg-surface"
               >
                 {iconUri ? (
                   <Image source={{ uri: iconUri }} className="h-full w-full" />
@@ -310,9 +310,9 @@ export default function OnboardingScreen() {
                     <AppIcon
                       name="photo_library"
                       size={30}
-                      className="text-accent-focus"
+                      className="text-accent"
                     />
-                    <Text className="text-[15px] font-body-semibold text-label-primary">
+                    <Text className="text-[15px] font-body-semibold text-foreground">
                       Choose image
                     </Text>
                   </View>
@@ -325,24 +325,24 @@ export default function OnboardingScreen() {
             <View className="gap-3">
               <TextInput
                 autoCapitalize="words"
-                className="rounded-2xl border border-outline bg-glass-surface px-4 py-4 text-[18px] font-body-semibold text-label-primary"
+                className="rounded-2xl border border-border bg-surface px-4 py-4 text-[18px] font-body-semibold text-foreground"
                 onChangeText={setDisplayName}
                 placeholder="Display name"
                 placeholderTextColor="#8a8f87"
                 value={displayName}
               />
-              <Text className="mt-2 text-[17px] font-body-semibold text-label-primary">
+              <Text className="mt-2 text-[17px] font-body-semibold text-foreground">
                 Tax rate (%)
               </Text>
               <TextInput
                 keyboardType="decimal-pad"
-                className="rounded-2xl border border-outline bg-glass-surface px-4 py-4 text-[18px] font-body-semibold text-label-primary"
+                className="rounded-2xl border border-border bg-surface px-4 py-4 text-[18px] font-body-semibold text-foreground"
                 onChangeText={setTaxRatePercent}
                 placeholder="12"
                 placeholderTextColor="#8a8f87"
                 value={taxRatePercent}
               />
-              <Text className="text-[12px] font-body-medium text-label-muted">
+              <Text className="text-[12px] font-body-medium text-muted-foreground">
                 Use 12 for 12%, or 0 for no tax.
               </Text>
             </View>
@@ -381,7 +381,7 @@ export default function OnboardingScreen() {
         totalSteps={lastStep}
       />
 
-      {/* <Text className="mt-4 text-center text-[12px] font-body-medium text-label-muted">
+      {/* <Text className="mt-4 text-center text-[12px] font-body-medium text-muted-foreground">
         Swipe left for next · Swipe right to go back
         {step === lastStep ? " · Swipe again to finish" : ""}
       </Text> */}
@@ -424,9 +424,9 @@ function StepDots({
             <View
               className={`rounded-full ${
                 isActive
-                  ? "h-2.5 w-8 bg-accent-focus"
+                  ? "h-2.5 w-8 bg-accent"
                   : isComplete
-                    ? "h-2.5 w-2.5 bg-forest"
+                    ? "h-2.5 w-2.5 bg-primary"
                     : "h-2.5 w-2.5 bg-outline"
               }`}
             />
@@ -439,9 +439,9 @@ function StepDots({
           accessibilityLabel="Finish setup"
           disabled={disabled}
           onPress={() => onSelectStep(totalSteps)}
-          className="ml-1 rounded-full border border-accent-focus-border bg-accent-focus-soft px-3 py-1 disabled:opacity-40"
+          className="ml-1 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 disabled:opacity-40"
         >
-          <Text className="text-[11px] font-label uppercase tracking-[0.14em] text-accent-focus">
+          <Text className="text-[11px] font-label uppercase tracking-[0.14em] text-accent">
             Done
           </Text>
         </Pressable>

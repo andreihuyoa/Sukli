@@ -11,7 +11,7 @@ export default function DashboardScreen() {
   const { dashboard, error, isEmpty, isLoading } = useHomeDashboard();
 
   return (
-    <View className="flex-1 bg-screen-grouped">
+    <View className="flex-1 bg-background">
       <Header />
       <ScreenShell bottomExtra={2}>
         <View className="gap-4">
