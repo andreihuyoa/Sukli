@@ -14,7 +14,6 @@ export type SetupProfile = {
   iconUri: string | null;
   displayName: string;
   currency: string;
-  taxRate: number;
   setupCompleted: boolean;
   updatedAt: Date;
 };
@@ -23,7 +22,6 @@ export type SetupProfileInput = {
   storeName: string;
   iconUri: string | null;
   displayName: string;
-  taxRate: number;
   currency?: string;
 };
 
@@ -71,7 +69,6 @@ export function saveSetupProfile(
         iconUri: value.iconUri,
         displayName: value.displayName,
         currency: value.currency,
-        taxRate: value.taxRate,
         setupCompleted: true,
         createdAt: now,
         updatedAt: now,
@@ -83,7 +80,6 @@ export function saveSetupProfile(
           iconUri: value.iconUri,
           displayName: value.displayName,
           currency: value.currency,
-          taxRate: value.taxRate,
           setupCompleted: true,
           updatedAt: now,
         },
@@ -113,7 +109,6 @@ function normalizeSetupProfile(
   const displayName = input.displayName.trim();
   const iconUri = input.iconUri?.trim() || null;
   const currency = input.currency?.trim() || DEFAULT_CURRENCY;
-  const taxRate = input.taxRate;
 
   if (!storeName) {
     throw new Error("Store name is required.");
@@ -123,15 +118,10 @@ function normalizeSetupProfile(
     throw new Error("Display name is required.");
   }
 
-  if (!Number.isFinite(taxRate) || taxRate < 0) {
-    throw new Error("Tax rate must be zero or greater.");
-  }
-
   return {
     storeName,
     iconUri,
     displayName,
-    taxRate,
     currency,
   };
 }
@@ -143,7 +133,6 @@ function mapSetupProfile(_db: Db, row: StoreProfile): SetupProfile {
     iconUri: row.iconUri,
     displayName: row.displayName,
     currency: row.currency,
-    taxRate: row.taxRate,
     setupCompleted: row.setupCompleted,
     updatedAt: row.updatedAt,
   };

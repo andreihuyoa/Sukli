@@ -1,5 +1,4 @@
 import { FlashList } from "@shopify/flash-list";
-import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,7 +8,6 @@ import { ImageWithFallback } from "@/components/media/ImageWithFallback";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { ScreenShell } from "@/components/ui/ScreenShell";
 import { usePosCatalog } from "@/lib/hooks/api/catalog/usePosCatalog";
-import { useStoreTaxRate } from "@/lib/hooks/api/store/useStoreTaxRate";
 import { POS_ALL_CATEGORY, type PosProduct } from "@/lib/types/api/catalog";
 
 const TAB_BAR = 88;
@@ -19,7 +17,7 @@ interface PosCartLine {
   qty: number;
 }
 
-function useCart(taxRate: number) {
+function useCart() {
   const [items, setItems] = useState<PosCartLine[]>([]);
 
   const add = (product: PosProduct) => {
@@ -55,18 +53,12 @@ function useCart(taxRate: number) {
     0
   );
   const count = items.reduce((sum, item) => sum + item.qty, 0);
-  const tax = total * taxRate;
 
-  return { items, add, remove, clear, qty, total, tax, count };
+  return { items, add, remove, clear, qty, total, count };
 }
 
 export default function SalesPOSScreen() {
   const { products } = usePosCatalog();
-  const {
-    taxRate,
-    isLoading: isTaxLoading,
-    error: taxError,
-  } = useStoreTaxRate();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] =
     useState<string>(POS_ALL_CATEGORY);
@@ -74,7 +66,7 @@ export default function SalesPOSScreen() {
   const [checkoutDone, setCheckoutDone] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const cart = useCart(taxRate ?? Number.NaN);
+  const cart = useCart();
 
   const categories = useMemo(() => {
     const unique = [
@@ -106,44 +98,6 @@ export default function SalesPOSScreen() {
       setCheckoutDone(false);
     }, 1800);
   };
-
-  if (isTaxLoading) {
-    return (
-      <View className="flex-1 bg-background items-center justify-center px-6">
-        <Text className="text-sm font-body-medium text-muted-foreground text-center">
-          Loading store tax configuration...
-        </Text>
-      </View>
-    );
-  }
-
-  if (taxRate === null || taxError) {
-    return (
-      <View className="flex-1 bg-background px-4 pt-10">
-        <View className="rounded-2xl border border-warning/30 bg-warning/12 p-4">
-          <Text className="text-base font-body-semibold text-foreground">
-            Sales is blocked
-          </Text>
-          <Text className="mt-1 text-sm font-body text-muted-foreground">
-            {taxError ??
-              "Tax configuration is missing. Please update setup before using sales."}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Open setup"
-            onPress={() =>
-              router.push({ pathname: "/onboarding", params: { mode: "edit" } })
-            }
-            className="mt-4 rounded-xl bg-primary-strong px-4 py-3 items-center"
-          >
-            <Text className="text-sm font-label text-primary-foreground">
-              Open Setup
-            </Text>
-          </Pressable>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View className="flex-1 bg-background">
@@ -378,21 +332,13 @@ export default function SalesPOSScreen() {
                       ₱{cart.total.toLocaleString("en-PH")}
                     </Text>
                   </View>
-                  <View className="mb-3 flex-row items-center justify-between">
-                    <Text className="text-[13px] font-body-medium text-muted-foreground">
-                      Tax ({Math.round(taxRate * 100)}%)
-                    </Text>
-                    <Text className="text-[13px] font-body-semibold text-foreground">
-                      ₱{cart.tax.toFixed(2)}
-                    </Text>
-                  </View>
                   <View className="flex-row items-center justify-between border-t border-border/40 pt-2">
                     <Text className="text-base font-label text-primary">
                       Total Amount
                     </Text>
                     <Text className="text-[22px] font-black text-primary">
                       ₱
-                      {(cart.total + cart.tax).toLocaleString("en-PH", {
+                      {cart.total.toLocaleString("en-PH", {
                         minimumFractionDigits: 2,
                       })}
                     </Text>

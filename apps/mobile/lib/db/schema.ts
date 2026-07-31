@@ -42,7 +42,6 @@ export const storeProfiles = sqliteTable("store_profiles", {
   iconUri: text("icon_uri"),
   displayName: text("display_name").notNull(),
   currency: text("currency").notNull(),
-  taxRate: real("tax_rate").notNull(),
   setupCompleted: integer("setup_completed", { mode: "boolean" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" }).notNull(),
@@ -182,7 +181,6 @@ export const saleOrders = sqliteTable(
     }).notNull(),
     totalAmount: real("total_amount").notNull(),
     discountAmount: real("discount_amount").notNull(),
-    taxAmount: real("tax_amount").notNull(),
     paymentMethod: text("payment_method", {
       enum: ["cash", "card", "gcash", "maya", "credit", "other"],
     }),

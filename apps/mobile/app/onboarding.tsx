@@ -37,7 +37,6 @@ export default function OnboardingScreen() {
       storeName: profile?.storeName ?? "",
       iconUri: profile?.iconUri ?? null,
       displayName: profile?.displayName ?? "",
-      taxRatePercent: profile ? formatTaxRatePercent(profile.taxRate) : "12",
     };
   }, []);
   const isLoading = false;
@@ -48,9 +47,6 @@ export default function OnboardingScreen() {
     initialSetupState.iconUri
   );
   const [displayName, setDisplayName] = useState(initialSetupState.displayName);
-  const [taxRatePercent, setTaxRatePercent] = useState(
-    initialSetupState.taxRatePercent
-  );
   const [isSaving, setIsSaving] = useState(false);
 
   const lastStep = isEditMode ? 3 : 4;
@@ -74,21 +70,10 @@ export default function OnboardingScreen() {
         Alert.alert("Display name required", "Enter your display name.");
         return false;
       }
-      if (!isValidTaxRatePercent(taxRatePercent)) {
-        Alert.alert("Invalid tax rate", "Tax rate must be zero or greater.");
-        return false;
-      }
     }
 
     return true;
-  }, [
-    displayName,
-    isProfileStep,
-    isStoreNameStep,
-    isWelcomeStep,
-    storeName,
-    taxRatePercent,
-  ]);
+  }, [displayName, isProfileStep, isStoreNameStep, isWelcomeStep, storeName]);
 
   const finishSetup = useCallback(async () => {
     const db = getDb();
@@ -97,12 +82,10 @@ export default function OnboardingScreen() {
     setIsSaving(true);
 
     try {
-      const taxRate = parseTaxRatePercentToDecimal(taxRatePercent);
       saveSetupProfile(db, userId, {
         storeName,
         iconUri,
         displayName,
-        taxRate,
       });
       router.replace("/(tabs)");
     } catch (error) {
@@ -113,7 +96,7 @@ export default function OnboardingScreen() {
     } finally {
       setIsSaving(false);
     }
-  }, [displayName, iconUri, storeName, taxRatePercent]);
+  }, [displayName, iconUri, storeName]);
 
   const goNext = useCallback(() => {
     if (!validateCurrentStep()) {
@@ -331,20 +314,6 @@ export default function OnboardingScreen() {
                 placeholderTextColor="#8a8f87"
                 value={displayName}
               />
-              <Text className="mt-2 text-[17px] font-body-semibold text-foreground">
-                Tax rate (%)
-              </Text>
-              <TextInput
-                keyboardType="decimal-pad"
-                className="rounded-2xl border border-border bg-surface px-4 py-4 text-[18px] font-body-semibold text-foreground"
-                onChangeText={setTaxRatePercent}
-                placeholder="12"
-                placeholderTextColor="#8a8f87"
-                value={taxRatePercent}
-              />
-              <Text className="text-[12px] font-body-medium text-muted-foreground">
-                Use 12 for 12%, or 0 for no tax.
-              </Text>
             </View>
           ) : null}
         </View>
@@ -462,7 +431,7 @@ function getOnboardingStepTitle(step: number, isEditMode: boolean): string {
       case 2:
         return "Store icon";
       case 3:
-        return "Display name & tax";
+        return "Display name";
       default:
         return "Setup";
     }
@@ -474,7 +443,7 @@ function getOnboardingStepTitle(step: number, isEditMode: boolean): string {
     case 3:
       return "Store icon";
     case 4:
-      return "Display name & tax";
+      return "Display name";
     default:
       return "Setup";
   }
@@ -495,7 +464,7 @@ function getOnboardingStepDescription(
       case 2:
         return "Choose a square image for your store. You can skip this and add one later.";
       case 3:
-        return "Set how you appear on sales and the default tax rate for new transactions.";
+        return "Set how you appear on sales and reports.";
       default:
         return null;
     }
@@ -507,26 +476,8 @@ function getOnboardingStepDescription(
     case 3:
       return "Choose a square image for your store. You can skip this and add one later.";
     case 4:
-      return "Set how you appear on sales and the default tax rate for new transactions.";
+      return "Set how you appear on sales and reports.";
     default:
       return null;
   }
-}
-
-function isValidTaxRatePercent(raw: string): boolean {
-  const value = Number(raw.trim());
-  return Number.isFinite(value) && value >= 0;
-}
-
-function parseTaxRatePercentToDecimal(raw: string): number {
-  const value = Number(raw.trim());
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error("Tax rate must be zero or greater.");
-  }
-  return value / 100;
-}
-
-function formatTaxRatePercent(decimalTaxRate: number): string {
-  const percent = decimalTaxRate * 100;
-  return Number.isInteger(percent) ? String(percent) : percent.toFixed(2);
 }

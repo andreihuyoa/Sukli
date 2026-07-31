@@ -39,7 +39,6 @@ export function buildHomeSalesQuery(db: Db, from: Date, to: Date) {
       status: saleOrders.status,
       paymentMethod: saleOrders.paymentMethod,
       totalAmount: saleOrders.totalAmount,
-      taxAmount: saleOrders.taxAmount,
       createdAt: saleOrders.createdAt,
       itemId: saleOrderItems.id,
       itemQuantity: saleOrderItems.quantity,

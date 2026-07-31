@@ -219,9 +219,19 @@ export const migrations: DrizzleMigrations = {
         tag: "0000_initial_schema",
         breakpoints: true,
       },
+      {
+        idx: 1,
+        when: 1785460000000,
+        tag: "0001_drop_tax_columns",
+        breakpoints: true,
+      },
     ],
   },
   migrations: {
     m0000: baseSchemaSql,
+    m0001: `
+ALTER TABLE \`store_profiles\` DROP COLUMN \`tax_rate\`;
+ALTER TABLE \`sale_orders\` DROP COLUMN \`tax_amount\`;
+`.trim(),
   },
 };
