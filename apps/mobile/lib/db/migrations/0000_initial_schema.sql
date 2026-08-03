@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `store_profiles` (
   `icon_uri`        TEXT,
   `display_name`    TEXT NOT NULL,
   `currency`        TEXT NOT NULL,
-  `tax_rate`        REAL NOT NULL,
   `setup_completed` INTEGER NOT NULL,
   `created_at`      INTEGER NOT NULL,
   `updated_at`      INTEGER NOT NULL
@@ -103,7 +102,6 @@ CREATE TABLE IF NOT EXISTS `sale_orders` (
   `status`          TEXT NOT NULL CHECK (`status` IN ('draft','completed','voided')),
   `total_amount`    REAL NOT NULL,
   `discount_amount` REAL NOT NULL,
-  `tax_amount`      REAL NOT NULL,
   `payment_method`  TEXT CHECK (`payment_method` IN ('cash','card','gcash','maya','credit','other')),
   `cashier_id`      TEXT REFERENCES `users`(`id`),
   `operation_id`    TEXT NOT NULL UNIQUE,

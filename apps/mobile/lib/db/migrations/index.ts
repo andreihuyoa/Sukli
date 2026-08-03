@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS \`store_profiles\` (
   \`icon_uri\`        TEXT,
   \`display_name\`    TEXT NOT NULL,
   \`currency\`        TEXT NOT NULL,
-  \`tax_rate\`        REAL NOT NULL,
   \`setup_completed\` INTEGER NOT NULL,
   \`created_at\`      INTEGER NOT NULL,
   \`updated_at\`      INTEGER NOT NULL
@@ -117,7 +116,6 @@ CREATE TABLE IF NOT EXISTS \`sale_orders\` (
   \`status\`          TEXT NOT NULL CHECK (\`status\` IN ('draft','completed','voided')),
   \`total_amount\`    REAL NOT NULL,
   \`discount_amount\` REAL NOT NULL,
-  \`tax_amount\`      REAL NOT NULL,
   \`payment_method\`  TEXT CHECK (\`payment_method\` IN ('cash','card','gcash','maya','credit','other')),
   \`cashier_id\`      TEXT REFERENCES \`users\`(\`id\`),
   \`operation_id\`    TEXT NOT NULL UNIQUE,
@@ -219,19 +217,9 @@ export const migrations: DrizzleMigrations = {
         tag: "0000_initial_schema",
         breakpoints: true,
       },
-      {
-        idx: 1,
-        when: 1785460000000,
-        tag: "0001_drop_tax_columns",
-        breakpoints: true,
-      },
     ],
   },
   migrations: {
     m0000: baseSchemaSql,
-    m0001: `
-ALTER TABLE \`store_profiles\` DROP COLUMN \`tax_rate\`;
-ALTER TABLE \`sale_orders\` DROP COLUMN \`tax_amount\`;
-`.trim(),
   },
 };
